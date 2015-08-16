@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="WebViewController" customModule="Resnate" customModuleProvider="target">
+            <connections>
+                <outlet property="backArrow" destination="EwT-ra-YSr" id="4Ym-Cj-fqO"/>
+                <outlet property="forwardArrow" destination="edD-No-cqP" id="Cke-bw-K2M"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+                <outlet property="webView" destination="uQB-Nr-SnR" id="Gg9-1S-qjn"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uQB-Nr-SnR">
+                    <rect key="frame" x="0.0" y="55" width="320" height="513"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </webView>
+                <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="close" translatesAutoresizingMaskIntoConstraints="NO" id="lud-L7-cfV">
+                    <rect key="frame" x="0.0" y="10" width="42" height="46"/>
+                    <gestureRecognizers/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="42" id="HVX-a4-74N"/>
+                        <constraint firstAttribute="height" constant="46" id="ge1-Fk-b53"/>
+                    </constraints>
+                    <connections>
+                        <outletCollection property="gestureRecognizers" destination="hTx-Yh-y7F" appends="YES" id="p4y-er-SdJ"/>
+                    </connections>
+                </imageView>
+                <imageView userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="forward" translatesAutoresizingMaskIntoConstraints="NO" id="edD-No-cqP">
+                    <rect key="frame" x="282" y="18" width="30" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="30" id="2E2-fj-Fwe"/>
+                        <constraint firstAttribute="height" constant="30" id="ISs-lJ-mHH"/>
+                    </constraints>
+                </imageView>
+                <imageView userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="back" translatesAutoresizingMaskIntoConstraints="NO" id="EwT-ra-YSr">
+                    <rect key="frame" x="250" y="18" width="30" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="Oyl-Jw-wGc"/>
+                        <constraint firstAttribute="width" constant="30" id="Vfj-MO-E7I"/>
+                    </constraints>
+                </imageView>
+            </subviews>
+            <color key="backgroundColor" red="0.50196078430000002" green="0.074509803920000006" blue="0.21176470589999999" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="uQB-Nr-SnR" secondAttribute="trailing" id="4sJ-Wz-qq9"/>
+                <constraint firstItem="uQB-Nr-SnR" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="55" id="8NF-r7-Bvq"/>
+                <constraint firstAttribute="trailing" secondItem="EwT-ra-YSr" secondAttribute="trailing" constant="40" id="9H2-a5-mTb"/>
+                <constraint firstItem="lud-L7-cfV" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="HKs-5v-YzJ"/>
+                <constraint firstItem="lud-L7-cfV" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="10" id="Mg8-vN-dvX"/>
+                <constraint firstItem="uQB-Nr-SnR" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="Ty6-Ci-vGa"/>
+                <constraint firstItem="EwT-ra-YSr" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="18" id="ZIE-BE-phn"/>
+                <constraint firstAttribute="bottom" secondItem="uQB-Nr-SnR" secondAttribute="bottom" id="fyd-Bh-kXv"/>
+                <constraint firstItem="edD-No-cqP" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="18" id="jHn-5s-WUF"/>
+                <constraint firstAttribute="trailing" secondItem="edD-No-cqP" secondAttribute="trailing" constant="8" id="ulQ-P4-JfD"/>
+            </constraints>
+            <point key="canvasLocation" x="181" y="285"/>
+        </view>
+        <tapGestureRecognizer id="hTx-Yh-y7F">
+            <connections>
+                <action selector="closeModal:" destination="-1" id="B6V-5W-qoM"/>
+            </connections>
+        </tapGestureRecognizer>
+    </objects>
+    <resources>
+        <image name="back" width="128" height="128"/>
+        <image name="close" width="512" height="512"/>
+        <image name="forward" width="128" height="128"/>
+    </resources>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
+</document>

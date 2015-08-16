@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UserPlaylistsViewController">
+            <connections>
+                <outlet property="userPlaylistsView" destination="A3B-Ac-dQj" id="v73-QD-g3Q"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="A3B-Ac-dQj">
+                    <rect key="frame" x="0.0" y="15" width="320" height="553"/>
+                </scrollView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="A3B-Ac-dQj" secondAttribute="trailing" id="7Eh-da-b9q"/>
+                <constraint firstItem="A3B-Ac-dQj" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="15" id="XKB-o1-bQX"/>
+                <constraint firstItem="A3B-Ac-dQj" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="d2N-eE-EMM"/>
+                <constraint firstAttribute="bottom" secondItem="A3B-Ac-dQj" secondAttribute="bottom" id="qFh-mD-pla"/>
+            </constraints>
+            <point key="canvasLocation" x="290" y="297"/>
+        </view>
+    </objects>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
+</document>
