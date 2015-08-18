@@ -45,8 +45,6 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate {
                 
                 let reviewView = self.reviewView
                 
-                let reviewTitle = self.reviewTitle
-                
                 let userID = review["user_id"].int!
                 
                 
@@ -92,7 +90,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate {
                                         
                                         if let gigName = json["resultsPage"]["results"]["event"]["displayName"].string {
                                             
-                                            reviewTitle.text = gigName
+                                            self.navigationItem.title = gigName
                                             
                                             
                                         }
@@ -132,8 +130,10 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate {
                             }
                             
                             if let ytName = song["name"].string {
-                                
+                                let reviewTitle = UILabel(frame: CGRect(x: 0, y: 0, width: 300, height: 50))
                                 reviewTitle.text = ytName
+                                reviewTitle.numberOfLines = 3
+                                self.navigationItem.titleView?.addSubview(reviewTitle)
                             }
                             
                             

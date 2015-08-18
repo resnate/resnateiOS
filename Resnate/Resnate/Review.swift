@@ -80,7 +80,7 @@ func toModalReview(sender:UITapGestureRecognizer) {
     reviewViewController.ID = sender.view!.tag
     
     
-    self.presentViewController(reviewViewController, animated: true, completion: nil)
+    self.navigationController?.pushViewController(reviewViewController, animated: true)
     
     
     
