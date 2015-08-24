@@ -17,9 +17,7 @@ class PastGigsViewController: UIViewController {
         
         setlistViewController.ID = sender.view!.tag
         
-        
-        self.presentViewController(setlistViewController, animated: true, completion: nil)
-        
+        self.navigationController?.pushViewController(setlistViewController, animated: true)
         
     }
     

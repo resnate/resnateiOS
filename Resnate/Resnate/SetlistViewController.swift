@@ -16,7 +16,7 @@ class SetlistViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        
+        self.navigationItem.title = "Setlist"
         
         let height = UIScreen.mainScreen().bounds.height
         
@@ -186,11 +186,6 @@ class SetlistViewController: UIViewController {
     
     @IBOutlet weak var setlistScroll: UIScrollView!
    
-    @IBOutlet weak var closeSetlist: UIImageView!
-
-    @IBAction func closeModal(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
     /*
     // MARK: - Navigation
 

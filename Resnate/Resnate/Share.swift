@@ -11,90 +11,158 @@ import UIKit
 import FBSDKShareKit
 import TwitterKit
 
+struct User: Equatable {
+    var name: String
+    var id: Int
+    var uid: String
+}
+
+func ==(lhs: User, rhs: User) -> Bool {
+    return lhs.id == rhs.id && lhs.name == rhs.name
+}
+
 extension UIViewController {
 
-func share(sender: AnyObject) {
+    func share(type: String, shareID: Int) {
     
-    let height = UIScreen.mainScreen().bounds.height
+        /*let height = UIScreen.mainScreen().bounds.height
     
-    let width = UIScreen.mainScreen().bounds.width
+        let width = UIScreen.mainScreen().bounds.width
     
-    let modalView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: height))
+        let modalView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: height))
     
-    modalView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+        modalView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
     
-    let shareBox = UIView(frame: CGRect(x: 0, y: 0, width: 250, height: 130))
+        let shareBox = UIView(frame: CGRect(x: 0, y: 50, width: 250, height: 130))
     
-    shareBox.backgroundColor = UIColor.whiteColor()
+        shareBox.backgroundColor = UIColor.whiteColor()
     
-    shareBox.center = modalView.center
+        shareBox.center.x = modalView.center.x
     
     
     
-    let cancel = UILabel(frame: CGRect(x: 10, y: 10, width: 50, height: 20))
+        let cancel = UILabel(frame: CGRect(x: 10, y: 10, width: 50, height: 20))
 
-    cancel.text = "Cancel"
+        cancel.text = "Cancel"
     
-    cancel.font = UIFont(name: "HelveticaNeue-Bold", size: 10)
+        cancel.font = UIFont(name: "HelveticaNeue-Bold", size: 10)
     
-    let tapRec = UITapGestureRecognizer()
-    tapRec.addTarget(self, action: "closeShare:")
-    cancel.addGestureRecognizer(tapRec)
-    cancel.userInteractionEnabled = true
+        let tapRec = UITapGestureRecognizer()
+        tapRec.addTarget(self, action: "closeShare:")
+        cancel.addGestureRecognizer(tapRec)
+        cancel.userInteractionEnabled = true
     
-    shareBox.addSubview(cancel)
-    
-    
-    
-    
-    
-    let share = UILabel(frame: CGRect(x: 210, y: 10, width: 50, height: 20))
-    
-    share.text = "Share"
-    
-    share.font = UIFont(name: "HelveticaNeue-Bold", size: 10)
-    
-    let tapRec2 = UITapGestureRecognizer()
-    tapRec2.addTarget(self, action: "closeShare:")
-    share.addGestureRecognizer(tapRec2)
-    share.userInteractionEnabled = true
-    
-    shareBox.addSubview(share)
+        shareBox.addSubview(cancel)
     
     
     
     
     
+        let share = UILabel(frame: CGRect(x: 210, y: 10, width: 50, height: 20))
     
-    var myColor : UIColor = UIColor( red: 0.1, green: 0.1, blue:0.1, alpha: 0.5 )
+        share.text = "Share"
     
-    let shareRecipient = UITextField(frame: CGRect(x: 10, y: 35, width: 230, height: 20))
+        share.font = UIFont(name: "HelveticaNeue-Bold", size: 10)
     
-    shareRecipient.layer.borderWidth = 0.5
-    shareRecipient.layer.borderColor = myColor.CGColor
-    shareRecipient.font = UIFont(name: "HelveticaNeue-Light", size: 10)
+        let tapRec2 = UITapGestureRecognizer()
+        tapRec2.addTarget(self, action: "closeShare:")
+        share.addGestureRecognizer(tapRec2)
+        share.userInteractionEnabled = true
+    
+        shareBox.addSubview(share)
+    
+    
+    
+    
+    
+    
+        var myColor : UIColor = UIColor( red: 0.1, green: 0.1, blue:0.1, alpha: 0.5 )
+    
+        let shareRecipient = UITextField(frame: CGRect(x: 10, y: 35, width: 230, height: 20))
+    
+        shareRecipient.layer.borderWidth = 0.5
+        shareRecipient.layer.borderColor = myColor.CGColor
+        shareRecipient.font = UIFont(name: "HelveticaNeue-Light", size: 10)
 
-    shareBox.addSubview(shareRecipient)
+        shareBox.addSubview(shareRecipient)
     
-    let shareInput = UITextView(frame: CGRect(x: 10, y: 70, width: 230, height: 50))
+        let shareInput = UITextView(frame: CGRect(x: 10, y: 70, width: 230, height: 50))
     
     
-    shareInput.layer.borderWidth = 0.5
-    shareInput.layer.borderColor = myColor.CGColor
-    shareInput.font = UIFont(name: "HelveticaNeue-Light", size: 10)
-    shareInput.becomeFirstResponder()
+        shareInput.layer.borderWidth = 0.5
+        shareInput.layer.borderColor = myColor.CGColor
+        shareInput.font = UIFont(name: "HelveticaNeue-Light", size: 10)
+        shareInput.becomeFirstResponder()
     
-    shareBox.addSubview(shareInput)
+        shareBox.addSubview(shareInput)
     
-    modalView.addSubview(shareBox)
+        modalView.addSubview(shareBox)
     
 
+        self.navigationController?.view.addSubview(modalView)
+    
+    
+        //friends autocomplete
+        
+        var autocompleteView = UITableView()
+        
+        shareRecipient.delegate = self
+        
+        autocompleteView.delegate = self*/
+        
+        var friends: [User] = []
+    
+    let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+    
+    let resnateToken = dictionary!["token"] as! String
+    
+    let resnateID = dictionary!["userID"] as! String
+    
+    let req = Router(OAuthToken: resnateToken, userID: resnateID)
+    
+    request(req.buildURLRequest("search/", path: "")).responseJSON { (_, _, json, error) in
+        if json != nil {
+            
+            var users = JSON(json!)
+            
+            for (index, user) in users {
+                var name = user["name"].string!
+                var id = user["id"].int!
+                var uid = user["uid"].string!
+                var friend = User(name: name, id: id, uid: uid)
+                friends.append(friend)
+            }
+            
+
+        }
+        
+        let shareViewController:ShareViewController = ShareViewController(nibName: "ShareViewController", bundle: nil)
+        
+        
+        shareViewController.type = type
+        
+        shareViewController.shareID = shareID
+        
+        shareViewController.users = friends
+        
+        self.navigationController?.pushViewController(shareViewController, animated: true)
+    }
+    
     
 }
 
 func closeShare(sender: AnyObject) {
  sender.view!.superview!.superview!.removeFromSuperview()
 }
+    
+    func shareGigReview(sender: AnyObject){
+        
+        share("Review", shareID: sender.tag!)
+        
+        
+        
+        
+    }
     
     
     

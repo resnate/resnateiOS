@@ -7,7 +7,6 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SetlistViewController" customModule="Resnate" customModuleProvider="target">
             <connections>
-                <outlet property="closeSetlist" destination="j4j-ht-LYr" id="9kK-ag-djh"/>
                 <outlet property="setlistScroll" destination="It4-LG-llO" id="TV5-jK-5YU"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -18,43 +17,15 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="It4-LG-llO">
-                    <rect key="frame" x="0.0" y="55" width="320" height="513"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="513" id="4Tz-Yw-2GU"/>
-                        <constraint firstAttribute="width" constant="320" id="IS4-DY-ski"/>
-                    </constraints>
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                 </scrollView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Setlist" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MgR-Mz-ypm">
-                    <rect key="frame" x="120" y="27" width="80" height="21.5"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="80" id="9YT-1g-4rz"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
-                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                    <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                </label>
-                <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="close" translatesAutoresizingMaskIntoConstraints="NO" id="j4j-ht-LYr">
-                    <rect key="frame" x="0.0" y="15" width="42" height="46"/>
-                    <gestureRecognizers/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="46" id="IUZ-ql-9ng"/>
-                        <constraint firstAttribute="width" constant="42" id="jyZ-Av-Qi6"/>
-                    </constraints>
-                    <connections>
-                        <outletCollection property="gestureRecognizers" destination="QVa-eD-rvY" appends="YES" id="wx8-es-h2b"/>
-                    </connections>
-                </imageView>
             </subviews>
             <color key="backgroundColor" red="0.50196078430000002" green="0.074509803920000006" blue="0.21176470589999999" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
-                <constraint firstItem="It4-LG-llO" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="55" id="6RX-6Z-2vL"/>
+                <constraint firstItem="It4-LG-llO" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="6RX-6Z-2vL"/>
                 <constraint firstItem="It4-LG-llO" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="EeQ-jc-wuK"/>
                 <constraint firstAttribute="trailing" secondItem="It4-LG-llO" secondAttribute="trailing" id="Ict-Ho-QVh"/>
-                <constraint firstAttribute="centerX" secondItem="MgR-Mz-ypm" secondAttribute="centerX" id="KCj-dV-S5k"/>
-                <constraint firstItem="MgR-Mz-ypm" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="27" id="dRf-A3-fSA"/>
                 <constraint firstAttribute="bottom" secondItem="It4-LG-llO" secondAttribute="bottom" id="eYt-Ge-1ES"/>
-                <constraint firstItem="j4j-ht-LYr" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="15" id="qJP-qj-ukc"/>
-                <constraint firstItem="j4j-ht-LYr" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="y3J-qy-jxl"/>
             </constraints>
             <point key="canvasLocation" x="420" y="297"/>
         </view>
@@ -64,9 +35,6 @@
             </connections>
         </tapGestureRecognizer>
     </objects>
-    <resources>
-        <image name="close" width="512" height="512"/>
-    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

@@ -10,20 +10,17 @@ import UIKit
 import TwitterKit
 
 
-class ReviewViewController: UIViewController, UIAlertViewDelegate {
+class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDelegate, UITableViewDelegate {
     
     var ID = 0
     
     var rating = 0
     
     var ratingButtons = [UIButton]()
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    
+    override func viewWillAppear(animated: Bool) {
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "testBkgd.jpg")!)
-        // Do any additional setup after loading the view.
         
-        self.shareImg.tag = ID
         let reviewID = String(ID)
         
         let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
@@ -90,8 +87,19 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate {
                                         
                                         if let gigName = json["resultsPage"]["results"]["event"]["displayName"].string {
                                             
-                                            self.navigationItem.title = gigName
+                                            let navHeight = self.navigationController?.navigationBar.frame.height
+                                            let reviewTitle = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: navHeight!))
+                                            reviewTitle.text = gigName
+                                            reviewTitle.textAlignment = .Center
+                                            reviewTitle.textColor = UIColor.whiteColor()
+                                            reviewTitle.font = UIFont(name: "Helvetica Neue", size: 12)!
+                                            reviewTitle.numberOfLines = 3
+                                            self.navigationItem.titleView = reviewTitle
+                                            var b = UIBarButtonItem(title: "", style: .Plain, target: self, action: "shareGigReview:")
+                                            b.image = UIImage(named: "Share")!.imageWithRenderingMode(.AlwaysOriginal)
+                                            b.tag = self.ID
                                             
+                                            self.navigationItem.rightBarButtonItem = b
                                             
                                         }
                                         
@@ -274,7 +282,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate {
                     
                     let ratingView = UIView(frame: CGRect(x: 5, y: reviewContent.frame.height + width + 30, width: 300, height: 50))
                     
-        
+                    
                     
                     let filledStarImage = UIImage(named: "filledStar")
                     let emptyStarImage = UIImage(named: "emptyStar")
@@ -312,7 +320,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate {
                     
                     let tapRecShare = UITapGestureRecognizer()
                     
-                    tapRecShare.addTarget(self, action: "share:")
+                    tapRecShare.addTarget(self, action: "shareGigReview:")
                     resnateShare.tag = reviewID.toInt()!
                     resnateShare.addGestureRecognizer(tapRecShare)
                     resnateShare.userInteractionEnabled = true
@@ -363,7 +371,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate {
                         
                         let name = json["name"].string!
                         
-                        self.reviewAuthor.text = name
+                        //self.reviewAuthor.text = name
                         
                     }
                 }
@@ -375,29 +383,18 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate {
                 
             }
         }
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
         
     }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    
-    
-    @IBOutlet weak var reviewTitle: UILabel!
-    
-    @IBOutlet weak var reviewAuthor: UILabel!
-
-    @IBAction func closeModal(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    @IBOutlet weak var shareImg: UIImageView!
-    
-    @IBAction func shareReview(sender: AnyObject) {
-        share(sender)
-     
     }
     
     

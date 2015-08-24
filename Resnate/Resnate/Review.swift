@@ -183,7 +183,7 @@ func toModalReview(sender:UITapGestureRecognizer) {
         
     }
     
-    func alertView(View: UIAlertView!, clickedButtonAtIndex buttonIndex: Int){
+    func alertView(View: UIAlertView, clickedButtonAtIndex buttonIndex: Int){
         
         let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
         
