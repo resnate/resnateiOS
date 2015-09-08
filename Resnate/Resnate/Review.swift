@@ -160,9 +160,7 @@ func toModalReview(sender:UITapGestureRecognizer) {
                 
             }))
             
-            deleteAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { (action: UIAlertAction!) in
-                println("Handle Cancel Logic here")
-            }))
+            deleteAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
             
             presentViewController(deleteAlert, animated: true, completion: nil)
         }

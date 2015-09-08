@@ -9,13 +9,15 @@
 import UIKit
 import FBSDKLoginKit
 
-class ScrollProfileViewController: UIViewController {
+class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
     
     var ID = 0
     
     var resnateToken = ""
     
     var webURL = ""
+    
+    let ytPlayer = VideoPlayer.sharedInstance
     
     
     func tappedView(sender:UITapGestureRecognizer) {
@@ -550,7 +552,7 @@ class ScrollProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        ytPlayer.delegate = self
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "testBkgd.jpg")!)
         
         let refreshControl = UIRefreshControl()

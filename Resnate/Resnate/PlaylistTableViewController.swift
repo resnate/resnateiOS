@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PlaylistTableViewController: LPRTableViewController {
+class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDelegate {
 
     
     var playlist: JSON = ""
@@ -259,11 +259,13 @@ class PlaylistTableViewController: LPRTableViewController {
         
         for (name, ytID) in song {
             
-            ytPlayer.playVid(ytID, tag: sender.view!.tag)
+            ytPlayer.playVid(ytID)
             
             ytPlayer.ytID = ytID
             
             ytPlayer.ytTitle = name
+            
+            ytPlayer.shareID = "\(ytID),\(name)"
             
             
         }

@@ -41,8 +41,8 @@
 		64BE7F631B127A1800FBA7D8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BE7F521B127A1800FBA7D8 /* LoginViewController.swift */; };
 		64BE7F641B127A1800FBA7D8 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 64BE7F531B127A1800FBA7D8 /* LoginViewController.xib */; };
 		64BE7F671B127A1800FBA7D8 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BE7F561B127A1800FBA7D8 /* Router.swift */; };
-		64BE7F681B127A1800FBA7D8 /* PeopleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BE7F571B127A1800FBA7D8 /* PeopleViewController.swift */; };
-		64BE7F691B127A1800FBA7D8 /* PeopleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 64BE7F581B127A1800FBA7D8 /* PeopleViewController.xib */; };
+		64BE7F681B127A1800FBA7D8 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BE7F571B127A1800FBA7D8 /* SettingsViewController.swift */; };
+		64BE7F691B127A1800FBA7D8 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 64BE7F581B127A1800FBA7D8 /* SettingsViewController.xib */; };
 		64E974501B4C369500A75DFC /* UserPlaylistsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E9744E1B4C369500A75DFC /* UserPlaylistsViewController.swift */; };
 		64E974511B4C369500A75DFC /* UserPlaylistsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 64E9744F1B4C369500A75DFC /* UserPlaylistsViewController.xib */; };
 		64E974541B4D8C9900A75DFC /* FollowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E974521B4D8C9900A75DFC /* FollowViewController.swift */; };
@@ -126,8 +126,8 @@
 		64BE7F521B127A1800FBA7D8 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoginViewController.swift; path = ../../../../Downloads/LoginTabbedApp/Resnate/LoginViewController.swift; sourceTree = "<group>"; };
 		64BE7F531B127A1800FBA7D8 /* LoginViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginViewController.xib; path = ../../../../Downloads/LoginTabbedApp/Resnate/LoginViewController.xib; sourceTree = "<group>"; };
 		64BE7F561B127A1800FBA7D8 /* Router.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Router.swift; path = ../../../../Downloads/LoginTabbedApp/Resnate/Router.swift; sourceTree = "<group>"; };
-		64BE7F571B127A1800FBA7D8 /* PeopleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PeopleViewController.swift; path = ../../../../Downloads/LoginTabbedApp/Resnate/PeopleViewController.swift; sourceTree = "<group>"; };
-		64BE7F581B127A1800FBA7D8 /* PeopleViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PeopleViewController.xib; path = ../../../../Downloads/LoginTabbedApp/Resnate/PeopleViewController.xib; sourceTree = "<group>"; };
+		64BE7F571B127A1800FBA7D8 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingsViewController.swift; path = ../../../../Downloads/LoginTabbedApp/Resnate/SettingsViewController.swift; sourceTree = "<group>"; };
+		64BE7F581B127A1800FBA7D8 /* SettingsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = SettingsViewController.xib; path = ../../../../Downloads/LoginTabbedApp/Resnate/SettingsViewController.xib; sourceTree = "<group>"; };
 		64E9744E1B4C369500A75DFC /* UserPlaylistsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserPlaylistsViewController.swift; sourceTree = "<group>"; };
 		64E9744F1B4C369500A75DFC /* UserPlaylistsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserPlaylistsViewController.xib; sourceTree = "<group>"; };
 		64E974521B4D8C9900A75DFC /* FollowViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FollowViewController.swift; sourceTree = "<group>"; };
@@ -256,7 +256,7 @@
 				64EC17021B213E990008FC57 /* SongkickInfo.swift */,
 				64BE7F561B127A1800FBA7D8 /* Router.swift */,
 				649B17701B77761400342B06 /* RatingControl.swift */,
-				64BE7F571B127A1800FBA7D8 /* PeopleViewController.swift */,
+				64BE7F571B127A1800FBA7D8 /* SettingsViewController.swift */,
 				6468034E1B127EC90077C754 /* Alamofire.h */,
 				6468034F1B127EC90077C754 /* Alamofire.swift */,
 				64EC17041B2148230008FC57 /* YTInfo.swift */,
@@ -306,7 +306,7 @@
 				64EC16FF1B212BBB0008FC57 /* ScrollProfileViewController.xib */,
 				64EF0A4F1B1C1A74001ADA4F /* InboxViewController.xib */,
 				64BE7F4F1B127A1800FBA7D8 /* ArtistsViewController.xib */,
-				64BE7F581B127A1800FBA7D8 /* PeopleViewController.xib */,
+				64BE7F581B127A1800FBA7D8 /* SettingsViewController.xib */,
 				64E980A21B22739300AB304B /* UserReviewsViewController.xib */,
 				64EA31FC1B385053003E132E /* WriteReviewViewController.xib */,
 				64EE81F81B2C6C6800CCEF95 /* ReviewViewController.xib */,
@@ -413,7 +413,7 @@
 				64EF06711B42E86D008B04E1 /* TwitterKitResources.bundle in Resources */,
 				64E974511B4C369500A75DFC /* UserPlaylistsViewController.xib in Resources */,
 				64BE7F5B1B127A1800FBA7D8 /* HomeViewController.xib in Resources */,
-				64BE7F691B127A1800FBA7D8 /* PeopleViewController.xib in Resources */,
+				64BE7F691B127A1800FBA7D8 /* SettingsViewController.xib in Resources */,
 				64EA31F41B31FD84003E132E /* SetlistViewController.xib in Resources */,
 				64EC17011B212BBB0008FC57 /* ScrollProfileViewController.xib in Resources */,
 				64EA31FA1B36C8DB003E132E /* PastGigsViewController.xib in Resources */,
@@ -495,7 +495,7 @@
 				645C80471B5DA075001BED10 /* YouTubePlayer.swift in Sources */,
 				64EF5D361B4AD03500FE70BC /* WebViewController.swift in Sources */,
 				6468035E1B127EC90077C754 /* ResponseSerialization.swift in Sources */,
-				64BE7F681B127A1800FBA7D8 /* PeopleViewController.swift in Sources */,
+				64BE7F681B127A1800FBA7D8 /* SettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,7 +18,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var type = ""
     
-    var shareID: Int = 0
+    var shareID = ""
     
     
     var users: [User] = []
@@ -31,15 +31,17 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var subTags: [Int] = []
     
     
-    var autocompleteTableView = UITableView(frame: CGRect(x: 0, y: 170, width: UIScreen.mainScreen().bounds.width, height: 500))
+    var autocompleteTableView = UITableView(frame: CGRect(x: 0, y: 110, width: UIScreen.mainScreen().bounds.width, height: 500))
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
+        self.automaticallyAdjustsScrollViewInsets = false
+        self.navigationController!.navigationBar.translucent = false
         self.navigationItem.title = "Share \(type)"
-        var b = UIBarButtonItem(title: "Send", style: .Plain, target: self, action: "sendMsg:")
+        var b = UIBarButtonItem(title: "Send", style: .Plain, target: self, action: "sendMsg")
 
         self.view.addSubview(autocompleteTableView)
         self.navigationItem.rightBarButtonItem = b
@@ -62,10 +64,19 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool
     {
         
-        autocompleteTableView.hidden = false
+        
+        
+        
         var substring = (self.userNames.text as NSString).stringByReplacingCharactersInRange(range, withString: string)
         
-        searchAutocompleteEntriesWithSubstring(substring)
+        if substring != "" {
+            autocompleteTableView.hidden = false
+            searchAutocompleteEntriesWithSubstring(substring)
+        } else {
+            autocompleteTableView.hidden = true
+        }
+        
+        
         return true
     }
     
@@ -84,6 +95,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 autoUsers.append(user)
             }
         }
+        autoUsers.sort() { $0.name < $1.name }
         autocompleteTableView.reloadData()
     }
     
@@ -100,6 +112,10 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     {
         let cell = tableView.dequeueReusableCellWithIdentifier("AutoUser", forIndexPath: indexPath) as! UITableViewCell
         let index = indexPath.row as Int
+        
+        var bgColorView = UIView()
+        bgColorView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
+        cell.selectedBackgroundView = bgColorView
         
         cell.contentView.subviews.map({ $0.removeFromSuperview() })
         
@@ -201,6 +217,9 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 
                 searchAutocompleteEntriesWithSubstring(userNames.text)
                 
+                userNames.text = ""
+                autocompleteTableView.hidden = true
+                
             }
         }
         
@@ -287,6 +306,83 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
         } else {
             addedUser.removeFromSuperview()
+        }
+        
+    }
+    
+    func sendMsg(){
+        
+        var subject = ""
+        
+        var recipients = subTags.description.replace("[", withString: "").replace("]", withString: "")
+        
+        if self.type == "Review" {
+            
+            subject = "R#\(shareID)"
+            
+        } else if self.type == "Song" {
+            
+            subject = "S#\(shareID)"
+            
+        }
+        
+        
+        
+        if subTags.isEmpty {
+            
+            if UIApplication.sharedApplication().respondsToSelector(Selector("registerUserNotificationSettings:")) {
+                
+                var noRecipientAlert = UIAlertController(title: "Can't send message", message: "Please add recipients", preferredStyle: UIAlertControllerStyle.Alert)
+                noRecipientAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+                
+                 presentViewController(noRecipientAlert, animated: true, completion: nil)
+                
+            } else {
+                
+                let alert = UIAlertView()
+                alert.title = "Can't send message"
+                alert.message = "Please add recipients"
+                alert.addButtonWithTitle("OK")
+                alert.show()
+                
+            }
+            
+            
+            
+        } else {
+        
+        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        
+        let resnateToken = dictionary!["token"] as! String
+        
+        let resnateID = dictionary!["userID"] as! String
+        
+        if (count(shareMessage.text!) <= 3000){
+            
+            let parameters =  ["body":"\(shareMessage.text)", "subject": "\(subject)", "user": "\(recipients)", "commit": "Send message", "sender_id": resnateID]
+            
+            
+            
+            let URL = NSURL(string: "https://www.resnate.com/api/messages")!
+            let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+            mutableURLRequest.HTTPMethod = Method.POST.rawValue
+            mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+            
+            request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { (_, _, JSON, error) in
+                if JSON != nil {
+                    self.dismissViewControllerAnimated(true, completion: nil)
+                    
+                    let window = UIApplication.sharedApplication().keyWindow
+                    
+                    if window!.rootViewController as? UITabBarController != nil {
+                        var tababarController = window!.rootViewController as! UITabBarController
+                        tababarController.selectedIndex = 0
+                    }
+                    
+                }
+            }
+            
+        }
         }
         
     }
