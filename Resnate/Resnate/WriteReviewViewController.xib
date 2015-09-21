@@ -16,8 +16,8 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rvn-Vg-CFC">
-                    <rect key="frame" x="0.0" y="72" width="320" height="280"/>
+                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rvn-Vg-CFC">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="320" id="ulu-gv-PNp"/>
@@ -26,54 +26,17 @@
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                 </textView>
-                <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Post" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uoN-7y-vfe">
-                    <rect key="frame" x="267" y="36" width="39.5" height="21.5"/>
-                    <gestureRecognizers/>
-                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
-                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                    <nil key="highlightedColor"/>
-                    <connections>
-                        <outletCollection property="gestureRecognizers" destination="asc-iO-9Ks" appends="YES" id="MVT-cL-W8S"/>
-                    </connections>
-                </label>
-                <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="close" translatesAutoresizingMaskIntoConstraints="NO" id="iBV-Ko-o83">
-                    <rect key="frame" x="0.0" y="23" width="42" height="46"/>
-                    <gestureRecognizers/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="46" id="pIb-gh-9GB"/>
-                        <constraint firstAttribute="width" constant="42" id="zRU-EV-EDM"/>
-                    </constraints>
-                    <connections>
-                        <outletCollection property="gestureRecognizers" destination="R7y-tm-GRd" appends="YES" id="esP-eR-U8I"/>
-                    </connections>
-                </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="Rvn-Vg-CFC" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="1rm-5a-xyG"/>
-                <constraint firstItem="iBV-Ko-o83" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="LNB-jc-xoO"/>
+                <constraint firstAttribute="bottom" secondItem="Rvn-Vg-CFC" secondAttribute="bottom" id="Fvp-iZ-tR5"/>
                 <constraint firstAttribute="trailing" secondItem="Rvn-Vg-CFC" secondAttribute="trailing" id="QYa-qi-jZP"/>
-                <constraint firstItem="Rvn-Vg-CFC" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="72" id="RvG-H3-ZkT"/>
-                <constraint firstItem="iBV-Ko-o83" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="23" id="XwX-5w-wjZ"/>
-                <constraint firstAttribute="trailing" secondItem="uoN-7y-vfe" secondAttribute="trailing" constant="13" id="k25-jG-4iG"/>
-                <constraint firstItem="uoN-7y-vfe" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="36" id="uKb-f6-0IA"/>
+                <constraint firstItem="Rvn-Vg-CFC" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="RvG-H3-ZkT"/>
             </constraints>
             <point key="canvasLocation" x="290" y="297"/>
         </view>
-        <tapGestureRecognizer id="R7y-tm-GRd">
-            <connections>
-                <action selector="closeModal:" destination="-1" id="XQg-by-6fh"/>
-            </connections>
-        </tapGestureRecognizer>
-        <tapGestureRecognizer id="asc-iO-9Ks">
-            <connections>
-                <action selector="postReview:" destination="-1" id="tII-o5-3w2"/>
-            </connections>
-        </tapGestureRecognizer>
     </objects>
-    <resources>
-        <image name="close" width="512" height="512"/>
-    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

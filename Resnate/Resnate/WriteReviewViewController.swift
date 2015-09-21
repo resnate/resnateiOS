@@ -18,8 +18,9 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "testBkgd.jpg")!)
+        var b = UIBarButtonItem(title: "Post", style: .Plain, target: self, action: "postReview")
+        
+        self.navigationItem.rightBarButtonItem = b
         
         if self.type == "Review"  {
             
@@ -79,13 +80,8 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
     
     
     @IBOutlet weak var reviewTextField: UITextView!
-
-    @IBAction func closeModal(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
     
-    
-    @IBAction func postReview(sender: AnyObject) {
+    func postReview(sender: AnyObject) {
         
         
             

@@ -75,6 +75,9 @@
 		64EF0A571B1E8267001ADA4F /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64EF0A561B1E8267001ADA4F /* SwiftyJSON.swift */; };
 		64EF5D361B4AD03500FE70BC /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64EF5D341B4AD03500FE70BC /* WebViewController.swift */; };
 		64EF5D371B4AD03500FE70BC /* WebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 64EF5D351B4AD03500FE70BC /* WebViewController.xib */; };
+		64FF05AF1BA64BF200E83D47 /* timeago.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FF05AE1BA64BF200E83D47 /* timeago.swift */; };
+		64FF05B21BA9C5A200E83D47 /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FF05B01BA9C5A100E83D47 /* ActivityViewController.swift */; };
+		64FF05B31BA9C5A200E83D47 /* ActivityViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 64FF05B11BA9C5A100E83D47 /* ActivityViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -160,6 +163,9 @@
 		64EF0A561B1E8267001ADA4F /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = ../../../Downloads/LoginTabbedApp/SwiftyJSON.swift; sourceTree = "<group>"; };
 		64EF5D341B4AD03500FE70BC /* WebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		64EF5D351B4AD03500FE70BC /* WebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebViewController.xib; sourceTree = "<group>"; };
+		64FF05AE1BA64BF200E83D47 /* timeago.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = timeago.swift; sourceTree = "<group>"; };
+		64FF05B01BA9C5A100E83D47 /* ActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
+		64FF05B11BA9C5A100E83D47 /* ActivityViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ActivityViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -234,6 +240,7 @@
 				64BE7F481B127A1800FBA7D8 /* AppDelegate.swift */,
 				64EF0A4E1B1C1A74001ADA4F /* InboxViewController.swift */,
 				64BE7F491B127A1800FBA7D8 /* HomeViewController.swift */,
+				64FF05B01BA9C5A100E83D47 /* ActivityViewController.swift */,
 				645C80381B5AD8E9001BED10 /* Images.xcassets */,
 				64BE7F4D1B127A1800FBA7D8 /* Launch Screen.xib */,
 				64BE7F4E1B127A1800FBA7D8 /* ArtistsViewController.swift */,
@@ -269,6 +276,7 @@
 				646803561B127EC90077C754 /* Upload.swift */,
 				646803571B127EC90077C754 /* Validation.swift */,
 				64BE7F4C1B127A1800FBA7D8 /* Info.plist */,
+				64FF05AE1BA64BF200E83D47 /* timeago.swift */,
 				64BE7F261B1279BE00FBA7D8 /* Supporting Files */,
 			);
 			path = Resnate;
@@ -317,6 +325,7 @@
 				64EF06741B44D777008B04E1 /* UpcomingGigsViewController.xib */,
 				64EF5D351B4AD03500FE70BC /* WebViewController.xib */,
 				64E9744F1B4C369500A75DFC /* UserPlaylistsViewController.xib */,
+				64FF05B11BA9C5A100E83D47 /* ActivityViewController.xib */,
 			);
 			name = views;
 			sourceTree = "<group>";
@@ -417,6 +426,7 @@
 				64EA31F41B31FD84003E132E /* SetlistViewController.xib in Resources */,
 				64EC17011B212BBB0008FC57 /* ScrollProfileViewController.xib in Resources */,
 				64EA31FA1B36C8DB003E132E /* PastGigsViewController.xib in Resources */,
+				64FF05B31BA9C5A200E83D47 /* ActivityViewController.xib in Resources */,
 				64EA31FE1B385053003E132E /* WriteReviewViewController.xib in Resources */,
 				64EF5D371B4AD03500FE70BC /* WebViewController.xib in Resources */,
 				645C80391B5AD8E9001BED10 /* Images.xcassets in Resources */,
@@ -461,6 +471,8 @@
 				64E974541B4D8C9900A75DFC /* FollowViewController.swift in Sources */,
 				64BE7F671B127A1800FBA7D8 /* Router.swift in Sources */,
 				64BE7F631B127A1800FBA7D8 /* LoginViewController.swift in Sources */,
+				64FF05B21BA9C5A200E83D47 /* ActivityViewController.swift in Sources */,
+				64FF05AF1BA64BF200E83D47 /* timeago.swift in Sources */,
 				64EC17031B213E990008FC57 /* SongkickInfo.swift in Sources */,
 				647122E01B6CA05A005408DB /* VideoPlayer.swift in Sources */,
 				646803591B127EC90077C754 /* Download.swift in Sources */,

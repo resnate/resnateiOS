@@ -217,8 +217,6 @@ class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDele
         
         let data = NSJSONSerialization.dataWithJSONObject(allSongs, options: nil, error: nil)
         let string = NSString(data: data!, encoding: NSUTF8StringEncoding)
-        println(string)
-        
         
         
         let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")

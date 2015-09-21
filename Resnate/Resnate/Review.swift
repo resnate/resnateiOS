@@ -12,7 +12,7 @@ import UIKit
 extension UIViewController {
     
     
-    func profile(sender: UITapGestureRecognizer) {
+    func profile(sender: AnyObject) {
         
             
             let scrollProfileViewController:ScrollProfileViewController = ScrollProfileViewController(nibName: "ScrollProfileViewController", bundle: nil)
@@ -101,7 +101,7 @@ func toModalReview(sender:UITapGestureRecognizer) {
         writeReviewViewController.type = "PastGig"
         
         
-        self.presentViewController(writeReviewViewController, animated: true, completion: nil)
+        self.navigationController?.pushViewController(writeReviewViewController, animated: true)
         
     }
     
