@@ -14,7 +14,13 @@ class AutoUser : UITableViewCell{
 }
 
 
+
+
 class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+    
+    @IBOutlet weak var close: UIImageView!
+    
+    @IBOutlet weak var send: UILabel!
     
     var type = ""
     
@@ -31,20 +37,32 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var subTags: [Int] = []
     
     
-    var autocompleteTableView = UITableView(frame: CGRect(x: 0, y: 110, width: UIScreen.mainScreen().bounds.width, height: 500))
+    var autocompleteTableView = UITableView(frame: CGRect(x: 0, y: 180, width: UIScreen.mainScreen().bounds.width, height: 500))
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
+        let tapClose = UITapGestureRecognizer()
+        
+        tapClose.addTarget(self, action: "closeModal")
+        
+        close.userInteractionEnabled = true
+        
+        self.close.addGestureRecognizer(tapClose)
+        
+        let tapSend = UITapGestureRecognizer()
+        
+        tapSend.addTarget(self, action: "sendMsg")
+        
+        send.userInteractionEnabled = true
+        
+        self.send.addGestureRecognizer(tapSend)
+        
         self.automaticallyAdjustsScrollViewInsets = false
-        self.navigationController!.navigationBar.translucent = false
-        self.navigationItem.title = "Share \(type)"
-        var b = UIBarButtonItem(title: "Send", style: .Plain, target: self, action: "sendMsg")
 
         self.view.addSubview(autocompleteTableView)
-        self.navigationItem.rightBarButtonItem = b
         
         userNames.becomeFirstResponder()
         
@@ -67,7 +85,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         
         
-        var substring = (self.userNames.text as NSString).stringByReplacingCharactersInRange(range, withString: string)
+        let substring = (self.userNames.text! as NSString).stringByReplacingCharactersInRange(range, withString: string)
         
         if substring != "" {
             autocompleteTableView.hidden = false
@@ -80,6 +98,14 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return true
     }
     
+    
+    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+        
+        return textView.text.characters.count + (text.characters.count - range.length) <= 140
+        
+    }
+    
+    
     func searchAutocompleteEntriesWithSubstring(substring: String)
     {
         autoUsers.removeAll(keepCapacity: false)
@@ -87,15 +113,15 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         for user in users
         {
           
-            var myString: NSString! = user.name as NSString
+            let myString: NSString! = user.name as NSString
             
-            var substringRange: NSRange! = myString.rangeOfString(substring, options: NSStringCompareOptions.CaseInsensitiveSearch)
+            let substringRange: NSRange! = myString.rangeOfString(substring, options: NSStringCompareOptions.CaseInsensitiveSearch)
             if (substringRange.location == 0)
             {
                 autoUsers.append(user)
             }
         }
-        autoUsers.sort() { $0.name < $1.name }
+        autoUsers.sortInPlace() { $0.name < $1.name }
         autocompleteTableView.reloadData()
     }
     
@@ -110,10 +136,10 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
     {
-        let cell = tableView.dequeueReusableCellWithIdentifier("AutoUser", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("AutoUser", forIndexPath: indexPath) 
         let index = indexPath.row as Int
         
-        var bgColorView = UIView()
+        let bgColorView = UIView()
         bgColorView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
         cell.selectedBackgroundView = bgColorView
         
@@ -148,7 +174,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         for user in autoUsers {
             
-            var subCount = toSend.subviews.count
+            let subCount = toSend.subviews.count
             
             if user.id == selectedCell.tag {
                 
@@ -189,33 +215,30 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     self.toSend.addSubview(addedUser)
                     subTags.append(addedUser.tag)
                 } else {
-                    if contains(subTags, addedUser.tag) {
+                    if subTags.contains(addedUser.tag) {
                         
 
                     } else {
                         if subCount == 1 {
-                            addedUser.frame.origin.x = 182.5
-                            self.toSend.addSubview(addedUser)
-                            subTags.append(addedUser.tag)
-                        } else if subCount == 2 {
                             addedUser.frame.origin.x = 5
                             addedUser.frame.origin.y = 35
                             self.toSend.addSubview(addedUser)
                             subTags.append(addedUser.tag)
-                        } else if subCount == 3 {
+                        } else if subCount == 2 {
                             addedUser.frame.origin.x = 150
                             addedUser.frame.origin.y = 35
                             self.toSend.addSubview(addedUser)
                             subTags.append(addedUser.tag)
+                            
                         }
                     }
                 }
                 
                 removedUsers.append(user)
                 
-                removeAtIndex(&users, find(users, user)!)
+                users.removeAtIndex(users.indexOf(user)!)
                 
-                searchAutocompleteEntriesWithSubstring(userNames.text)
+                searchAutocompleteEntriesWithSubstring(userNames.text!)
                 
                 userNames.text = ""
                 autocompleteTableView.hidden = true
@@ -233,60 +256,31 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func removeUser(sender: AnyObject) {
         
-        removeAtIndex(&subTags, find(subTags, sender.view!.tag)!)
+        subTags.removeAtIndex(subTags.indexOf(sender.view!!.tag)!)
         
         for user in removedUsers {
             
-            if user.id == sender.view!.tag {
+            if user.id == sender.view!!.tag {
                 
                 users.append(user)
                 
-                removeAtIndex(&removedUsers, find(removedUsers, user)!)
+                removedUsers.removeAtIndex(removedUsers.indexOf(user)!)
                 
-                searchAutocompleteEntriesWithSubstring(userNames.text)
+                searchAutocompleteEntriesWithSubstring(userNames.text!)
                 
             }
             
         }
         
-        var addedUser = sender.view!.superview!
-        
+        let addedUser = sender.view!!.superview!
+
         if addedUser.frame.origin.x == 37.5 {
             
             for user in addedUser.superview!.subviews {
-                if user.frame.origin.x == 182.5 {
-                    if let userView = user as? UIView {
-                        userView.frame = CGRect(x: 37.5, y: 0, width: 140, height: 30)
-                    }
-                    
-                }
-                 else if user.frame.origin.x == 5 {
-                    if let userView = user as? UIView {
-                        userView.frame = CGRect(x: 182.5, y: 0, width: 140, height: 30)
-                    }
-                    
-                } else if user.frame.origin.x == 150 {
-                    if let userView = user as? UIView {
-                        userView.frame = CGRect(x: 5, y: 35, width: 140, height: 30)
-                    }
-                    
-                }
-            }
-            addedUser.removeFromSuperview()
-            
-        } else if addedUser.frame.origin.x == 182.5 {
-            
-            for user in addedUser.superview!.subviews {
                 if user.frame.origin.x == 5 {
-                    if let userView = user as? UIView {
-                        userView.frame = CGRect(x: 182.5, y: 0, width: 140, height: 30)
-                    }
-                    
+                    user.frame = CGRect(x: 37.5, y: 0, width: 140, height: 30)
                 } else if user.frame.origin.x == 150 {
-                    if let userView = user as? UIView {
-                        userView.frame = CGRect(x: 5, y: 35, width: 140, height: 30)
-                    }
-                    
+                    user.frame = CGRect(x: 5, y: 35, width: 140, height: 30)
                 }
             }
             addedUser.removeFromSuperview()
@@ -295,9 +289,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             for user in addedUser.superview!.subviews {
                 if user.frame.origin.x == 150 {
-                    if let userView = user as? UIView {
-                        userView.frame = CGRect(x: 5, y: 35, width: 140, height: 30)
-                    }
+                    user.frame = CGRect(x: 5, y: 35, width: 140, height: 30)
                     
                 }
             }
@@ -314,17 +306,9 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         var subject = ""
         
-        var recipients = subTags.description.replace("[", withString: "").replace("]", withString: "")
-        
-        if self.type == "Review" {
+        let recipients = subTags.description.replace("[", withString: "").replace("]", withString: "")
             
-            subject = "R#\(shareID)"
-            
-        } else if self.type == "Song" {
-            
-            subject = "S#\(shareID)"
-            
-        }
+        subject = "\(self.type[self.type.startIndex])#\(shareID)"
         
         
         
@@ -332,10 +316,15 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             if UIApplication.sharedApplication().respondsToSelector(Selector("registerUserNotificationSettings:")) {
                 
-                var noRecipientAlert = UIAlertController(title: "Can't send message", message: "Please add recipients", preferredStyle: UIAlertControllerStyle.Alert)
-                noRecipientAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+                if #available(iOS 8.0, *) {
+                    let noRecipientAlert = UIAlertController(title: "Can't send message", message: "Please add recipients", preferredStyle: UIAlertControllerStyle.Alert)
+                    noRecipientAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+                    
+                    presentViewController(noRecipientAlert, animated: true, completion: nil)
+                } else {
+                    // Fallback on earlier versions
+                }
                 
-                 presentViewController(noRecipientAlert, animated: true, completion: nil)
                 
             } else {
                 
@@ -351,13 +340,13 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
         } else {
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
         
         let resnateID = dictionary!["userID"] as! String
         
-        if (count(shareMessage.text!) <= 3000){
+        if ((shareMessage.text!).characters.count <= 140){
             
             let parameters =  ["body":"\(shareMessage.text)", "subject": "\(subject)", "user": "\(recipients)", "commit": "Send message", "sender_id": resnateID]
             
@@ -368,33 +357,28 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             mutableURLRequest.HTTPMethod = Method.POST.rawValue
             mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
             
-            request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { (_, _, JSON, error) in
-                if JSON != nil {
+            request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
                     self.dismissViewControllerAnimated(true, completion: nil)
                     
                     let window = UIApplication.sharedApplication().keyWindow
                     
                     if window!.rootViewController as? UITabBarController != nil {
-                        var tababarController = window!.rootViewController as! UITabBarController
+                        let tababarController = window!.rootViewController as! UITabBarController
                         tababarController.selectedIndex = 0
                     }
                     
-                }
+                
             }
             
         }
         }
         
+        
+        
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    
+    func closeModal() {
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
-    */
 
 }

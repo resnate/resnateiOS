@@ -11,15 +11,7 @@ import UIKit
 class PastGigsViewController: UIViewController {
     
     
-    func toSetlist(sender: AnyObject) {
-        
-        let setlistViewController:SetlistViewController = SetlistViewController(nibName: "SetlistViewController", bundle: nil)
-        
-        setlistViewController.ID = sender.view!.tag
-        
-        self.navigationController?.pushViewController(setlistViewController, animated: true)
-        
-    }
+    
     
     
     
@@ -33,7 +25,7 @@ class PastGigsViewController: UIViewController {
         
         
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
         
@@ -46,22 +38,20 @@ class PastGigsViewController: UIViewController {
         
         
         
-        request(req.buildURLRequest("users/", path: "/past_gigs")).responseJSON { (_, _, json, error) in
-            if json != nil {
+        request(req.buildURLRequest("users/", path: "/past_gigs")).responseJSON { response in
+            
+            let json = JSON(response.result.value!)
                 
                 
-                if let pastGigs = JSON(json!).array {
+                if let pastGigs = json.array {
                     
                     
                     
                     var y = 0
                     
                     for pastGig in pastGigs {
-                    
-                        let width = UIScreen.mainScreen().bounds.width
                         
-                        
-                        let pgView = UIView(frame: CGRect(x: 0, y: y, width: 350, height: 250))
+                        let pgView = UIView(frame: CGRect(x: 10, y: y, width: 350, height: 250))
                         
                         self.pastGigsView.addSubview(pgView)
                         
@@ -99,35 +89,43 @@ class PastGigsViewController: UIViewController {
                         
                         
                         
-                        if let id = pastGig["id"].int {
+                        let id = pastGig["id"].int!
                             
                             let resnateID = String(id)
                             
                             let req = Router(OAuthToken: resnateToken, userID: resnateID)
                             
                             
-                            request(req.buildURLRequest("past_gigs/", path: "/review")).responseJSON { (_, _, json, error) in
-                                if json != nil {
-                                    var json = JSON(json!)
-                                    if let id = json["id"].int {
+                            request(req.buildURLRequest("past_gigs/", path: "/review")).responseJSON { response in
+                                
+                                
+                                
+                                var json = JSON(response.result.value!)
+                                
+                                print(json)
+                                    
+                                    let reviewLabel = UILabel(frame: CGRect(x: 110, y: 130, width: 100, height: 40))
+                                    
+                                    reviewLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:0.9)
+                                    
+                                    reviewLabel.textColor = UIColor.whiteColor()
+                                    reviewLabel.textAlignment = .Center
+                                    reviewLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+                                    reviewLabel.numberOfLines = 2
+                                    
+                                    let tapReview = UITapGestureRecognizer()
+                                    reviewLabel.addGestureRecognizer(tapReview)
+                                    
+                                    
+                                    reviewLabel.userInteractionEnabled = true
+                                    
+                                    if let reviewID = json["id"].int {
                                         
-                                        let reviewLabel = UILabel(frame: CGRect(x: 0, y: 190, width: width, height: 40))
-                                        
-                                        reviewLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
+                                        reviewLabel.tag = reviewID
                                         
                                         reviewLabel.text = "Review"
-                                        reviewLabel.textColor = UIColor.whiteColor()
-                                        reviewLabel.textAlignment = .Center
-                                        reviewLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
-                                        let tapRec = UITapGestureRecognizer()
                                         
-                                        
-                                        tapRec.addTarget(self, action: "toModalReview:")
-                                        reviewLabel.addGestureRecognizer(tapRec)
-                                        reviewLabel.tag = id
-                                        
-                                        reviewLabel.userInteractionEnabled = true
-                                        
+                                        tapReview.addTarget(self, action: "toReview:")
                                         
                                         pgView.addSubview(reviewLabel)
                                         
@@ -137,33 +135,20 @@ class PastGigsViewController: UIViewController {
                                         
                                         if resnateID == pgUserID {
                                             
-                                            let reviewLabel = UILabel(frame: CGRect(x: 0, y: 190, width: width, height: 40))
+                                            reviewLabel.text = "Write a \nReview"
                                             
-                                            reviewLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
-                                            
-                                            reviewLabel.text = "Write a Review"
-                                            reviewLabel.textColor = UIColor.whiteColor()
-                                            reviewLabel.textAlignment = .Center
-                                            reviewLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
-                                            let tapRec = UITapGestureRecognizer()
-                                            
-                                            tapRec.addTarget(self, action: "writeGigReview:")
-                                            reviewLabel.addGestureRecognizer(tapRec)
-                                            reviewLabel.tag = id
-                                            
-                                            reviewLabel.userInteractionEnabled = true
-                                            
+                                            tapReview.addTarget(self, action: "writeGigReview:")
                                             
                                             pgView.addSubview(reviewLabel)
                                             
                                         }
                                     }
-                                }
+                                
                             }
                             
                             
                             
-                        }
+                        
                         
                         
                         
@@ -174,14 +159,14 @@ class PastGigsViewController: UIViewController {
                         if let songkickID = pastGig["songkick_id"].int {
                             
                             
-                            let setlistLabel = UILabel(frame: CGRect(x: 0, y: 130, width: width, height: 40))
+                            let setlistLabel = UILabel(frame: CGRect(x: 0, y: 130, width: 100, height: 40))
                             
-                            setlistLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
+                            setlistLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:0.9)
                             
                             setlistLabel.text = "Setlist"
                             setlistLabel.textColor = UIColor.whiteColor()
                             setlistLabel.textAlignment = .Center
-                            setlistLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+                            setlistLabel.font = UIFont(name: "HelveticaNeue", size: 14)
                             let tapRec = UITapGestureRecognizer()
                             
                             
@@ -201,9 +186,8 @@ class PastGigsViewController: UIViewController {
                             
                             let pgSK = "https://api.songkick.com/api/3.0/events/\(String(songkickID)).json?apikey=Pxms4Lvfx5rcDIuR"
                             
-                            request(.GET, pgSK).responseJSON { (_, _, json, _) in
-                                if json != nil {
-                                    var json = JSON(json!)
+                            request(.GET, pgSK).responseJSON { response in
+                                var json = JSON(response.result.value!)
                                     
                                     
                                     
@@ -257,7 +241,7 @@ class PastGigsViewController: UIViewController {
                                     
                                     
                                     
-                                }
+                                
                             }
                             
                             
@@ -265,16 +249,14 @@ class PastGigsViewController: UIViewController {
                         
                         
                         
-                        y += 290
+                        y += 250
                         
                     }
                     
                     self.pastGigsView.contentSize.height = CGFloat(y + 30)
                 }
                 
-                
-                
-            }
+
             
             
         }

@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InboxViewController" customModule="Resnate" customModuleProvider="target">
             <connections>
+                <outlet property="inboxScroll" destination="O9j-1V-BuI" id="ksj-nC-bnt"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -14,6 +15,17 @@
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O9j-1V-BuI">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                </scrollView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="O9j-1V-BuI" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="7Tj-jC-jrX"/>
+                <constraint firstAttribute="bottom" secondItem="O9j-1V-BuI" secondAttribute="bottom" id="JNO-V8-DED"/>
+                <constraint firstItem="O9j-1V-BuI" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="ZTf-e3-ToF"/>
+                <constraint firstAttribute="trailing" secondItem="O9j-1V-BuI" secondAttribute="trailing" id="cKO-6w-nMr"/>
+            </constraints>
             <point key="canvasLocation" x="181" y="297"/>
         </view>
     </objects>

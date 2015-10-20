@@ -18,8 +18,6 @@ class SetlistViewController: UIViewController {
         // Do any additional setup after loading the view.
         self.navigationItem.title = "Setlist"
         
-        let height = UIScreen.mainScreen().bounds.height
-        
         let width = UIScreen.mainScreen().bounds.width
         
         
@@ -27,21 +25,19 @@ class SetlistViewController: UIViewController {
         
         let pgSK = "https://api.songkick.com/api/3.0/events/\(String(ID)).json?apikey=Pxms4Lvfx5rcDIuR"
         
-        request(.GET, pgSK).responseJSON { (_, _, json, _) in
-            if json != nil {
-                var json = JSON(json!)
-                
-                
+        request(.GET, pgSK).responseJSON { response in
+            if let re = response.result.value {
+                let json = JSON(re)
                 
                 let location = json["resultsPage"]["results"]["event"]["venue"]["metroArea"]["displayName"].string!
                 
                 
-                var dateFormatter = NSDateFormatter()
+                let dateFormatter = NSDateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 
                 let date = json["resultsPage"]["results"]["event"]["start"]["date"].string!
                 
-                var setlistDateString = dateFormatter.dateFromString(date)
+                let setlistDateString = dateFormatter.dateFromString(date)
                 
                 let secondFormatter = NSDateFormatter()
                 secondFormatter.dateFormat = "dd-MM-yyyy"
@@ -56,7 +52,7 @@ class SetlistViewController: UIViewController {
                 if let artistName = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["displayName"].string {
                     
                     
-                    var setlistURL = "http://api.setlist.fm/rest/0.1/search/setlists.json"
+                    let setlistURL = "http://api.setlist.fm/rest/0.1/search/setlists.json"
                     
                     let parameters = [
                         "artistName": artistName,
@@ -67,12 +63,12 @@ class SetlistViewController: UIViewController {
                     
                     
                     request(.GET, setlistURL, parameters: parameters)
-                        .responseJSON { (_, _, json, error) in
-                            if json != nil {
+                        .responseJSON { response in
+                            if let re = response.result.value {
                                 
                                 var y = 5
                                 
-                                var json = JSON(json!)
+                                let json = JSON(re)
                                 if (json["setlists"]["setlist"].array != nil) {
                                     
                                     
@@ -165,6 +161,14 @@ class SetlistViewController: UIViewController {
                                 setlistView.contentSize.height = CGFloat(y + 20)
                                 
                                 
+                                
+                            } else {
+                                
+                                let setlistSong = UILabel(frame: CGRect(x: width/2 - 100, y: 150, width: 200, height: 30))
+                                setlistSong.text = "No Setlist Found"
+                                setlistSong.textAlignment = .Center
+                                setlistSong.textColor = UIColor.whiteColor()
+                                self.setlistScroll.addSubview(setlistSong)
                                 
                             }
                     }

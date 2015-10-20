@@ -18,7 +18,7 @@ class UpcomingGigsViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
         
@@ -27,16 +27,29 @@ class UpcomingGigsViewController: UIViewController {
         let req = Router(OAuthToken: resnateToken, userID: resnateID)
         
         
-        request(req.buildURLRequest("users/", path: "/upcoming_gigs")).responseJSON { (_, _, json, error) in
-            if json != nil {
-                if let upcomingGigs = JSON(json!).array {
+        request(req.buildURLRequest("users/", path: "/upcoming_gigs")).responseJSON { response in
+            
+                if let upcomingGigs = JSON(response.result.value!).array {
                     var y = 0
                     
                     for gig in upcomingGigs {
                         
+                        let ugView = UIView(frame: CGRect(x: 0, y: y, width: 350, height: 250))
+                        
+                        let ugTapView = UIView(frame: CGRect(x: 0, y: 0, width: 350, height: 100))
+                        
+                        ugView.addSubview(ugTapView)
+                        
                         let gigID = gig["id"].int!
                         
                         let songkickID = gig["songkick_id"].int!
+                        
+                        let songkickTap = UITapGestureRecognizer()
+                        songkickTap.addTarget(self, action: "loadGig:")
+                        ugTapView.tag = songkickID
+                        
+                        ugTapView.addGestureRecognizer(songkickTap)
+                        ugTapView.userInteractionEnabled = true
                         
                         let userID = String(self.ID)
                         
@@ -46,23 +59,19 @@ class UpcomingGigsViewController: UIViewController {
                         
                         let width = UIScreen.mainScreen().bounds.width
                         
-                        
-                        let ugView = UIView(frame: CGRect(x: 0, y: y, width: 350, height: 250))
-                        
                         self.upcomingGigsView.addSubview(ugView)
                         
-                        request(req.buildURLRequest("gigs/", path: "/friendsGoing")).responseJSON { (_, _, json, error) in
-                            if json != nil {
+                        request(req.buildURLRequest("gigs/", path: "/friendsGoing")).responseJSON { response in
                                 
                                 
                                 
-                                let users = JSON(json!)
+                                let users = JSON(response.result.value!)
                                 let count = users.count
                                 
                                 
                                 if count > 0 {
                                     
-                                    let friendsGoingLabel = UILabel(frame: CGRect(x: 5, y: 105, width: 100, height: 50))
+                                    let friendsGoingLabel = UILabel(frame: CGRect(x: 10, y: 105, width: 100, height: 50))
                                     
                                     friendsGoingLabel.text = "Friends Going"
                                     
@@ -74,11 +83,10 @@ class UpcomingGigsViewController: UIViewController {
                                     
                                     ugView.addSubview(friendsGoingLabel)
                                     
-                                    var i = 0
                                     
                                     for i in 0...count {
                                         
-                                        var x = 110
+                                        var x = 120
                                         
                                         if let resnateID = users[i]["id"].int {
                                             
@@ -86,9 +94,9 @@ class UpcomingGigsViewController: UIViewController {
                                             
                                             let req = Router(OAuthToken: resnateToken, userID: stringID)
                                             
-                                            request(req.buildURLRequest("users/", path: "/profile")).responseJSON { (_, _, json, error) in
-                                                if json != nil {
-                                                    var json = JSON(json!)
+                                            request(req.buildURLRequest("users/", path: "/profile")).responseJSON { response in
+                                                
+                                                    var json = JSON(response.result.value!)
                                                     
                                                     if let uid = json["userID"].string {
                                                         
@@ -117,7 +125,6 @@ class UpcomingGigsViewController: UIViewController {
                                                         }
                                                         
                                                     }
-                                                }
                                             }
                                             
                                             
@@ -128,11 +135,6 @@ class UpcomingGigsViewController: UIViewController {
                                     
                                     
                                 }
-                                
-                                
-                            } else {
-                                println(error)
-                            }
                         }
                         
                         
@@ -148,7 +150,7 @@ class UpcomingGigsViewController: UIViewController {
                         
                         let month = returnDayAndMonth(date).month
                         
-                        let dayLabel = UILabel(frame: CGRect(x: 110, y: 20, width: 40, height: 35))
+                        let dayLabel = UILabel(frame: CGRect(x: 120, y: 20, width: 40, height: 35))
                         
                         dayLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
                         
@@ -157,7 +159,7 @@ class UpcomingGigsViewController: UIViewController {
                         dayLabel.text = day
                         dayLabel.backgroundColor = UIColor.whiteColor()
                         
-                        let monthLabel = UILabel(frame: CGRect(x: 110, y: 0, width: 40, height: 22))
+                        let monthLabel = UILabel(frame: CGRect(x: 120, y: 0, width: 40, height: 22))
                         monthLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 13)
                         monthLabel.backgroundColor = UIColor.redColor()
                         monthLabel.text = month as String
@@ -165,8 +167,8 @@ class UpcomingGigsViewController: UIViewController {
                         monthLabel.textAlignment = .Center
                         
                         
-                        ugView.addSubview(dayLabel)
-                        ugView.addSubview(monthLabel)
+                        ugTapView.addSubview(dayLabel)
+                        ugTapView.addSubview(monthLabel)
                         
                         
                         
@@ -175,9 +177,9 @@ class UpcomingGigsViewController: UIViewController {
                             
                             let ugSK = "https://api.songkick.com/api/3.0/events/\(String(songkickID)).json?apikey=Pxms4Lvfx5rcDIuR"
                             
-                            request(.GET, ugSK).responseJSON { (_, _, json, _) in
-                                if json != nil {
-                                    var json = JSON(json!)
+                            request(.GET, ugSK).responseJSON { response in
+
+                                    var json = JSON(response.result.value!)
                                     
                                     
                                     
@@ -191,8 +193,8 @@ class UpcomingGigsViewController: UIViewController {
                                         
                                         
                                         let artistView = getArtistPic(artist)
-                                        artistView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
-                                        ugView.addSubview(artistView)
+                                        artistView.frame = CGRect(x: 10, y: 0, width: 100, height: 100)
+                                        ugTapView.addSubview(artistView)
                                         
                                         
                                         
@@ -200,7 +202,7 @@ class UpcomingGigsViewController: UIViewController {
                                     
                                     if let gigName = json["resultsPage"]["results"]["event"]["displayName"].string {
                                         
-                                        let gigNameLabel = UILabel(frame: CGRect(x: 160, y: 0, width: 145, height: 68))
+                                        let gigNameLabel = UILabel(frame: CGRect(x: 170, y: 0, width: 135, height: 68))
                                         gigNameLabel.text = gigName
                                         gigNameLabel.textColor = UIColor.whiteColor()
                                         gigNameLabel.lineBreakMode = .ByTruncatingTail
@@ -209,15 +211,10 @@ class UpcomingGigsViewController: UIViewController {
                                         gigNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
                                         gigNameLabel.sizeToFit()
                                         
-                                        ugView.addSubview(gigNameLabel)
+                                        ugTapView.addSubview(gigNameLabel)
                                         
                                     }
-                                    
-                                    
-                                    
-                                    
-                                    
-                                }
+
                             }
                             
                             
@@ -279,7 +276,6 @@ class UpcomingGigsViewController: UIViewController {
                     self.upcomingGigsView.contentSize.height = CGFloat(y + 30)
 
                 }
-            }
         }
     }
 

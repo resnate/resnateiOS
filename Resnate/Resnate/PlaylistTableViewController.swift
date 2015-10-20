@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDelegate {
+class PlaylistTableViewController: LPRTableViewController {
 
     
     var playlist: JSON = ""
@@ -54,11 +54,11 @@ class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDele
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
         
         cell.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
         
-        var bgColorView = UIView()
+        let bgColorView = UIView()
         bgColorView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
         cell.selectedBackgroundView = bgColorView
 
@@ -111,10 +111,18 @@ class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDele
                         cell.separatorInset = UIEdgeInsetsZero
                     }
                     if cell.respondsToSelector("setLayoutMargins:") {
-                        cell.layoutMargins = UIEdgeInsetsZero
+                        if #available(iOS 8.0, *) {
+                            cell.layoutMargins = UIEdgeInsetsZero
+                        } else {
+                            // Fallback on earlier versions
+                        }
                     }
                     if cell.respondsToSelector("setPreservesSuperviewLayoutMargins:") {
-                        cell.preservesSuperviewLayoutMargins = false
+                        if #available(iOS 8.0, *) {
+                            cell.preservesSuperviewLayoutMargins = false
+                        } else {
+                            // Fallback on earlier versions
+                        }
                     }
 
                     
@@ -130,7 +138,7 @@ class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDele
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateID = dictionary!["userID"] as! String
         
@@ -145,7 +153,7 @@ class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDele
     }
     
     override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateID = dictionary!["userID"] as! String
         
@@ -196,7 +204,7 @@ class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDele
     // Optional: Called within an animation block when the dragging view is about to show.
     //
     override func tableView(tableView: UITableView, showDraggingView view: UIView, atIndexPath indexPath: NSIndexPath) {
-        println("The dragged cell is about to be animated!")
+        print("The dragged cell is about to be animated!")
     }
     
     //
@@ -215,11 +223,11 @@ class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDele
         }
         
         
-        let data = NSJSONSerialization.dataWithJSONObject(allSongs, options: nil, error: nil)
+        let data = try? NSJSONSerialization.dataWithJSONObject(allSongs, options: [])
         let string = NSString(data: data!, encoding: NSUTF8StringEncoding)
         
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
         
@@ -229,17 +237,15 @@ class PlaylistTableViewController: LPRTableViewController, VideoPlayerUIViewDele
         
         if playlistUserID == resnateID {
             
-            let parameters =  ["content": string!]
+            let parameters =  ["token": "\(resnateToken)", "content": string!]
             
             let URL = NSURL(string: "https://www.resnate.com/api/playlists/\(self.playlistID)")!
             let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
             mutableURLRequest.HTTPMethod = Method.PUT.rawValue
             mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
             
-            request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { (_, _, JSON, error) in
-                if JSON != nil {
-                    println(JSON)
-                }
+            request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+
             }
             
         }

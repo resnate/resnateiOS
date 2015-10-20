@@ -28,7 +28,7 @@ class UserPlaylistsViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
         
@@ -36,10 +36,9 @@ class UserPlaylistsViewController: UIViewController {
         
         let req = Router(OAuthToken: resnateToken, userID: resnateID)
         
-        request(req.buildURLRequest("users/", path: "/likes")).responseJSON { (_, _, json, error) in
-            if json != nil {
+        request(req.buildURLRequest("users/", path: "/likes")).responseJSON { response in
                 
-                let songs = JSON(json!)
+                let songs = JSON(response.result.value!)
                 
                 if let firstSong = songs[0].dictionary {
                     
@@ -47,13 +46,21 @@ class UserPlaylistsViewController: UIViewController {
                     
                     let content = firstSong["content"]!.string!
                     
-                    let likesView = getYTPic("https://img.youtube.com/vi/\(content)/hqdefault.jpg")
-                    
-                    likesView.frame = CGRect(x: 0, y: 0, width: 133, height: 100)
+                    let likesUrl = NSURL(string: "https://img.youtube.com/vi/\(content)/hqdefault.jpg")
+                    let likesView = UIImageView(frame: CGRect(x: 0, y: 0, width: 133, height: 100))
+                    self.getDataFromUrl(likesUrl!) { data in
+                        dispatch_async(dispatch_get_main_queue()) {
+                            
+                            likesView.image = UIImage(data: data!)
+                            
+                            
+                            
+                        }
+                    }
                     
                     likesUberView.addSubview(likesView)
                     
-                    var likesLabel = UILabel(frame: CGRect(x: 143, y: 30, width: 150, height: 30))
+                    let likesLabel = UILabel(frame: CGRect(x: 143, y: 30, width: 150, height: 30))
                     
                     setSKLabelText(likesLabel)
                     
@@ -64,24 +71,19 @@ class UserPlaylistsViewController: UIViewController {
                     self.userPlaylistsView.addSubview(likesUberView)
                     
                 }
-                
-                
-                
-            }
         }
         
         
-        request(req.buildURLRequest("users/", path: "/playlists")).responseJSON { (_, _, json, error) in
-            if json != nil {
+        request(req.buildURLRequest("users/", path: "/playlists")).responseJSON { response in
                 
-                let playlists = JSON(json!)
+                let playlists = JSON(response.result.value!)
                 
                 
                 var y = 200
                 
                 var i = 0
                 
-                for (index, playlist) in playlists {
+                for (_, playlist) in playlists {
                     
                     let playlistUberView = UIView(frame: CGRect(x: 0, y: y, width: 350, height: 150))
                     
@@ -93,27 +95,33 @@ class UserPlaylistsViewController: UIViewController {
                         
                         
                         
-                        var data: NSData = content.dataUsingEncoding(NSUTF8StringEncoding)!
+                        let data: NSData = content.dataUsingEncoding(NSUTF8StringEncoding)!
+                       
                         
-                        var jsonError: NSError?
-                        
-                        
-                        
-                        if let json = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError) as? [AnyObject]
-                        {
+                        do {
+                            let json = try NSJSONSerialization.JSONObjectWithData(data, options: []) as! [AnyObject]
                             
                             self.songs.insert(json, atIndex: i)
                             
                             let firstSong: AnyObject = json[0]
                             let song = firstSong as! [String: String]
-                            for (name, ytID) in song {
-                                let playlistView = getYTPic("https://img.youtube.com/vi/\(ytID)/hqdefault.jpg")
-                                playlistView.frame = CGRect(x: 0, y: 0, width: 133, height: 100)
+                            for (_, ytID) in song {
+                                let playlistUrl = NSURL(string: "https://img.youtube.com/vi/\(ytID)/hqdefault.jpg")
+                                let playlistView = UIImageView(frame: CGRect(x: 0, y: 0, width: 133, height: 100))
+                                self.getDataFromUrl(playlistUrl!) { data in
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        
+                                        playlistView.image = UIImage(data: data!)
+                                        
+                                        
+                                        
+                                    }
+                                }
                                 
                                 let playlistName = playlist["name"].string!
                                 
                                 
-                                var playlistLabel = UILabel(frame: CGRect(x: 143, y: 30, width: 150, height: 30))
+                                let playlistLabel = UILabel(frame: CGRect(x: 143, y: 30, width: 150, height: 30))
                                 setSKLabelText(playlistLabel)
                                 playlistLabel.text = playlistName
                                 playlistUberView.addSubview(playlistLabel)
@@ -132,22 +140,24 @@ class UserPlaylistsViewController: UIViewController {
                                 
                             }
                             
+                            i += 1
                             
+                            y += 180
                             
-                        } else {
-                            println(error)
+                        } catch let error as NSError {
+                            print("json error: \(error.localizedDescription)")
                         }
                         
-                    }
+                        
+                            
+                        
+                        }
                     
-                    i += 1
                     
-                    y += 180
                     
                 }
                 
                 self.userPlaylistsView.contentSize.height = CGFloat(y + 20)
-            }
         }
         
     }

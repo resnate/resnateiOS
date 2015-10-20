@@ -39,15 +39,13 @@ func setBoldText(label: UILabel) {
 }
 
 func returnDayAndMonth(date: String) -> (month: NSString, day: String) {
-    var dateFormatter = NSDateFormatter()
+    let dateFormatter = NSDateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd"
     
-    var dateFormatted = dateFormatter.dateFromString(date)
+    let dateFormatted = dateFormatter.dateFromString(date)
     
     
-    let requestedDateComponents: NSCalendarUnit = .CalendarUnitYear |
-        .CalendarUnitMonth |
-        .CalendarUnitDay
+    let requestedDateComponents: NSCalendarUnit = [.Year, .Month, .Day]
     
     let userCalendar = NSCalendar(calendarIdentifier: NSGregorianCalendar)!
     
@@ -58,7 +56,7 @@ func returnDayAndMonth(date: String) -> (month: NSString, day: String) {
     let secondFormatter = NSDateFormatter()
     secondFormatter.dateFormat = "MM"
     
-    var month = String(dateComponents.month)
+    let month = String(dateComponents.month)
     
     
     let nsMonth = secondFormatter.dateFromString(month)

@@ -21,7 +21,7 @@ class UserReviewsViewController: UIViewController {
         
         
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
         
@@ -29,28 +29,63 @@ class UserReviewsViewController: UIViewController {
         
         let req = Router(OAuthToken: resnateToken, userID: resnateID)
         
+        let width = Int(UIScreen.mainScreen().bounds.width)
         
-        request(req.buildURLRequest("users/", path: "/reviews")).responseJSON { (_, _, json, error) in
-            if json != nil {
+        
+        request(req.buildURLRequest("users/", path: "/reviews")).responseJSON { response in
+            
+            if let re = response.result.value {
                 
-                if let reviews = JSON(json!).array {
+                if let reviews = JSON(re).array {
                     
                    
                     var y = 0
                     
                     for review in reviews {
                         
-                        let reviewView = UIView(frame: CGRect(x: 0, y: y, width: 350, height: 150))
+                        let reviewView = UIView(frame: CGRect(x: 10, y: y, width: width - 20, height: 150))
                         self.userReviewsView.addSubview(reviewView)
                         
                         let tapRec = UITapGestureRecognizer()
                         
                         if let reviewID = review["id"].int {
-                            tapRec.addTarget(self, action: "toModalReview:")
+                            tapRec.addTarget(self, action: "toReview:")
                             reviewView.addGestureRecognizer(tapRec)
                             
                             reviewView.tag = reviewID
                             reviewView.userInteractionEnabled = true
+                            
+                            
+                            
+                            let req = Router(OAuthToken: resnateToken, userID: String(reviewID))
+                            
+                            request(req.buildURLRequest("reviews/", path: "/likes")).responseJSON { response in
+                                if let re = response.result.value {
+                                    let users = JSON(re)
+                                    let userCount = users.count
+                                    
+                                    let userCountLabel = UILabel(frame: CGRect(x: 0, y: 110, width: 100, height: 40))
+                                    
+                                    if userCount == 0 {
+                                        
+                                    }
+                                    else if userCount == 1 {
+                                        userCountLabel.text = "1 like"
+                                    } else {
+                                        userCountLabel.text = "\(userCount) likes"
+                                    }
+                                    
+                                    userCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+                                    
+                                    userCountLabel.textColor = UIColor.whiteColor()
+                                    
+                                    userCountLabel.textAlignment = .Center
+                                    
+                                    reviewView.addSubview(userCountLabel)
+                                    
+                                }
+                            }
+                            
                             
                         }
                         
@@ -58,7 +93,7 @@ class UserReviewsViewController: UIViewController {
                         
                         
                         
-                        let reviewTitle = UILabel(frame: CGRect(x: 110, y: y, width: 200, height: 70))
+                        let reviewTitle = UILabel(frame: CGRect(x: 120, y: y, width: width - 150, height: 70))
                         
                         reviewTitle.lineBreakMode = .ByTruncatingTail
                         reviewTitle.numberOfLines = 3
@@ -78,22 +113,23 @@ class UserReviewsViewController: UIViewController {
                             let req = Router(OAuthToken: resnateToken, userID: pastGigID)
                             
                             
-                            request(req.buildURLRequest("past_gigs/", path: "")).responseJSON { (_, _, json, _) in
-                                if json != nil {
+                            request(req.buildURLRequest("past_gigs/", path: "")).responseJSON { response in
+                                
+                                if let re = response.result.value {
                                     
                                     
-                                    let pastGig = JSON(json!)
+                                    let pastGig = JSON(re)
                                     if let skID = pastGig["songkick_id"].int {
                                         
                                         let artistLink = "https://api.songkick.com/api/3.0/events/" + String(skID) + ".json?apikey=Pxms4Lvfx5rcDIuR"
                                         
-                                        request(.GET, artistLink).responseJSON { (_, _, json, _) in
-                                            if json != nil {
+                                        request(.GET, artistLink).responseJSON { response in
+                                            if let re = response.result.value {
                                                 
                                                 
                                                 
                                                 
-                                                var json = JSON(json!)
+                                                let json = JSON(re)
                                                 if let artist = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["id"].int {
                                                     
                                                     
@@ -130,21 +166,27 @@ class UserReviewsViewController: UIViewController {
                             
                             let req = Router(OAuthToken: resnateToken, userID: songID)
                             
-                            request(req.buildURLRequest("songs/", path: "")).responseJSON { (_, _, json, _) in
-                                if json != nil {
+                            request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
+                                if let re = response.result.value {
                                     
-                                    let song = JSON(json!)
+                                    let song = JSON(re)
                                     
                                     if let ytID = song["content"].string {
                                         
                                         let ytLink = "https://img.youtube.com/vi/" + ytID + "/hqdefault.jpg"
                                         
-                                        
-                                        
-                                        let songReviewView = getYTPic(ytLink)
-                                        songReviewView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
-                                        reviewView.addSubview(songReviewView)
-                                        self.userReviewsView.addSubview(reviewView)
+                                        let songImgUrl = NSURL(string: ytLink)
+                                        let reviewSongImg = UIImageView(frame: CGRect(x: 10, y: 0, width: 100, height: 100))
+                                        self.getDataFromUrl(songImgUrl!) { data in
+                                            dispatch_async(dispatch_get_main_queue()) {
+                                                
+                                                reviewSongImg.image = UIImage(data: data!)
+                                                
+                                                
+                                                
+                                            }
+                                        }
+                                        self.userReviewsView.addSubview(reviewSongImg)
                                         
                                         
                                     }
@@ -168,12 +210,13 @@ class UserReviewsViewController: UIViewController {
                         
                         if let content = review["content"].string {
                             
-                            let reviewContent = UILabel(frame: CGRect(x: 110, y: y + 60, width: 200, height: 100))
+                            let reviewContent = UILabel(frame: CGRect(x: 120, y: y + 55, width: width - 150, height: 100))
                             
-                            setSKLabelText(reviewContent)
+                            reviewContent.textColor = UIColor.whiteColor()
                             reviewContent.text = content
+                            reviewContent.font = UIFont(name: "HelveticaNeue-Light", size: 12)
                             
-                            reviewContent.numberOfLines = 4
+                            reviewContent.numberOfLines = 3
                             reviewContent.sizeToFit()
                             
                             
@@ -202,15 +245,13 @@ class UserReviewsViewController: UIViewController {
                 
                 
                 
-            } else {
-                println(error)
             }
         }
         
         
-        request(req.buildURLRequest("users/", path: "/profile")).responseJSON { (_, _, json, _) in
-            if json != nil {
-                var json = JSON(json!)
+        request(req.buildURLRequest("users/", path: "/profile")).responseJSON { response in
+            if let re = response.result.value {
+                let json = JSON(re)
                 
                 let first_name = json["first_name"].string!
                 self.navigationItem.title = "  \(first_name)'s Reviews"

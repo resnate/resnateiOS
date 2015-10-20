@@ -21,7 +21,7 @@ class FollowViewController: UIViewController {
         
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "testBkgd.jpg")!)
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
         
@@ -31,9 +31,9 @@ class FollowViewController: UIViewController {
         
         let path = "/\(type)"
         
-        request(req.buildURLRequest("users/", path: path)).responseJSON { (_, _, json, error) in
-            if json != nil {
-                var json = JSON(json!)
+        request(req.buildURLRequest("users/", path: path)).responseJSON { response in
+            
+            let json = JSON(response.result.value!)
                 
                 if let users = json.array {
                     
@@ -60,9 +60,9 @@ class FollowViewController: UIViewController {
                         let req = Router(OAuthToken: resnateToken, userID: resnateID)
                         
                         
-                        request(req.buildURLRequest("users/", path: "/level")).responseJSON { (_, _, json, error) in
-                            if json != nil {
-                                var json = JSON(json!)
+                        request(req.buildURLRequest("users/", path: "/level")).responseJSON { response in
+
+                                var json = JSON(response.result.value!)
                                 if let levelText = json["level_name"].string {
                                     
                                     let badgeImgView = UIImageView(frame: CGRect(x: 120, y: 30, width: 70, height: 70))
@@ -73,10 +73,10 @@ class FollowViewController: UIViewController {
                                     
                                     followUberView.addSubview(badgeImgView)
                                 }
-                                
+                            
                                 if let points = json["points"].string {
                                     
-                                    var pointsLabel = UILabel(frame: CGRect(x: 210, y: 40, width: 150, height: 50))
+                                    let pointsLabel = UILabel(frame: CGRect(x: 210, y: 40, width: 150, height: 50))
                                     
                                     pointsLabel.font = UIFont(name: "HelveticaNeue-UltraLight", size: 50)
                                     
@@ -87,7 +87,7 @@ class FollowViewController: UIViewController {
                                     followUberView.addSubview(pointsLabel)
                                     
                                 }
-                            }
+                            
                         }
                         
                         
@@ -115,7 +115,7 @@ class FollowViewController: UIViewController {
                         }
                         
                         
-                        var followLabel = UILabel(frame: CGRect(x: 120, y: 0, width: 150, height: 30))
+                        let followLabel = UILabel(frame: CGRect(x: 120, y: 0, width: 220, height: 30))
                         
                         followLabel.textColor = UIColor.whiteColor()
                         
@@ -127,7 +127,7 @@ class FollowViewController: UIViewController {
                         
                         
                         self.followView.addSubview(followUberView)
-                            
+                        
                         y += 150
                         
                     }
@@ -135,9 +135,9 @@ class FollowViewController: UIViewController {
                     self.followView.contentSize.height = CGFloat(y + 20)
                     
                 }
-
                 
-            }
+            
+            
         }
 
         // Do any additional setup after loading the view.

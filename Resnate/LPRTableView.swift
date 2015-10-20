@@ -56,7 +56,7 @@ public class LPRTableView: UITableView {
 		self.init(frame: CGRectZero)
 	}
 	
-	public convenience override init(frame: CGRect) {
+	public convenience init(frame: CGRect) {
 		self.init(frame: frame, style: .Plain)
 	}
 	
@@ -65,7 +65,7 @@ public class LPRTableView: UITableView {
 		initialize()
 	}
 	
-	public required init(coder aDecoder: NSCoder) {
+	public required init?(coder aDecoder: NSCoder) {
 		super.init(coder: aDecoder)
 		initialize()
 	}
@@ -79,7 +79,7 @@ public class LPRTableView: UITableView {
 
 extension LPRTableView {
 	
-	private func canMoveRowAt(#indexPath: NSIndexPath) -> Bool {
+	private func canMoveRowAt(indexPath indexPath: NSIndexPath) -> Bool {
 		return (dataSource?.respondsToSelector("tableView:canMoveRowAtIndexPath:") == false) || (dataSource?.tableView?(self, canMoveRowAtIndexPath: indexPath) == true)
 	}
 	
@@ -93,7 +93,7 @@ extension LPRTableView {
 		let location = gesture.locationInView(self)
 		let indexPath = indexPathForRowAtPoint(location)
 		
-		let sections = numberOfSections()
+		let sections = numberOfSections
 		var rows = 0
 		for i in 0..<sections {
 			rows += numberOfRowsInSection(i)
@@ -125,13 +125,13 @@ extension LPRTableView {
 						
 						// Make an image from the pressed table view cell.
 						UIGraphicsBeginImageContextWithOptions(cell.bounds.size, false, 0.0)
-						cell.layer.renderInContext(UIGraphicsGetCurrentContext())
-						var cellImage = UIGraphicsGetImageFromCurrentImageContext()
+						cell.layer.renderInContext(UIGraphicsGetCurrentContext()!)
+						let cellImage = UIGraphicsGetImageFromCurrentImageContext()
 						UIGraphicsEndImageContext()
 						
 						draggingView = UIImageView(image: cellImage)
 						
-						if var draggingView = draggingView {
+						if let draggingView = draggingView {
 							addSubview(draggingView)
 							let rect = rectForRowAtIndexPath(indexPath)
 							draggingView.frame = CGRectOffset(draggingView.bounds, rect.origin.x, rect.origin.y)
@@ -169,7 +169,7 @@ extension LPRTableView {
 		// Dragging.
 		else if gesture.state == .Changed {
 			
-			if var draggingView = draggingView {
+			if let draggingView = draggingView {
 				// Update position of the drag view,
 				// but don't let it go past the top or the bottom too far.
 				if (location.y >= 0.0) && (location.y <= contentSize.height + 50.0) {
@@ -211,7 +211,7 @@ extension LPRTableView {
 			// Animate the drag view to the newly hovered cell.
 			UIView.animateWithDuration(0.3,
 				animations: { [unowned self] in
-					if var draggingView = self.draggingView {
+					if let draggingView = self.draggingView {
 						if let currentLocationIndexPath = self.currentLocationIndexPath {
 							UIView.beginAnimations("LongPressReorder-HideDraggingView", context: nil)
 							self.longPressReorderDelegate?.tableView?(self, hideDraggingView: draggingView, atIndexPath: currentLocationIndexPath)
@@ -223,12 +223,12 @@ extension LPRTableView {
 					}
 				},
 				completion: { [unowned self] (finished: Bool) in
-					if var draggingView = self.draggingView {
+					if let draggingView = self.draggingView {
 						draggingView.removeFromSuperview()
 					}
 					
 					// Reload the rows that were affected just to be safe.
-					if let visibleRows = self.indexPathsForVisibleRows() {
+					if let visibleRows = self.indexPathsForVisibleRows {
 						self.reloadRowsAtIndexPaths(visibleRows, withRowAnimation: .None)
 					}
 					
@@ -303,7 +303,7 @@ public class LPRTableViewController: UITableViewController, LPRTableViewDelegate
 	/** Returns the long press to reorder table view managed by the controller object. */
 	public var lprTableView: LPRTableView! { return tableView as! LPRTableView }
 	
-	public override init(nibName nibNameOrNil: String!, bundle nibBundleOrNil: NSBundle!) {
+	public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
 		super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 		initialize()
 	}
@@ -314,7 +314,7 @@ public class LPRTableViewController: UITableViewController, LPRTableViewDelegate
 	}
 	
 	public required init(coder aDecoder: NSCoder) {
-		super.init(coder: aDecoder)
+		super.init(coder: aDecoder)!
 		initialize()
 	}
 	

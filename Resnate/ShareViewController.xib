@@ -7,6 +7,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ShareViewController" customModule="Resnate" customModuleProvider="target">
             <connections>
+                <outlet property="close" destination="Beq-yd-Jir" id="2vg-zQ-IWf"/>
+                <outlet property="send" destination="gTh-aS-Wkw" id="s0L-x5-6gQ"/>
                 <outlet property="shareMessage" destination="4Dt-Co-uCs" id="o4R-tv-FIo"/>
                 <outlet property="toSend" destination="x1A-71-dLh" id="tkb-op-XKO"/>
                 <outlet property="userNames" destination="S4x-Kx-WX7" id="w0Z-2x-8QF"/>
@@ -19,45 +21,77 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Check this out!" translatesAutoresizingMaskIntoConstraints="NO" id="4Dt-Co-uCs">
-                    <rect key="frame" x="0.0" y="127" width="320" height="381"/>
+                    <rect key="frame" x="0.0" y="207" width="320" height="361"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="381" id="Jh1-Lh-txy"/>
+                        <constraint firstAttribute="height" constant="361" id="Jh1-Lh-txy"/>
                         <constraint firstAttribute="width" constant="320" id="z9z-Mk-Gk3"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                 </textView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="To:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oEt-wb-SYk">
-                    <rect key="frame" x="5" y="8" width="35" height="36"/>
+                    <rect key="frame" x="5" y="78" width="35" height="36"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x1A-71-dLh">
-                    <rect key="frame" x="0.0" y="10" width="320" height="68.5"/>
+                    <rect key="frame" x="0.0" y="80" width="320" height="68.5"/>
                 </view>
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="S4x-Kx-WX7">
-                    <rect key="frame" x="0.0" y="80" width="320" height="30"/>
+                    <rect key="frame" x="0.0" y="150" width="320" height="30"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="30" id="DPG-qa-3Si"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits"/>
                 </textField>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cln-T2-dRs">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="close" translatesAutoresizingMaskIntoConstraints="NO" id="Beq-yd-Jir">
+                            <rect key="frame" x="-4" y="20" width="50" height="50"/>
+                            <gestureRecognizers/>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Send" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gTh-aS-Wkw">
+                            <rect key="frame" x="260" y="25" width="53" height="40"/>
+                            <gestureRecognizers/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="AAD-rq-5lC"/>
+                                <constraint firstAttribute="width" constant="53" id="acS-ez-geU"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="20"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" red="0.50196078430000002" green="0.074509803920000006" blue="0.21176470589999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="75" id="0gS-Tk-WOX"/>
+                        <constraint firstAttribute="trailing" secondItem="gTh-aS-Wkw" secondAttribute="trailing" constant="7" id="lng-0e-S5q"/>
+                        <constraint firstItem="gTh-aS-Wkw" firstAttribute="top" secondItem="Cln-T2-dRs" secondAttribute="top" constant="25" id="yo4-TP-qs8"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="S4x-Kx-WX7" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="80" id="0NC-Sp-td2"/>
+                <constraint firstItem="S4x-Kx-WX7" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="150" id="0NC-Sp-td2"/>
+                <constraint firstItem="4Dt-Co-uCs" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="207" id="6aM-C4-z55"/>
                 <constraint firstAttribute="trailing" secondItem="S4x-Kx-WX7" secondAttribute="trailing" id="7pH-Mm-JFB"/>
                 <constraint firstAttribute="trailing" secondItem="4Dt-Co-uCs" secondAttribute="trailing" id="AgC-xS-lDF"/>
+                <constraint firstAttribute="trailing" secondItem="Cln-T2-dRs" secondAttribute="trailing" id="B3Z-iL-v65"/>
                 <constraint firstItem="4Dt-Co-uCs" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="IXt-3p-bsO"/>
-                <constraint firstItem="4Dt-Co-uCs" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="127" id="dt7-QW-hgQ"/>
+                <constraint firstItem="Cln-T2-dRs" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="TbI-OM-Cj0"/>
+                <constraint firstItem="Cln-T2-dRs" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="du8-dP-l2d"/>
                 <constraint firstItem="S4x-Kx-WX7" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="v9U-NL-H3l"/>
             </constraints>
             <point key="canvasLocation" x="305" y="320"/>
         </view>
     </objects>
+    <resources>
+        <image name="close" width="512" height="512"/>
+    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

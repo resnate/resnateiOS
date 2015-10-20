@@ -28,7 +28,7 @@ extension UIViewController {
         
         var friends: [User] = []
     
-        let (dictionary, error) = Locksmith.loadDataForUserAccount("resnateAccount", inService: "resnate")
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
     
         let resnateToken = dictionary!["token"] as! String
     
@@ -36,24 +36,24 @@ extension UIViewController {
         
         let req = Router(OAuthToken: resnateToken, userID: resnateID)
     
-    request(req.buildURLRequest("search/", path: "")).responseJSON { (_, _, json, error) in
-        if json != nil {
+    request(req.buildURLRequest("search/", path: "")).responseJSON { response in
+        let json = JSON(response.result.value!)
             
-            var users = JSON(json!)
+            let users = json.array
             
-            for (index, user) in users {
-                var name = user["name"].string!
-                var id = user["id"].int!
-                var uid = user["uid"].string!
-                var friend = User(name: name, id: id, uid: uid)
-                if friend.id != resnateID.toInt() {
+            for user in users! {
+                let name = user["name"].string!
+                let id = user["id"].int!
+                let uid = user["uid"].string!
+                let friend = User(name: name, id: id, uid: uid)
+                if friend.id != Int(resnateID) {
                     friends.append(friend)
                 }
                 
             }
             
 
-        }
+        
         
         let shareViewController:ShareViewController = ShareViewController(nibName: "ShareViewController", bundle: nil)
         
@@ -64,33 +64,39 @@ extension UIViewController {
         
         shareViewController.users = friends
         
-        self.navigationController?.pushViewController(shareViewController, animated: true)
+        self.presentViewController(shareViewController, animated: true, completion: nil)
+        
+        
+        
+        
     }
     
     
 }
     
     func closeShare(sender: AnyObject) {
-        sender.view!.superview!.superview!.removeFromSuperview()
+        sender.view!!.superview!.superview!.removeFromSuperview()
     
     }
     
-    func shareGigReview(sender: AnyObject){
+    func shareReview(sender: AnyObject){
         
-        share("Review", shareID: String(sender.tag!))
+        share("Review", shareID: String(sender.view!!.tag))
         
         
     }
     
     
-    
+    func shareGig(sender: AnyObject){
+        share("Gig", shareID: String(sender.view!!.tag))
+    }
     
     
     
     
     func fbReview(sender: AnyObject){
         let content = FBSDKShareLinkContent()
-        content.contentURL = NSURL(string: "www.resnate.com/reviews/\(sender.view!.tag)/pl")
+        content.contentURL = NSURL(string: "www.resnate.com/reviews/\(sender.view!!.tag)/pl")
         FBSDKShareDialog.showFromViewController(self, withContent: content, delegate: nil)
     }
     
@@ -99,16 +105,16 @@ extension UIViewController {
 
     func twitter(sender: AnyObject){
         let composer = TWTRComposer()
-        let url = "I've written a review on @resnate! https://www.resnate.com/reviews/\(sender.view!.tag)/pl"
+        let url = "I've written a review on @resnate! https://www.resnate.com/reviews/\(sender.view!!.tag)/pl"
         composer.setText(url)
         composer.setImage(UIImage(named: "fabric"))
         
         composer.showWithCompletion { (result) -> Void in
             if (result == TWTRComposerResult.Cancelled) {
-                println("Tweet composition cancelled")
+                print("Tweet composition cancelled")
             }
             else {
-                println("Sending tweet!")
+                print("Sending tweet!")
             }
         }
     }
@@ -116,17 +122,11 @@ extension UIViewController {
     func checkIfSharing(UIView: VideoPlayer) {
         
         let ytPlayer = VideoPlayer.sharedInstance
-        
-        if ytPlayer.videoPlayer.tag == -1 {
             
-            ytPlayer.hideControls()
+        ytPlayer.hideControls()
             
-            share("Song", shareID: ytPlayer.shareID)
+        share("Song", shareID: ytPlayer.shareID)
             
-        } else {
-            println("no")
-        }
-        
         
     }
 

@@ -16,7 +16,7 @@ protocol VideoPlayerUIViewDelegate : class {
 }
 
 
-class VideoPlayer: UIView, UIGestureRecognizerDelegate {
+class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
     
     static let sharedInstance = VideoPlayer()
     
@@ -31,6 +31,8 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
     var ytTitle = ""
     
     var shareID = ""
+    
+    var activityID = 0
     
     var playerOverlay = UIView(frame: CGRect(x: -260, y: UIScreen.mainScreen().bounds.height - 200, width: 250, height: 141))
     
@@ -117,6 +119,14 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
         self.playerControls.addSubview(twitSong)
         
         
+        
+        let tapLike = UITapGestureRecognizer()
+        likeSong.addGestureRecognizer(tapLike)
+        
+        likeSong.userInteractionEnabled = true
+        tapLike.addTarget(self, action: "likeSong:")
+        
+        
         let tapShareSong = UITapGestureRecognizer()
         
         tapShareSong.addTarget(self, action: "share")
@@ -141,7 +151,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
         twitSong.userInteractionEnabled = true
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -181,11 +191,33 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
         
         
         
-        var playingID = videoID
+        let playingID = videoID
         
         self.videoPlayer.playerVars = ["playsinline": "1", "modestbranding": "1", "showinfo": "0", "rel": "0", "controls": "0", "iv_load_policy": "3", "autoplay": "1"]
         
         self.videoPlayer.loadVideoID(playingID)
+        
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+        
+        let resnateToken = dictionary!["token"] as! String
+        
+        let parameters =  ["song" : ["content": "\(self.ytID)", "name": "\(self.ytTitle)" ], "token": "\(resnateToken)"]
+        
+        let URL = NSURL(string: "https://www.resnate.com/api/songs/")!
+        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+        mutableURLRequest.HTTPMethod = Method.POST.rawValue
+        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+        
+        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters ).0).responseJSON { response in
+                
+                let json = JSON(response.result.value!)
+            
+                if let activity = json["activity"].string {
+                    
+                    self.activityID = Int(activity)!
+                    
+                }
+        }
         
         
         
@@ -234,15 +266,88 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
         
     }
     
-    func fbSong(sender: AnyObject){
-        let content = FBSDKShareLinkContent()
-        content.contentURL = NSURL(string: "youtu.be/\(self.ytID)")
+    func likeSong(sender: AnyObject){
         
-        let dialog: FBSDKShareDialog = FBSDKShareDialog()
-        dialog.fromViewController = UIApplication.sharedApplication().keyWindow?.rootViewController
-        dialog.shareContent = content
-        dialog.mode = FBSDKShareDialogMode(rawValue: 0)!
-        dialog.show()
+        let likeSong = UIImageView(frame: CGRect(x: 55, y: 5, width: 40, height: 40))
+        
+        likeSong.image = UIImage(named: "liked")
+        
+        self.playerControls.addSubview(likeSong)
+        
+        let tapUnlike = UITapGestureRecognizer()
+        likeSong.addGestureRecognizer(tapUnlike)
+        
+        likeSong.userInteractionEnabled = true
+        tapUnlike.addTarget(self, action: "unlikeSong:")
+        
+        sender.view!!.removeFromSuperview()
+        
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+        
+        let resnateToken = dictionary!["token"] as! String
+        
+        let parameters =  ["likeable_id" : "\(self.activityID)", "likeable_type" : "Song", "token": "\(resnateToken)"]
+        
+        let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
+        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+        mutableURLRequest.HTTPMethod = Method.POST.rawValue
+        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+        
+        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+           
+        }
+        
+    }
+    
+    func unlikeSong(sender: AnyObject){
+        
+        let likeSong = UIImageView(frame: CGRect(x: 55, y: 5, width: 40, height: 40))
+        
+        likeSong.image = UIImage(named: "likeWhite")
+        
+        self.playerControls.addSubview(likeSong)
+        
+        let tapLike = UITapGestureRecognizer()
+        likeSong.addGestureRecognizer(tapLike)
+        
+        likeSong.userInteractionEnabled = true
+        tapLike.addTarget(self, action: "likeSong:")
+        
+        sender.view!!.removeFromSuperview()
+        
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+        
+        let resnateToken = dictionary!["token"] as! String
+        
+        let parameters =  ["likeable_id" : self.activityID, "likeable_type" : "Song", "token": "\(resnateToken)"]
+        
+        let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
+        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+        mutableURLRequest.HTTPMethod = Method.DELETE.rawValue
+        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+        
+        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters as? [String : AnyObject]).0).responseJSON { response in
+            
+        }
+    }
+    
+    func fbSong(sender: AnyObject){
+        
+        let content = FBSDKShareLinkContent()
+        
+        content.contentURL = NSURL(string: "https://youtu.be/\(self.ytID)")
+        
+        let shareDialog = FBSDKShareDialog()
+        shareDialog.fromViewController = UIApplication.sharedApplication().keyWindow?.rootViewController
+        shareDialog.shareContent = content
+        shareDialog.delegate = self
+        shareDialog.mode = .Native
+        if !shareDialog.canShow() {
+            shareDialog.mode = .FeedBrowser
+        }
+        
+        shareDialog.show()
+        
     }
     
     func twitSong(sender: AnyObject){
@@ -253,10 +358,10 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
         
         composer.showWithCompletion { (result) -> Void in
             if (result == TWTRComposerResult.Cancelled) {
-                println("Tweet composition cancelled")
+                print("Tweet composition cancelled")
             }
             else {
-                println("Sending tweet!")
+                print("Sending tweet!")
             }
         }
     }
@@ -267,7 +372,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
         {
             UIView.animateWithDuration(0.2,
                 delay: 0,
-                options: .CurveEaseInOut | .AllowUserInteraction,
+                options: [.CurveEaseInOut, .AllowUserInteraction],
                 animations: {
                     
                     self.videoPlayer.frame.origin.x = UIScreen.mainScreen().bounds.width + 10
@@ -292,7 +397,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
             
             UIView.animateWithDuration(0.2,
                 delay: 0,
-                options: .CurveEaseInOut | .AllowUserInteraction,
+                options: [.CurveEaseInOut, .AllowUserInteraction],
                 animations: {
                     self.playerControls.frame.origin.x = UIScreen.mainScreen().bounds.width - 260
                     self.playerControls.frame.origin.y = UIScreen.mainScreen().bounds.height - 109
@@ -327,7 +432,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
             
             UIView.animateWithDuration(0.2,
                 delay: 0,
-                options: .CurveEaseInOut | .AllowUserInteraction,
+                options: [.CurveEaseInOut, .AllowUserInteraction],
                 animations: {
                     
                     self.videoPlayer.frame.origin.y = UIScreen.mainScreen().bounds.height - 200
@@ -341,6 +446,19 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate {
             })
         }
         
+    }
+    
+    func sharer(sharer: FBSDKSharing!, didCompleteWithResults results: [NSObject: AnyObject]) {
+        print(results)
+    }
+    
+    func sharer(sharer: FBSDKSharing!, didFailWithError error: NSError!) {
+        print("sharer NSError")
+        print(error.description)
+    }
+    
+    func sharerDidCancel(sharer: FBSDKSharing!) {
+        print("sharerDidCancel")
     }
     
 
