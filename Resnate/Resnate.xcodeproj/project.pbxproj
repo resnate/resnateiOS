@@ -28,14 +28,6 @@
 		640613B61BCF5C2300A9E2C5 /* Upload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640613A71BCF5C2300A9E2C5 /* Upload.swift */; settings = {ASSET_TAGS = (); }; };
 		640613B71BCF5C2300A9E2C5 /* Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640613A81BCF5C2300A9E2C5 /* Validation.swift */; settings = {ASSET_TAGS = (); }; };
 		640613CB1BCFD64500A9E2C5 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640613C41BCFD64400A9E2C5 /* Bolts.framework */; settings = {ASSET_TAGS = (); }; };
-		640613CC1BCFD64500A9E2C5 /* FacebookSDKStrings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 640613C51BCFD64500A9E2C5 /* FacebookSDKStrings.bundle */; settings = {ASSET_TAGS = (); }; };
-		640613CD1BCFD64500A9E2C5 /* FBAudienceNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640613C61BCFD64500A9E2C5 /* FBAudienceNetwork.framework */; settings = {ASSET_TAGS = (); }; };
-		640613CE1BCFD64500A9E2C5 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640613C71BCFD64500A9E2C5 /* FBSDKCoreKit.framework */; settings = {ASSET_TAGS = (); }; };
-		640613CF1BCFD64500A9E2C5 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640613C81BCFD64500A9E2C5 /* FBSDKLoginKit.framework */; settings = {ASSET_TAGS = (); }; };
-		640613D01BCFD64500A9E2C5 /* FBSDKMessengerShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640613C91BCFD64500A9E2C5 /* FBSDKMessengerShareKit.framework */; settings = {ASSET_TAGS = (); }; };
-		640613D11BCFD64500A9E2C5 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640613CA1BCFD64500A9E2C5 /* FBSDKShareKit.framework */; settings = {ASSET_TAGS = (); }; };
-		640613D51BCFEA5600A9E2C5 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 640613D41BCFEA5600A9E2C5 /* Info.plist */; settings = {ASSET_TAGS = (); }; };
-		6434ECD51BD65CF500F44EE5 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 6434ECD41BD65CF500F44EE5 /* Podfile */; settings = {ASSET_TAGS = (); }; };
 		6436997D1B86B891007A6452 /* ShareViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6436997C1B86B891007A6452 /* ShareViewController.xib */; };
 		6436997F1B86B8A9007A6452 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436997E1B86B8A9007A6452 /* ShareViewController.swift */; };
 		645C80391B5AD8E9001BED10 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 645C80381B5AD8E9001BED10 /* Images.xcassets */; };
@@ -91,7 +83,7 @@
 		64FF05AF1BA64BF200E83D47 /* timeago.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FF05AE1BA64BF200E83D47 /* timeago.swift */; };
 		64FF05B21BA9C5A200E83D47 /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FF05B01BA9C5A100E83D47 /* ActivityViewController.swift */; };
 		64FF05B31BA9C5A200E83D47 /* ActivityViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 64FF05B11BA9C5A100E83D47 /* ActivityViewController.xib */; };
-		D40682AD3BF4BE13A525EFDD /* libPods-Resnate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 721C339CBC3AAF97B5010145 /* libPods-Resnate.a */; };
+		833AD6B08B3D9F38D2AD8FE1 /* Pods_Resnate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 347F67DFC115041C41030377 /* Pods_Resnate.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,6 +97,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		347F67DFC115041C41030377 /* Pods_Resnate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Resnate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		58155C874C8BA95AB416BDEC /* Pods-Resnate.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Resnate.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Resnate/Pods-Resnate.debug.xcconfig"; sourceTree = "<group>"; };
 		6406138A1BCF566C00A9E2C5 /* Locksmith.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Locksmith.h; path = Resnate/Locksmith.h; sourceTree = "<group>"; };
 		6406138B1BCF566C00A9E2C5 /* LocksmithAccessibleOption.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocksmithAccessibleOption.swift; path = Resnate/LocksmithAccessibleOption.swift; sourceTree = "<group>"; };
@@ -129,14 +122,7 @@
 		640613A71BCF5C2300A9E2C5 /* Upload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Upload.swift; path = "../../../Downloads/27d6032ed8cfff/Alamofire-master/Source/Upload.swift"; sourceTree = "<group>"; };
 		640613A81BCF5C2300A9E2C5 /* Validation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Validation.swift; path = "../../../Downloads/27d6032ed8cfff/Alamofire-master/Source/Validation.swift"; sourceTree = "<group>"; };
 		640613C41BCFD64400A9E2C5 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
-		640613C51BCFD64500A9E2C5 /* FacebookSDKStrings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = FacebookSDKStrings.bundle; sourceTree = "<group>"; };
-		640613C61BCFD64500A9E2C5 /* FBAudienceNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBAudienceNetwork.framework; sourceTree = "<group>"; };
-		640613C71BCFD64500A9E2C5 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
-		640613C81BCFD64500A9E2C5 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
-		640613C91BCFD64500A9E2C5 /* FBSDKMessengerShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKMessengerShareKit.framework; sourceTree = "<group>"; };
-		640613CA1BCFD64500A9E2C5 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKShareKit.framework; sourceTree = "<group>"; };
 		640613D41BCFEA5600A9E2C5 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6434ECD41BD65CF500F44EE5 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
 		6436997C1B86B891007A6452 /* ShareViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ShareViewController.xib; path = Resnate.xcodeproj/../ShareViewController.xib; sourceTree = SOURCE_ROOT; };
 		6436997E1B86B8A9007A6452 /* ShareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShareViewController.swift; path = Resnate.xcodeproj/../ShareViewController.swift; sourceTree = SOURCE_ROOT; };
 		645C80381B5AD8E9001BED10 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../../ResnateiOS/ResnateiOS/Images.xcassets; sourceTree = "<group>"; };
@@ -195,7 +181,6 @@
 		64FF05AE1BA64BF200E83D47 /* timeago.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = timeago.swift; sourceTree = "<group>"; };
 		64FF05B01BA9C5A100E83D47 /* ActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
 		64FF05B11BA9C5A100E83D47 /* ActivityViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ActivityViewController.xib; sourceTree = "<group>"; };
-		721C339CBC3AAF97B5010145 /* libPods-Resnate.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Resnate.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8A3B46AB4E72D7EDFEE8883 /* Pods-Resnate.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Resnate.release.xcconfig"; path = "Pods/Target Support Files/Pods-Resnate/Pods-Resnate.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -205,15 +190,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				64EF066F1B42E86D008B04E1 /* Fabric.framework in Frameworks */,
-				640613CE1BCFD64500A9E2C5 /* FBSDKCoreKit.framework in Frameworks */,
 				64EF06721B42E86D008B04E1 /* TwitterCore.framework in Frameworks */,
 				64EF06701B42E86D008B04E1 /* TwitterKit.framework in Frameworks */,
-				640613D01BCFD64500A9E2C5 /* FBSDKMessengerShareKit.framework in Frameworks */,
-				640613D11BCFD64500A9E2C5 /* FBSDKShareKit.framework in Frameworks */,
-				640613CF1BCFD64500A9E2C5 /* FBSDKLoginKit.framework in Frameworks */,
-				640613CD1BCFD64500A9E2C5 /* FBAudienceNetwork.framework in Frameworks */,
 				640613CB1BCFD64500A9E2C5 /* Bolts.framework in Frameworks */,
-				D40682AD3BF4BE13A525EFDD /* libPods-Resnate.a in Frameworks */,
+				833AD6B08B3D9F38D2AD8FE1 /* Pods_Resnate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,17 +247,11 @@
 				645C80461B5DA075001BED10 /* YouTubePlayer.swift */,
 				645C80481B5DCA92001BED10 /* YTPlayer.html */,
 				640613C41BCFD64400A9E2C5 /* Bolts.framework */,
-				640613C51BCFD64500A9E2C5 /* FacebookSDKStrings.bundle */,
-				640613C61BCFD64500A9E2C5 /* FBAudienceNetwork.framework */,
-				640613C71BCFD64500A9E2C5 /* FBSDKCoreKit.framework */,
-				640613C81BCFD64500A9E2C5 /* FBSDKLoginKit.framework */,
-				640613C91BCFD64500A9E2C5 /* FBSDKMessengerShareKit.framework */,
-				640613CA1BCFD64500A9E2C5 /* FBSDKShareKit.framework */,
 				64EF066B1B42E86D008B04E1 /* Fabric.framework */,
 				64EF066C1B42E86D008B04E1 /* TwitterKit.framework */,
 				64EF066D1B42E86D008B04E1 /* TwitterKitResources.bundle */,
 				64EF066E1B42E86D008B04E1 /* TwitterCore.framework */,
-				721C339CBC3AAF97B5010145 /* libPods-Resnate.a */,
+				347F67DFC115041C41030377 /* Pods_Resnate.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -289,7 +263,6 @@
 				64BE7F251B1279BE00FBA7D8 /* Resnate */,
 				64BE7F3B1B1279BE00FBA7D8 /* ResnateTests */,
 				64BE7F241B1279BE00FBA7D8 /* Products */,
-				6434ECD41BD65CF500F44EE5 /* Podfile */,
 				1E497951A9DB74A7D2A82E21 /* Pods */,
 			);
 			sourceTree = "<group>";
@@ -477,7 +450,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				64EF0A511B1C1A74001ADA4F /* InboxViewController.xib in Resources */,
-				640613CC1BCFD64500A9E2C5 /* FacebookSDKStrings.bundle in Resources */,
 				64BE7F601B127A1800FBA7D8 /* ArtistsViewController.xib in Resources */,
 				6436997D1B86B891007A6452 /* ShareViewController.xib in Resources */,
 				645C80491B5DCA92001BED10 /* YTPlayer.html in Resources */,
@@ -486,7 +458,6 @@
 				64EF06711B42E86D008B04E1 /* TwitterKitResources.bundle in Resources */,
 				64E974511B4C369500A75DFC /* UserPlaylistsViewController.xib in Resources */,
 				64BE7F5B1B127A1800FBA7D8 /* HomeViewController.xib in Resources */,
-				640613D51BCFEA5600A9E2C5 /* Info.plist in Resources */,
 				64BE7F691B127A1800FBA7D8 /* SettingsViewController.xib in Resources */,
 				64EA31F41B31FD84003E132E /* SetlistViewController.xib in Resources */,
 				64EC17011B212BBB0008FC57 /* ScrollProfileViewController.xib in Resources */,
@@ -494,7 +465,6 @@
 				64FF05B31BA9C5A200E83D47 /* ActivityViewController.xib in Resources */,
 				64EA31FE1B385053003E132E /* WriteReviewViewController.xib in Resources */,
 				64EF5D371B4AD03500FE70BC /* WebViewController.xib in Resources */,
-				6434ECD51BD65CF500F44EE5 /* Podfile in Resources */,
 				645C80391B5AD8E9001BED10 /* Images.xcassets in Resources */,
 				64BE7F641B127A1800FBA7D8 /* LoginViewController.xib in Resources */,
 				64E974551B4D8C9900A75DFC /* FollowViewController.xib in Resources */,
@@ -748,12 +718,14 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Resnate/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.resnate.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -774,12 +746,14 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Resnate/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.resnate.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Release;
 		};
