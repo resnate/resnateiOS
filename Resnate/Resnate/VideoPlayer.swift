@@ -22,9 +22,9 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
     
     weak var delegate:VideoPlayerUIViewDelegate?
     
-    var videoPlayer = YouTubePlayerView(frame: CGRect(x: -260, y: UIScreen.mainScreen().bounds.height - 200, width: 250, height: 141))
+    var videoPlayer = YouTubePlayerView(frame: CGRect(x: -170, y: UIScreen.mainScreen().bounds.height - 200, width: 160, height: 90))
     
-    var playerControls = UIView(frame: CGRect(x: -260, y: UIScreen.mainScreen().bounds.height - 109, width: 250, height: 50))
+    var playerControls = UIView(frame: CGRect(x: -170, y: UIScreen.mainScreen().bounds.height - 95, width: 160, height: 35))
     
     var ytID = ""
     
@@ -34,7 +34,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
     
     var activityID = 0
     
-    var playerOverlay = UIView(frame: CGRect(x: -260, y: UIScreen.mainScreen().bounds.height - 200, width: 250, height: 141))
+    var playerOverlay = UIView(frame: CGRect(x: -170, y: UIScreen.mainScreen().bounds.height - 200, width: 160, height: 90))
     
     
     init() {
@@ -84,35 +84,35 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
         
         
         
-        let addSong = UIImageView(frame: CGRect(x: 5, y: 5, width: 40, height: 40))
+        let addSong = UIImageView(frame: CGRect(x: 5, y: 5, width: 25, height: 25))
         
         addSong.image = UIImage(named: "plusWhite")
         
         self.playerControls.addSubview(addSong)
         
         
-        let likeSong = UIImageView(frame: CGRect(x: 55, y: 5, width: 40, height: 40))
+        let likeSong = UIImageView(frame: CGRect(x: 35, y: 5, width: 25, height: 25))
         
         likeSong.image = UIImage(named: "likeWhite")
         
         self.playerControls.addSubview(likeSong)
         
         
-        let shareSong = UIImageView(frame: CGRect(x: 105, y: 5, width: 40, height: 40))
+        let shareSong = UIImageView(frame: CGRect(x: 67, y: 5, width: 25, height: 25))
         
         shareSong.image = UIImage(named: "Share")
         
         self.playerControls.addSubview(shareSong)
         
         
-        let fbSong = UIImageView(frame: CGRect(x: 155, y: 5, width: 40, height: 40))
+        let fbSong = UIImageView(frame: CGRect(x: 99, y: 5, width: 25, height: 25))
         
         fbSong.image = UIImage(named: "facebook.jpg")
         
         self.playerControls.addSubview(fbSong)
         
         
-        let twitSong = UIImageView(frame: CGRect(x: 205, y: 5, width: 40, height: 40))
+        let twitSong = UIImageView(frame: CGRect(x: 129, y: 5, width: 25, height: 25))
         
         twitSong.image = UIImage(named: "twitter")
         
@@ -165,15 +165,15 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
         
         self.playerControls.layer.zPosition = -1
         
-        self.videoPlayer.frame.origin.x = UIScreen.mainScreen().bounds.width - 260
+        self.videoPlayer.frame.origin.x = UIScreen.mainScreen().bounds.width - 170
         
-        self.videoPlayer.frame.origin.y = UIScreen.mainScreen().bounds.height - 200
+        self.videoPlayer.frame.origin.y = UIScreen.mainScreen().bounds.height - 150
         
-        self.playerOverlay.frame.origin.x = UIScreen.mainScreen().bounds.width - 260
+        self.playerOverlay.frame.origin.x = UIScreen.mainScreen().bounds.width - 170
         
-        self.playerOverlay.frame.origin.y = UIScreen.mainScreen().bounds.height - 200
+        self.playerOverlay.frame.origin.y = UIScreen.mainScreen().bounds.height - 150
         
-        self.playerControls.frame.origin.x = UIScreen.mainScreen().bounds.width - 260
+        self.playerControls.frame.origin.x = UIScreen.mainScreen().bounds.width - 170
         
         self.playerControls.frame.origin.y = UIScreen.mainScreen().bounds.height - 109
         
@@ -225,7 +225,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
     
     func pauseVid(){
         
-        let playButton = UIImageView(frame: CGRect(x: 100, y: 46, width: 50, height: 50))
+        let playButton = UIImageView(frame: CGRect(x: 55, y: 21, width: 50, height: 50))
         
         if self.videoPlayer.frame.width == UIScreen.mainScreen().bounds.width {
             
@@ -268,7 +268,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
     
     func likeSong(sender: AnyObject){
         
-        let likeSong = UIImageView(frame: CGRect(x: 55, y: 5, width: 40, height: 40))
+        let likeSong = UIImageView(frame: CGRect(x: 35, y: 5, width: 25, height: 25))
         
         likeSong.image = UIImage(named: "liked")
         
@@ -301,7 +301,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
     
     func unlikeSong(sender: AnyObject){
         
-        let likeSong = UIImageView(frame: CGRect(x: 55, y: 5, width: 40, height: 40))
+        let likeSong = UIImageView(frame: CGRect(x: 35, y: 5, width: 25, height: 25))
         
         likeSong.image = UIImage(named: "likeWhite")
         
@@ -399,10 +399,10 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
                 delay: 0,
                 options: [.CurveEaseInOut, .AllowUserInteraction],
                 animations: {
-                    self.playerControls.frame.origin.x = UIScreen.mainScreen().bounds.width - 260
-                    self.playerControls.frame.origin.y = UIScreen.mainScreen().bounds.height - 109
-                    self.videoPlayer.frame.origin.y = UIScreen.mainScreen().bounds.height - 250
-                    self.playerOverlay.frame.origin.y = UIScreen.mainScreen().bounds.height - 250
+                    self.playerControls.frame.origin.x = UIScreen.mainScreen().bounds.width - 170
+                    self.playerControls.frame.origin.y = UIScreen.mainScreen().bounds.height - 95
+                    self.videoPlayer.frame.origin.y = UIScreen.mainScreen().bounds.height - 184
+                    self.playerOverlay.frame.origin.y = UIScreen.mainScreen().bounds.height - 184
                 },
                 completion: { finished in
                     
@@ -435,8 +435,8 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
                 options: [.CurveEaseInOut, .AllowUserInteraction],
                 animations: {
                     
-                    self.videoPlayer.frame.origin.y = UIScreen.mainScreen().bounds.height - 200
-                    self.playerOverlay.frame.origin.y = UIScreen.mainScreen().bounds.height - 200
+                    self.videoPlayer.frame.origin.y = UIScreen.mainScreen().bounds.height - 150
+                    self.playerOverlay.frame.origin.y = UIScreen.mainScreen().bounds.height - 150
                     self.playerControls.layer.zPosition = -1
                 },
                 completion: { finished in
