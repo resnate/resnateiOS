@@ -22,6 +22,7 @@ PODS:
     - libPusher/Core (= 1.6.1)
   - libPusher/Core (1.6.1):
     - SocketRocket (= 0.4.1)
+  - ReachabilitySwift (2.1)
   - SocketRocket (0.4.1)
 
 DEPENDENCIES:
@@ -29,6 +30,16 @@ DEPENDENCIES:
   - FBSDKLoginKit
   - FBSDKShareKit
   - libPusher (= 1.6.1)
+  - ReachabilitySwift (from `https://github.com/ashleymills/Reachability.swift`)
+
+EXTERNAL SOURCES:
+  ReachabilitySwift:
+    :git: https://github.com/ashleymills/Reachability.swift
+
+CHECKOUT OPTIONS:
+  ReachabilitySwift:
+    :commit: 89b2431fe262bc5915972472e36d04c067f686bc
+    :git: https://github.com/ashleymills/Reachability.swift
 
 SPEC CHECKSUMS:
   Bolts: 805a4a87413e49d4a0c2b7d469084cbc46b09342
@@ -36,6 +47,7 @@ SPEC CHECKSUMS:
   FBSDKLoginKit: 01bce8dd3f3a26a023b0ba4ffdde7ef5062889fe
   FBSDKShareKit: 1f927bb05e4d36a99d5d5bf2f4b1ff294ce3e15c
   libPusher: 5ea58aeb83fa4ac1f5d8ef8543b1def6ace997b8
+  ReachabilitySwift: 99bb7acceebb90b2048b4a8fd6539be96454dcb2
   SocketRocket: ee0b5c34182d37bb4f1f8d628bbe737718126daa
 
 COCOAPODS: 0.39.0

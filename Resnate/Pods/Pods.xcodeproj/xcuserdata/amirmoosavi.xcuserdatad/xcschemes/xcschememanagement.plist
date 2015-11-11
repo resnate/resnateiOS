@@ -29,6 +29,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>ReachabilitySwift.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>SocketRocket.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -42,6 +47,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>0391CA4BC7C3669C134D959B633FE39A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>57ADC05E440A960212657DE6DA1FEDD5</key>
 		<dict>
 			<key>primary</key>
@@ -57,17 +67,17 @@
 			<key>primary</key>
 			<true/>
 		</dict>
+		<key>769635ADD0D971379F9F00F723FB8752</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>94A50FB884552F1E25589DD6EA641782</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
 		<key>96C4C0EDEAD003340953DF9256BD80A7</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>B4BD482F77F5CEA1A4E3839CB7621240</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -19,12 +19,7 @@ class PlaylistTableViewController: LPRTableViewController {
     
     var playlistID = 0
     
-        
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        
-    }
+    var likes = false
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -44,6 +39,7 @@ class PlaylistTableViewController: LPRTableViewController {
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
         return songs.count
     }
     
@@ -111,18 +107,10 @@ class PlaylistTableViewController: LPRTableViewController {
                         cell.separatorInset = UIEdgeInsetsZero
                     }
                     if cell.respondsToSelector("setLayoutMargins:") {
-                        if #available(iOS 8.0, *) {
-                            cell.layoutMargins = UIEdgeInsetsZero
-                        } else {
-                            // Fallback on earlier versions
-                        }
+                        cell.layoutMargins = UIEdgeInsetsZero
                     }
                     if cell.respondsToSelector("setPreservesSuperviewLayoutMargins:") {
-                        if #available(iOS 8.0, *) {
-                            cell.preservesSuperviewLayoutMargins = false
-                        } else {
-                            // Fallback on earlier versions
-                        }
+                        cell.preservesSuperviewLayoutMargins = false
                     }
 
                     
@@ -144,7 +132,7 @@ class PlaylistTableViewController: LPRTableViewController {
         
         let playlistUserID = String(playlist["user_id"].int!)
         
-        if playlistUserID == resnateID {
+        if playlistUserID == resnateID && self.likes == false {
             return true
         } else {
             return false
@@ -159,7 +147,7 @@ class PlaylistTableViewController: LPRTableViewController {
         
         let playlistUserID = String(playlist["user_id"].int!)
         
-        if playlistUserID == resnateID {
+        if playlistUserID == resnateID && self.likes == false {
             return true
         } else {
             return false
@@ -235,7 +223,7 @@ class PlaylistTableViewController: LPRTableViewController {
         
         let playlistUserID = String(playlist["user_id"].int!)
         
-        if playlistUserID == resnateID {
+        if playlistUserID == resnateID && self.likes == false {
             
             let parameters =  ["token": "\(resnateToken)", "content": string!]
             

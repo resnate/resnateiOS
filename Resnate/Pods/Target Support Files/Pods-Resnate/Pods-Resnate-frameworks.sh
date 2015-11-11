@@ -88,6 +88,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "Pods-Resnate/FBSDKCoreKit.framework"
   install_framework "Pods-Resnate/FBSDKLoginKit.framework"
   install_framework "Pods-Resnate/FBSDKShareKit.framework"
+  install_framework "Pods-Resnate/ReachabilitySwift.framework"
   install_framework "Pods-Resnate/SocketRocket.framework"
   install_framework "Pods-Resnate/Pusher.framework"
 fi
@@ -96,6 +97,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "Pods-Resnate/FBSDKCoreKit.framework"
   install_framework "Pods-Resnate/FBSDKLoginKit.framework"
   install_framework "Pods-Resnate/FBSDKShareKit.framework"
+  install_framework "Pods-Resnate/ReachabilitySwift.framework"
   install_framework "Pods-Resnate/SocketRocket.framework"
   install_framework "Pods-Resnate/Pusher.framework"
 fi

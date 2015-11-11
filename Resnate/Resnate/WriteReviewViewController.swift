@@ -7,20 +7,62 @@
 //
 import Foundation
 import UIKit
+import ReachabilitySwift
 
 class WriteReviewViewController: UIViewController, UITextViewDelegate {
     
     var ID = 0
     
     var type = ""
+    
+    let noConnection = UILabel(frame: CGRect(x: 0, y: UIScreen.mainScreen().bounds.width - 100, width: UIScreen.mainScreen().bounds.width, height: 30))
+    
+    var reachability: Reachability?
 
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-
-        let b = UIBarButtonItem(title: "Post", style: .Plain, target: self, action: "postReview")
         
-        self.navigationItem.rightBarButtonItem = b
+        super.viewDidLoad()
+        
+        noConnection.text = "No Internet Connection"
+        noConnection.textAlignment = .Center
+        noConnection.textColor = UIColor.whiteColor()
+        noConnection.backgroundColor = UIColor.redColor()
+        
+        let postButton = UIBarButtonItem(title: "Post", style: .Plain, target: self, action: "postReview")
+        
+        self.navigationItem.rightBarButtonItem = postButton
+        
+        do {
+            let reachability = try Reachability.reachabilityForInternetConnection()
+            self.reachability = reachability
+        } catch {
+            return
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: ReachabilityChangedNotification, object: reachability)
+        
+        
+        do {
+            try reachability?.startNotifier()
+        } catch {
+            return
+        }
+        
+        // Initial reachability check
+        if let reachability = reachability {
+            if reachability.isReachable() {
+                
+            } else {
+                noConnection.tag = -72
+                self.view.addSubview(noConnection)
+                self.navigationItem.rightBarButtonItem?.tag = -53
+            }
+        }
+
+        
+        
+       
         
         if self.type == "Review"  {
             
@@ -79,11 +121,12 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
     
     func postReview() {
         
+            
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+            
+        let resnateToken = dictionary!["token"] as! String
         
-            
-            let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
-            
-            let resnateToken = dictionary!["token"] as! String
+        if self.navigationItem.rightBarButtonItem?.tag != -53 {
             
             if type == "Review"  {
                 
@@ -97,15 +140,15 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
                 mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
                 
                 request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
-
-                        self.navigationController?.popViewControllerAnimated(true)
-                        
-                        let window = UIApplication.sharedApplication().keyWindow
-                        
-                        if window!.rootViewController as? UITabBarController != nil {
-                            let tababarController = window!.rootViewController as! UITabBarController
-                            tababarController.selectedIndex = 0
-                        }
+                    
+                    self.navigationController?.popViewControllerAnimated(true)
+                    
+                    let window = UIApplication.sharedApplication().keyWindow
+                    
+                    if window!.rootViewController as? UITabBarController != nil {
+                        let tababarController = window!.rootViewController as! UITabBarController
+                        tababarController.selectedIndex = 0
+                    }
                     
                 }
                 
@@ -113,18 +156,18 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
             } else {
                 
                 if reviewTextField.text != "Write a review of the show to your heart's extent (as long as your heart's extent is less than 5000 characters)!" {
-                
-                let parameters =  ["token": "\(resnateToken)", "review": ["reviewable_id": "\(String(ID))", "content":"\(reviewTextField.text)", "reviewable_type": "\(type)" ]]
-                
-                
-                
-                let URL = NSURL(string: "https://www.resnate.com/api/reviews")!
-                let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
-                mutableURLRequest.HTTPMethod = Method.POST.rawValue
-                mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
-                
-                request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters as? [String : AnyObject]).0).responseJSON { response in
-
+                    
+                    let parameters =  ["token": "\(resnateToken)", "review": ["reviewable_id": "\(String(ID))", "content":"\(reviewTextField.text)", "reviewable_type": "\(type)" ]]
+                    
+                    
+                    
+                    let URL = NSURL(string: "https://www.resnate.com/api/reviews")!
+                    let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                    mutableURLRequest.HTTPMethod = Method.POST.rawValue
+                    mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                    
+                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters as? [String : AnyObject]).0).responseJSON { response in
+                        
                         self.navigationController?.popViewControllerAnimated(true)
                         
                         let window = UIApplication.sharedApplication().keyWindow
@@ -135,20 +178,48 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
                         }
                         
                     }
+                    
+                }
+                
+                
+                
+                
+                
+                
                 
             }
             
             
-            
-            
-            
-            
-            
         }
         
+    }
+    
+    deinit {
         
+        reachability?.stopNotifier()
         
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: ReachabilityChangedNotification, object: nil)
         
+    }
+    
+    func reachabilityChanged(note: NSNotification) {
+        let reachability = note.object as! Reachability
+        
+        if reachability.isReachable() {
+            
+            self.navigationItem.rightBarButtonItem?.tag = 0
+            
+            for view in self.view.subviews {
+                if view.tag == -72 {
+                    view.removeFromSuperview()
+                }
+            }
+        } else {
+            print("NO ")
+            noConnection.tag = -72
+            self.view.addSubview(noConnection)
+            self.navigationItem.rightBarButtonItem?.tag = -53
+        }
     }
     
     func keyboardShown(notification: NSNotification) {

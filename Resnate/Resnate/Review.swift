@@ -141,8 +141,6 @@ func toReview(sender:AnyObject) {
         
         if UIApplication.sharedApplication().respondsToSelector(Selector("registerUserNotificationSettings:")) {
             
-            // Notifications for iOS 8
-            if #available(iOS 8.0, *) {
                 let deleteAlert = UIAlertController(title: "Delete Review", message: "Are you sure you want to delete this review?", preferredStyle: UIAlertControllerStyle.Alert)
                 
                 deleteAlert.addAction(UIAlertAction(title: "Delete", style: .Default, handler: { (action: UIAlertAction) in
@@ -169,17 +167,7 @@ func toReview(sender:AnyObject) {
                 deleteAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
                 
                 presentViewController(deleteAlert, animated: true, completion: nil)
-            } else {
-                // Fallback on earlier versions
-                let alert = UIAlertView()
-                alert.title = "Delete Review"
-                alert.delegate = self
-                alert.tag = sender.view!.tag
-                alert.message = "Are you sure you want to delete this review?"
-                alert.addButtonWithTitle("Cancel")
-                alert.addButtonWithTitle("Delete")
-                alert.show()
-            }
+            
             
         }
         

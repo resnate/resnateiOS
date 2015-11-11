@@ -14,6 +14,8 @@ class UserPlaylistsViewController: UIViewController {
     
     var songs: [AnyObject] = []
     
+    var likedSongs: [AnyObject] = []
+    
     var playlist: [JSON] = []
     
     override func viewDidLoad() {
@@ -28,6 +30,9 @@ class UserPlaylistsViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         
+        let backItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backItem
+        
         let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
@@ -39,6 +44,20 @@ class UserPlaylistsViewController: UIViewController {
         request(req.buildURLRequest("users/", path: "/likes")).responseJSON { response in
                 
                 let songs = JSON(response.result.value!)
+            
+            for (_, song) in songs {
+                
+                var likedSong = [String: String]()
+                
+                let name = song["name"].string!
+                
+                let content = song["content"].string!
+                
+                likedSong = [ "\(name)" : "\(content)" ]
+                
+                self.likedSongs.append(likedSong)
+                
+            }
                 
                 if let firstSong = songs[0].dictionary {
                     
@@ -47,7 +66,7 @@ class UserPlaylistsViewController: UIViewController {
                     let content = firstSong["content"]!.string!
                     
                     let likesUrl = NSURL(string: "https://img.youtube.com/vi/\(content)/hqdefault.jpg")
-                    let likesView = UIImageView(frame: CGRect(x: 0, y: 0, width: 133, height: 100))
+                    let likesView = UIImageView(frame: CGRect(x: 10, y: 0, width: 100, height: 100))
                     self.getDataFromUrl(likesUrl!) { data in
                         dispatch_async(dispatch_get_main_queue()) {
                             
@@ -60,7 +79,7 @@ class UserPlaylistsViewController: UIViewController {
                     
                     likesUberView.addSubview(likesView)
                     
-                    let likesLabel = UILabel(frame: CGRect(x: 143, y: 30, width: 150, height: 30))
+                    let likesLabel = UILabel(frame: CGRect(x: 120, y: 30, width: 150, height: 30))
                     
                     setSKLabelText(likesLabel)
                     
@@ -69,6 +88,15 @@ class UserPlaylistsViewController: UIViewController {
                     likesUberView.addSubview(likesLabel)
                     
                     self.userPlaylistsView.addSubview(likesUberView)
+                    
+                    let tapLikes = UITapGestureRecognizer()
+                    
+                    
+                    tapLikes.addTarget(self, action: "likes:")
+                    likesUberView.addGestureRecognizer(tapLikes)
+                    likesUberView.tag = self.ID
+                    
+                    likesUberView.userInteractionEnabled = true
                     
                 }
         }
@@ -107,7 +135,7 @@ class UserPlaylistsViewController: UIViewController {
                             let song = firstSong as! [String: String]
                             for (_, ytID) in song {
                                 let playlistUrl = NSURL(string: "https://img.youtube.com/vi/\(ytID)/hqdefault.jpg")
-                                let playlistView = UIImageView(frame: CGRect(x: 0, y: 0, width: 133, height: 100))
+                                let playlistView = UIImageView(frame: CGRect(x: 10, y: 0, width: 100, height: 100))
                                 self.getDataFromUrl(playlistUrl!) { data in
                                     dispatch_async(dispatch_get_main_queue()) {
                                         
@@ -121,7 +149,7 @@ class UserPlaylistsViewController: UIViewController {
                                 let playlistName = playlist["name"].string!
                                 
                                 
-                                let playlistLabel = UILabel(frame: CGRect(x: 143, y: 30, width: 150, height: 30))
+                                let playlistLabel = UILabel(frame: CGRect(x: 120, y: 30, width: 150, height: 30))
                                 setSKLabelText(playlistLabel)
                                 playlistLabel.text = playlistName
                                 playlistUberView.addSubview(playlistLabel)
@@ -176,6 +204,26 @@ class UserPlaylistsViewController: UIViewController {
         let playlistTableViewController:PlaylistTableViewController = PlaylistTableViewController(nibName: nil, bundle: nil)
         
         playlistTableViewController.songs = self.songs[sender.view!.tag] as! [AnyObject]
+        
+        playlistTableViewController.likes = false
+        
+        playlistTableViewController.playlist = self.playlist[sender.view!.tag]
+        
+        if let playlistID = self.playlist[sender.view!.tag]["id"].int {
+            playlistTableViewController.playlistID = playlistID
+        }
+        
+        self.navigationController?.pushViewController(playlistTableViewController, animated: true)
+        
+    }
+    
+    func likes(sender: UITapGestureRecognizer){
+        
+        let playlistTableViewController:PlaylistTableViewController = PlaylistTableViewController(nibName: nil, bundle: nil)
+        
+        playlistTableViewController.songs = self.likedSongs
+        
+        playlistTableViewController.likes = true
         
         playlistTableViewController.playlist = self.playlist[sender.view!.tag]
         

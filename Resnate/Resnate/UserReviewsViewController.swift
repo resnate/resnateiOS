@@ -19,7 +19,8 @@ class UserReviewsViewController: UIViewController {
         
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "testBkgd.jpg")!)
         
-        
+        let backItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backItem
         
         let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
@@ -176,7 +177,7 @@ class UserReviewsViewController: UIViewController {
                                         let ytLink = "https://img.youtube.com/vi/" + ytID + "/hqdefault.jpg"
                                         
                                         let songImgUrl = NSURL(string: ytLink)
-                                        let reviewSongImg = UIImageView(frame: CGRect(x: 10, y: 0, width: 100, height: 100))
+                                        let reviewSongImg = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
                                         self.getDataFromUrl(songImgUrl!) { data in
                                             dispatch_async(dispatch_get_main_queue()) {
                                                 
@@ -186,7 +187,7 @@ class UserReviewsViewController: UIViewController {
                                                 
                                             }
                                         }
-                                        self.userReviewsView.addSubview(reviewSongImg)
+                                        reviewView.addSubview(reviewSongImg)
                                         
                                         
                                     }

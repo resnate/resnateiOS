@@ -8,6 +8,7 @@ target 'Resnate' do
     pod 'FBSDKCoreKit'
     pod 'FBSDKLoginKit'
     pod 'FBSDKShareKit'
+    pod 'ReachabilitySwift', git: 'https://github.com/ashleymills/Reachability.swift'
 end
 
 target 'ResnateTests' do

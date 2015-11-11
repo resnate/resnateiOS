@@ -10,10 +10,8 @@ import UIKit
 
 class AutoUser : UITableViewCell{
     
-    //Do whatever you want as exta customization
+ 
 }
-
-
 
 
 class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
@@ -26,6 +24,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var shareID = ""
     
+    var shareTitle = ""
     
     var users: [User] = []
     
@@ -42,7 +41,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        self.navigationController?.title = self.shareTitle
         
         let tapClose = UITapGestureRecognizer()
         
@@ -316,14 +315,10 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             if UIApplication.sharedApplication().respondsToSelector(Selector("registerUserNotificationSettings:")) {
                 
-                if #available(iOS 8.0, *) {
-                    let noRecipientAlert = UIAlertController(title: "Can't send message", message: "Please add recipients", preferredStyle: UIAlertControllerStyle.Alert)
-                    noRecipientAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+                let noRecipientAlert = UIAlertController(title: "Can't send message", message: "Please add recipients", preferredStyle: UIAlertControllerStyle.Alert)
+                noRecipientAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
                     
-                    presentViewController(noRecipientAlert, animated: true, completion: nil)
-                } else {
-                    // Fallback on earlier versions
-                }
+                presentViewController(noRecipientAlert, animated: true, completion: nil)
                 
                 
             } else {

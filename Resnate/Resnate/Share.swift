@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import FBSDKShareKit
 import TwitterKit
+import ReachabilitySwift
 
 struct User: Equatable {
     var name: String
@@ -37,7 +38,10 @@ extension UIViewController {
         let req = Router(OAuthToken: resnateToken, userID: resnateID)
     
     request(req.buildURLRequest("search/", path: "")).responseJSON { response in
-        let json = JSON(response.result.value!)
+        
+        if let re = response.result.value {
+            
+            let json = JSON(re)
             
             let users = json.array
             
@@ -52,22 +56,22 @@ extension UIViewController {
                 
             }
             
-
-        
-        
-        let shareViewController:ShareViewController = ShareViewController(nibName: "ShareViewController", bundle: nil)
-        
-        
-        shareViewController.type = type
-        
-        shareViewController.shareID = shareID
-        
-        shareViewController.users = friends
-        
-        self.presentViewController(shareViewController, animated: true, completion: nil)
-        
-        
-        
+            
+            
+            
+            let shareViewController:ShareViewController = ShareViewController(nibName: "ShareViewController", bundle: nil)
+            
+            
+            shareViewController.type = type
+            
+            shareViewController.shareID = shareID
+            
+            shareViewController.users = friends
+            
+            self.presentViewController(shareViewController, animated: true, completion: nil)
+            
+            
+        }
         
     }
     
@@ -79,9 +83,17 @@ extension UIViewController {
     
     }
     
+    func shareSingleSong(sender: AnyObject) {
+        
+        let songID = sender.view!.tag
+            
+        share("Song", shareID: "\(songID)")
+        
+    }
+    
     func shareReview(sender: AnyObject){
         
-        share("Review", shareID: String(sender.view!!.tag))
+        share("Review", shareID: String(sender.view!.tag))
         
         
     }
@@ -129,6 +141,8 @@ extension UIViewController {
             
         
     }
+    
+    
 
 }
 

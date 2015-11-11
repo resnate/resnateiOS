@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '1E115A9D97502F644104CAF0'
+               BlueprintIdentifier = '52A61E1C7576AC02D54EE292'
                BlueprintName = 'Pods-Resnate'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'Pods_Resnate.framework'>

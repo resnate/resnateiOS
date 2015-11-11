@@ -12,10 +12,6 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
     
     var ID = 0
     
-    var ytID = ""
-    
-    var ytTitle = ""
-    
     let width = Int(UIScreen.mainScreen().bounds.width)
     
     let imgWidth = Int(UIScreen.mainScreen().bounds.width) - 20
@@ -29,6 +25,147 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
     var postComment = UILabel(frame: CGRect(x: UIScreen.mainScreen().bounds.width - 50, y: UIScreen.mainScreen().bounds.height - 79, width: 50, height: 30))
     
     var type = ""
+    
+    var song = [String: String]()
+    
+    let ytPlayer = VideoPlayer.sharedInstance
+    
+    
+    func getSongInfo(songID: Int, view: UIView, token: String, currentUserID: String, likerID: String)  {
+        
+        let req = Router(OAuthToken: token, userID: String(songID))
+        
+        request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
+            
+            let song = JSON(response.result.value!)
+            
+            if let songID = song["id"].int {
+                
+                if let songName = song["name"].string {
+                    
+                    if let songContent = song["content"].string {
+                        
+                        let likeSong = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
+                        
+                        view.addSubview(likeSong)
+                        
+                        let tapLike = UITapGestureRecognizer()
+                        
+                        
+                        likeSong.tag = songID
+                        
+                        likeSong.addGestureRecognizer(tapLike)
+                        
+                        likeSong.userInteractionEnabled = true
+                        
+                        if currentUserID == likerID {
+                            
+                            likeSong.image = UIImage(named: "liked")
+                            tapLike.addTarget(self, action: "unlikeSong:")
+                            
+                        } else {
+                            
+                            let req = Router(OAuthToken: token, userID: currentUserID)
+                            
+                            request(req.buildURLRequest("likes/ifLike/Song/", path: "/\(songID)")).responseJSON { response in
+                                if let re = response.result.value {
+                                    
+                                    let json = JSON(re)
+                                    
+                                    if let count = json["count"].int {
+                                        
+                                        if count > 0 {
+                                            
+                                            likeSong.image = UIImage(named: "liked")
+                                            tapLike.addTarget(self, action: "unlikeSong:")
+                                            
+                                        }
+                                            
+                                        else {
+                                            
+                                            likeSong.image = UIImage(named: "likeWhite")
+                                            tapLike.addTarget(self, action: "likeSong:")
+                                        }
+                                        
+                                        
+                                    }
+                                    
+                                    
+                                }
+                            }
+                            
+                            
+                            
+                        }
+                        
+                        
+                        
+                        
+                        
+                        let shareSong = UIImageView(frame: CGRect(x: self.width/4 * 3 - 15, y: self.imgWidth + 120, width: 30, height: 30))
+                        
+                        shareSong.image = UIImage(named: "Share")
+                        
+                        view.addSubview(shareSong)
+                        
+                        let tapShare = UITapGestureRecognizer()
+                        
+                        tapShare.addTarget(self, action: "shareSingleSong:")
+                        shareSong.tag = songID
+                        
+                        shareSong.addGestureRecognizer(tapShare)
+                        
+                        shareSong.userInteractionEnabled = true
+                        
+                        let ytSong = [songName: songContent]
+                        
+                        let songNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                        
+                        songNameLabel.text = songName
+                        
+                        songNameLabel.textColor = UIColor.whiteColor()
+                        songNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
+                        songNameLabel.numberOfLines = 2
+                        
+                        view.addSubview(songNameLabel)
+                        
+                        let activitysongImg = UIImageView(frame: CGRect(x: 10, y: 125, width: self.imgWidth, height: self.imgHeight))
+                        
+                        
+                        
+                        let tapVideo = UITapGestureRecognizer()
+                        
+                        tapVideo.addTarget(self, action: "playSong:")
+                        activitysongImg.tag = songID
+                        
+                        activitysongImg.addGestureRecognizer(tapVideo)
+                        
+                        activitysongImg.userInteractionEnabled = true
+                        
+                        view.addSubview(activitysongImg)
+                        
+                        
+                        let songImgUrl = NSURL(string: "https://img.youtube.com/vi/\(songContent)/hqdefault.jpg")
+                        
+                        self.getDataFromUrl(songImgUrl!) { data in
+                            dispatch_async(dispatch_get_main_queue()) {
+                                
+                                activitysongImg.image = UIImage(data: data!)
+                                
+                                
+                                
+                            }
+                        }
+                        
+                        
+                    }
+                    
+                }
+                
+            }
+        }
+        
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,9 +193,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name:UIKeyboardWillShowNotification, object: nil)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name:UIKeyboardWillHideNotification, object: nil)
-        
-        
-        
+            
         self.view.addSubview(postComment)
         
         postComment.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
@@ -114,6 +249,8 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
         
         let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
+        let resnateID = dictionary!["userID"] as! String
+        
         let resnateToken = dictionary!["token"] as! String
         
         let activityID = String(self.ID)
@@ -121,8 +258,10 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
         let req = Router(OAuthToken: resnateToken, userID: activityID)
         
         request(req.buildURLRequest("", path: "/activities")).responseJSON { response in
+            
+            if let re = response.result.value {
                 
-                let activity = JSON(response.result.value!)
+                let activity = JSON(re)
                 
                 let activityView = UIView(frame: CGRect(x: 0, y: 10, width: self.width, height: self.imgHeight + 100))
                 
@@ -146,8 +285,6 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                     userNameLabel.userInteractionEnabled = true
                     
                     activityView.addSubview(userNameLabel)
-                    
-                    let activityUserImg = UIImageView(frame: CGRect(x: 10, y: 0, width: 60, height: 60))
                     
                     let commentImgView = UIImageView(frame: CGRect(x: self.width/2 - 15, y: self.imgWidth + 120, width: 30, height: 30))
                     
@@ -252,201 +389,89 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                         
                         if let songID = activity["trackable_id"].int {
                             
-                            let req = Router(OAuthToken: resnateToken, userID: String(songID))
-                            
-                            request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
-                                if let re = response.result.value {
-                                    
-                                    var song = JSON(re)
-                                        
-                                        if let songName = song["name"].string {
-                                            
-                                            if let songContent = song["content"].string {
-                                                
-                                                self.ytID = songContent
-                                                
-                                                self.ytTitle = songName
-                                                
-                                                let likeSong = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgHeight + 120, width: 30, height: 30))
-                                                
-                                                likeSong.image = UIImage(named: "likeWhite")
-                                                
-                                                activityView.addSubview(likeSong)
-                                                
-                                                let shareSong = UIImageView(frame: CGRect(x: self.width/4 * 3 - 15, y: self.imgHeight + 120, width: 30, height: 30))
-                                                
-                                                shareSong.image = UIImage(named: "Share")
-                                                
-                                                activityView.addSubview(shareSong)
-                                                
-                                                let songNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
-                                                
-                                                songNameLabel.text = songName
-                                                songNameLabel.textColor = UIColor.whiteColor()
-                                                songNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
-                                                songNameLabel.numberOfLines = 2
-                                                
-                                                let tapVideo = UITapGestureRecognizer()
-                                                
-                                                tapVideo.addTarget(self, action: "playSingleSong")
-                                                songNameLabel.tag = self.ID
-                                                
-                                                songNameLabel.addGestureRecognizer(tapVideo)
-                                                
-                                                songNameLabel.userInteractionEnabled = true
-                                                
-                                                activityView.addSubview(songNameLabel)
-                                                
-                                                
-                                                let activitysongImg = UIImageView(frame: CGRect(x: 10, y: 70, width: self.imgWidth, height: self.imgHeight))
-                                                
-                                                let songImgUrl = NSURL(string: "https://img.youtube.com/vi/\(songContent)/hqdefault.jpg")
-                                                
-                                                self.getDataFromUrl(songImgUrl!) { data in
-                                                    dispatch_async(dispatch_get_main_queue()) {
-                                                        activitysongImg.image = UIImage(data: data!)
-                                                        
-                                                        let tapVideo = UITapGestureRecognizer()
-                                                        
-                                                        tapVideo.addTarget(self, action: "playSingleSong")
-                                                        activitysongImg.tag = self.ID
-                                                        
-                                                        activitysongImg.addGestureRecognizer(tapVideo)
-                                                        
-                                                        activitysongImg.userInteractionEnabled = true
-                                                        
-                                                        activityView.addSubview(activitysongImg)
-                                                        
-                                                    }
-                                                }
-                                                
-                                                
-                                                
-                                                if let listenerID = song["user_id"].int {
-                                                    
-                                                    let req = Router(OAuthToken: resnateToken, userID: String(listenerID))
-                                                    
-                                                    request(req.buildURLRequest("users/", path: "")).responseJSON { response in
-                                                        if let re = response.result.value {
-                                                            
-                                                            var user = JSON(re)
-                                                            
-                                                            if let userName = user["name"].string {
-                                                                
-                                                                if let userImageID = user["uid"].string {
-                                                                    
-                                                                    if let userID = user["id"].int {
-                                                                        
-                                                                        
-                                                                        
-                                                                        userNameLabel.text = userName
-                                                                        
-                                                                        
-                                                                        userNameLabel.sizeToFit()
-                                                                        
-                                                                        
-                                                                        
-                                                                        
-                                                                        userNameLabel.tag = userID
-                                                                        
-                                                                        
-                                                                        
-                                                                        
-                                                                        let userImgUrl = NSURL(string: "https://graph.facebook.com/\(userImageID)/picture?width=200&height=200")
-                                                                        
-                                                                        self.getDataFromUrl(userImgUrl!) { data in
-                                                                            dispatch_async(dispatch_get_main_queue()) {
-                                                                                activityUserImg.image = UIImage(data: data!)
-                                                                                
-                                                                                activityView.addSubview(activityUserImg)
-                                                                                
-                                                                                let tapRecProfile = UITapGestureRecognizer()
-                                                                                tapRecProfile.addTarget(self, action: "profile:")
-                                                                                
-                                                                                activityUserImg.tag = userID
-                                                                                activityUserImg.addGestureRecognizer(tapRecProfile)
-                                                                                activityUserImg.userInteractionEnabled = true
-                                                                                
-                                                                            }
-                                                                        }
-                                                                        
-                                                                        
-                                                                    }
-                                                                    
-                                                                }
-                                                                
-                                                            }
-                                                            
-                                                        }
-                                                    }
-                                                    
-                                                }
-                                                
-                                            }
-                                            
-                                        }
-                                        
-                                    
-                                    
-                                    
-                                    
-                                    
-                                }
-                            }
+                            self.getSongInfo(songID, view: activityView, token: resnateToken, currentUserID: resnateID, likerID: "")
                             
                             
                         }
                         
+                    } else if type == "Socialization::ActiveRecordStores::Follow" {
                         
-                    } else if type == "Gig" {
+                        verbLabel.text = "followed"
                         
-                        verbLabel.text = "is going to"
-                        
-                        commentsAndLikesLabel.frame.origin.y = CGFloat(80 + self.imgWidth)
-                        
-                        let gigNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
-                        
-                        gigNameLabel.textColor = UIColor.whiteColor()
-                        gigNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
-                        gigNameLabel.numberOfLines = 2
-                        
-                        activityView.addSubview(gigNameLabel)
-                        
-                        if let gigID = activity["trackable_id"].int {
+                        if let trackableID = activity["trackable_id"].int {
                             
-                            let req = Router(OAuthToken: resnateToken, userID: String(gigID))
+                            let followReq = Router(OAuthToken: resnateToken, userID: String(trackableID))
                             
-                            request(req.buildURLRequest("gigs/", path: "")).responseJSON { response in
+                            request(followReq.buildURLRequest("follows/", path: "")).responseJSON { response in
                                 if let re = response.result.value {
                                     
-                                    let gig = JSON(re)
+                                    let followable = JSON(re)
                                     
-                                    if let songkickID = gig["songkick_id"].int {
+                                    let followeeNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                                    followeeNameLabel.textColor = UIColor.whiteColor()
+                                    followeeNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
+                                    followeeNameLabel.numberOfLines = 2
+                                    
+                                    activityView.addSubview(followeeNameLabel)
+                                    
+                                    if let followable_id = followable["followable_id"].int {
                                         
-                                        let pgSK = "https://api.songkick.com/api/3.0/events/\(String(songkickID)).json?apikey=Pxms4Lvfx5rcDIuR"
-                                        
-                                        request(.GET, pgSK).responseJSON { response in
-                                            if let re = response.result.value {
-                                                let json = JSON(re)
+                                        if let followable_type = followable["followable_type"].string {
+                                            
+                                            if followable_type == "User" {
                                                 
-                                                if let artist = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["id"].int {
+                                                let userReq = Router(OAuthToken: resnateToken, userID: String(followable_id))
+                                                
+                                                request(userReq.buildURLRequest("users/", path: "")).responseJSON { response in
                                                     
-                                                    let artistView = getArtistPic(artist)
-                                                    artistView.frame = CGRect(x: 10, y: 70, width: self.imgWidth, height: self.imgWidth)
-                                                    activityView.addSubview(artistView)
-                                                    artistView.tag = gigID
-                                                    
-                                                    artistView.userInteractionEnabled = true
-                                                    activityView.addSubview(artistView)
-                                                    
-                                                    if let gigName = json["resultsPage"]["results"]["event"]["displayName"].string {
+                                                    if let re = response.result.value {
                                                         
-                                                        gigNameLabel.text = gigName
+                                                        let user = JSON(re)
+                                                        
+                                                        if let uid = user["uid"].string {
+                                                            
+                                                            let imgUrl = NSURL(string: "https://graph.facebook.com/\(uid)/picture?width=500&height=500")
+                                                            
+                                                            self.getDataFromUrl(imgUrl!) { data in
+                                                                dispatch_async(dispatch_get_main_queue()) {
+                                                                    
+                                                                    let userImageView = UIImageView(frame: CGRect(x: 10, y: 70, width: self.imgWidth, height: self.imgWidth))
+                                                                    userImageView.image = UIImage(data: data!)
+                                                                    activityView.addSubview(userImageView)
+                                                                    
+                                                                    let tapRecProfile = UITapGestureRecognizer()
+                                                                    tapRecProfile.addTarget(self, action: "profile:")
+                                                                    
+                                                                    userImageView.tag = followable_id
+                                                                    userImageView.addGestureRecognizer(tapRecProfile)
+                                                                    userImageView.userInteractionEnabled = true
+                                                                    
+                                                                }
+                                                            }
+                                                            
+                                                            
+                                                            
+                                                        }
+                                                        
+                                                        if let name = user["name"].string {
+                                                            
+                                                            followeeNameLabel.text = name
+                                                            let tapRecProfile = UITapGestureRecognizer()
+                                                            tapRecProfile.addTarget(self, action: "profile:")
+                                                            
+                                                            followeeNameLabel.tag = followable_id
+                                                            followeeNameLabel.addGestureRecognizer(tapRecProfile)
+                                                            followeeNameLabel.userInteractionEnabled = true
+                                                            
+                                                        }
                                                         
                                                     }
                                                 }
+                                                
                                             }
+                                            
                                         }
+                                        
                                     }
                                     
                                 }
@@ -455,8 +480,61 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                         }
                         
                         
+                    } else if type == "Gig" {
                         
-                    }  else if type == "User" {
+                        verbLabel.text = "is going to"
+                        
+                        
+                        if let gigID = activity["trackable_id"].int {
+                            
+                            self.getGigInfo(gigID, view: activityView, token: resnateToken, currentUserID: resnateID, likerID: "")
+                            
+                        }
+                        
+                    } else if type == "Socialization::ActiveRecordStores::Like" {
+                        
+                        verbLabel.text = "liked"
+                        
+                        if let likeID = activity["trackable_id"].int {
+                            
+                            let req = Router(OAuthToken: resnateToken, userID: String(likeID))
+                            
+                            request(req.buildURLRequest("likes/", path: "")).responseJSON { response in
+                                if let re = response.result.value {
+                                    
+                                    var like = JSON(re)
+                                    
+                                    if let likeable_type = like["likeable_type"].string {
+                                        
+                                        if let likeable_id = like["likeable_id"].int {
+                                            
+                                            if let liker_id = like["liker_id"].int {
+                                                
+                                                if likeable_type == "Song" {
+                                                    
+                                                    self.getSongInfo(likeable_id, view: activityView, token: resnateToken, currentUserID: resnateID, likerID: String(liker_id))
+                                                    
+                                                } else if likeable_type == "Gig" {
+                                                    
+                                                    self.getGigInfo(likeable_id, view: activityView, token: resnateToken, currentUserID: resnateID, likerID: String(liker_id))
+                                                    
+                                                }
+                                                
+                                            }
+                                            
+                                            
+                                            
+                                        }
+                                        
+                                    }
+                                    
+                                }
+                            }
+                            
+                            
+                        }
+                        
+                    } else if type == "User" {
                         
                         if let userID = activity["trackable_id"].int {
                             
@@ -537,20 +615,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                         
                                         commentsAndLikesLabel.text = "\(likesCount) like"
                                         
-                                    } else {
-                                        
-                                        if type == "User" {
-                                            
-                                            commentsAndLikesLabel.text = "Comment!"
-                                            
-                                            
-                                        } else {
-                                            
-                                            commentsAndLikesLabel.text = "Like, comment or share!"
-                                            
-                                        }
-                                        
-                                    }
+                                    } 
                                     
                                     commentsAndLikesLabel.font = UIFont(name: "HelveticaNeue", size: 12)
                                     
@@ -707,12 +772,15 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                 
                             }
                             
+                        } else {
+                            
+                            self.scrollView.contentSize.height = CGFloat(self.imgHeight + 270)
+                         
                         }
                     }
                 }
                 
-
-                
+            }
             
         }
         
@@ -737,8 +805,20 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
     }
     
     func keyboardWillHide(sender: NSNotification) {
-        self.commentTextView.frame = CGRectMake(0, UIScreen.mainScreen().bounds.height - 141, self.view.bounds.width - 50, 30)
-        self.postComment.frame = CGRectMake(self.view.bounds.width - 50, UIScreen.mainScreen().bounds.height - 141, 50, 30)
+        
+        if self.navigationController?.viewControllers.count > 2 {
+            
+            self.commentTextView.frame = CGRectMake(0, UIScreen.mainScreen().bounds.height - 79, self.view.bounds.width - 50, 30)
+            self.postComment.frame = CGRectMake(self.view.bounds.width - 50, UIScreen.mainScreen().bounds.height - 79, 50, 30)
+            
+        } else {
+            
+            self.commentTextView.frame = CGRectMake(0, UIScreen.mainScreen().bounds.height - 141, self.view.bounds.width - 50, 30)
+            self.postComment.frame = CGRectMake(self.view.bounds.width - 50, UIScreen.mainScreen().bounds.height - 141, 50, 30)
+            
+        }
+        
+        
     }
     
     func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
@@ -788,7 +868,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
     
     
 
-    func playSingleSong(){
+    func playSong(sender: AnyObject){
         
         self.view.endEditing(true)
         
@@ -796,13 +876,23 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
         
         self.tabBarController?.view.addSubview(ytPlayer.videoPlayer)
         
-        ytPlayer.playVid(self.ytID)
+        let song = self.song
         
-        ytPlayer.ytID = self.ytID
+        for (name, ytID) in song {
+            
+            ytPlayer.ytID = ytID
+            
+            ytPlayer.ytTitle = name
+            
+            ytPlayer.shareID = "\(ytID),\(name)"
+            
+            ytPlayer.playVid(ytID)
+            
+        }
         
-        ytPlayer.ytTitle = self.ytTitle
         
-        ytPlayer.shareID = "\(self.ytID),\(self.ytTitle)"
+        self.tabBarController?.view.addSubview(ytPlayer.playerControls)
+        
         
     }
     
@@ -853,9 +943,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
             
             self.view.endEditing(true)
             
-        }
-        
-        
+        }  
         
     }
 

@@ -37,6 +37,11 @@
 		645C80531B6A3AC7001BED10 /* LPRTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645C80521B6A3AC7001BED10 /* LPRTableView.swift */; };
 		647122E01B6CA05A005408DB /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647122DF1B6CA05A005408DB /* VideoPlayer.swift */; };
 		649B17711B77761400342B06 /* RatingControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649B17701B77761400342B06 /* RatingControl.swift */; };
+		649E439C1BED7A7F00EA287C /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649E439A1BED7A7F00EA287C /* NotificationsViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		649E439D1BED7A7F00EA287C /* NotificationsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 649E439B1BED7A7F00EA287C /* NotificationsViewController.xib */; settings = {ASSET_TAGS = (); }; };
+		649E43A01BF06D3500EA287C /* BadgesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649E439E1BF06D3500EA287C /* BadgesViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		649E43A11BF06D3500EA287C /* BadgesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 649E439F1BF06D3500EA287C /* BadgesViewController.xib */; settings = {ASSET_TAGS = (); }; };
+		649E43A31BF1BBC000EA287C /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649E43A21BF1BBC000EA287C /* Activity.swift */; settings = {ASSET_TAGS = (); }; };
 		64BE7F3F1B1279BE00FBA7D8 /* ResnateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BE7F3E1B1279BE00FBA7D8 /* ResnateTests.swift */; };
 		64BE7F591B127A1800FBA7D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BE7F481B127A1800FBA7D8 /* AppDelegate.swift */; };
 		64BE7F5A1B127A1800FBA7D8 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BE7F491B127A1800FBA7D8 /* HomeViewController.swift */; };
@@ -132,6 +137,11 @@
 		645C80521B6A3AC7001BED10 /* LPRTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LPRTableView.swift; sourceTree = "<group>"; };
 		647122DF1B6CA05A005408DB /* VideoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayer.swift; sourceTree = "<group>"; };
 		649B17701B77761400342B06 /* RatingControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RatingControl.swift; path = Resnate.xcodeproj/../RatingControl.swift; sourceTree = SOURCE_ROOT; };
+		649E439A1BED7A7F00EA287C /* NotificationsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
+		649E439B1BED7A7F00EA287C /* NotificationsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NotificationsViewController.xib; sourceTree = "<group>"; };
+		649E439E1BF06D3500EA287C /* BadgesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BadgesViewController.swift; sourceTree = "<group>"; };
+		649E439F1BF06D3500EA287C /* BadgesViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BadgesViewController.xib; sourceTree = "<group>"; };
+		649E43A21BF1BBC000EA287C /* Activity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		64BE7F231B1279BE00FBA7D8 /* Resnate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Resnate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64BE7F381B1279BE00FBA7D8 /* ResnateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ResnateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		64BE7F3D1B1279BE00FBA7D8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -282,6 +292,8 @@
 				64BE7F6A1B127A5000FBA7D8 /* views */,
 				64BE7F481B127A1800FBA7D8 /* AppDelegate.swift */,
 				64EF0A4E1B1C1A74001ADA4F /* InboxViewController.swift */,
+				649E439A1BED7A7F00EA287C /* NotificationsViewController.swift */,
+				649E43A21BF1BBC000EA287C /* Activity.swift */,
 				64BE7F491B127A1800FBA7D8 /* HomeViewController.swift */,
 				64FF05B01BA9C5A100E83D47 /* ActivityViewController.swift */,
 				645C80381B5AD8E9001BED10 /* Images.xcassets */,
@@ -289,6 +301,7 @@
 				64BE7F4E1B127A1800FBA7D8 /* ArtistsViewController.swift */,
 				647122DF1B6CA05A005408DB /* VideoPlayer.swift */,
 				64BE7F521B127A1800FBA7D8 /* LoginViewController.swift */,
+				649E439E1BF06D3500EA287C /* BadgesViewController.swift */,
 				64EC16FE1B212BBB0008FC57 /* ScrollProfileViewController.swift */,
 				64EF5D341B4AD03500FE70BC /* WebViewController.swift */,
 				64E974521B4D8C9900A75DFC /* FollowViewController.swift */,
@@ -358,6 +371,8 @@
 				64EF5D351B4AD03500FE70BC /* WebViewController.xib */,
 				64E9744F1B4C369500A75DFC /* UserPlaylistsViewController.xib */,
 				64FF05B11BA9C5A100E83D47 /* ActivityViewController.xib */,
+				649E439B1BED7A7F00EA287C /* NotificationsViewController.xib */,
+				649E439F1BF06D3500EA287C /* BadgesViewController.xib */,
 			);
 			name = views;
 			sourceTree = "<group>";
@@ -456,6 +471,7 @@
 				64EF06761B44D777008B04E1 /* UpcomingGigsViewController.xib in Resources */,
 				64EE81FA1B2C6C6800CCEF95 /* ReviewViewController.xib in Resources */,
 				64EF06711B42E86D008B04E1 /* TwitterKitResources.bundle in Resources */,
+				649E439D1BED7A7F00EA287C /* NotificationsViewController.xib in Resources */,
 				64E974511B4C369500A75DFC /* UserPlaylistsViewController.xib in Resources */,
 				64BE7F5B1B127A1800FBA7D8 /* HomeViewController.xib in Resources */,
 				64BE7F691B127A1800FBA7D8 /* SettingsViewController.xib in Resources */,
@@ -468,6 +484,7 @@
 				645C80391B5AD8E9001BED10 /* Images.xcassets in Resources */,
 				64BE7F641B127A1800FBA7D8 /* LoginViewController.xib in Resources */,
 				64E974551B4D8C9900A75DFC /* FollowViewController.xib in Resources */,
+				649E43A11BF06D3500EA287C /* BadgesViewController.xib in Resources */,
 				64BE7F5E1B127A1800FBA7D8 /* Launch Screen.xib in Resources */,
 				64E980A41B22739300AB304B /* UserReviewsViewController.xib in Resources */,
 			);
@@ -550,6 +567,8 @@
 			files = (
 				640613AF1BCF5C2300A9E2C5 /* ParameterEncoding.swift in Sources */,
 				64E974541B4D8C9900A75DFC /* FollowViewController.swift in Sources */,
+				649E43A01BF06D3500EA287C /* BadgesViewController.swift in Sources */,
+				649E439C1BED7A7F00EA287C /* NotificationsViewController.swift in Sources */,
 				640613AE1BCF5C2300A9E2C5 /* MultipartFormData.swift in Sources */,
 				64BE7F671B127A1800FBA7D8 /* Router.swift in Sources */,
 				64BE7F631B127A1800FBA7D8 /* LoginViewController.swift in Sources */,
@@ -562,6 +581,7 @@
 				640613A91BCF5C2300A9E2C5 /* Alamofire.swift in Sources */,
 				64EA31FD1B385053003E132E /* WriteReviewViewController.swift in Sources */,
 				640613B21BCF5C2300A9E2C5 /* ResponseSerialization.swift in Sources */,
+				649E43A31BF1BBC000EA287C /* Activity.swift in Sources */,
 				64EA31F91B36C8DB003E132E /* PastGigsViewController.swift in Sources */,
 				64BE7F591B127A1800FBA7D8 /* AppDelegate.swift in Sources */,
 				64EF0A571B1E8267001ADA4F /* SwiftyJSON.swift in Sources */,

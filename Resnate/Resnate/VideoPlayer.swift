@@ -95,6 +95,8 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
         
         likeSong.image = UIImage(named: "likeWhite")
         
+        likeSong.tag = -713
+        
         self.playerControls.addSubview(likeSong)
         
         
@@ -201,6 +203,8 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
         
         let resnateToken = dictionary!["token"] as! String
         
+        let resnateID = dictionary!["userID"] as! String
+        
         let parameters =  ["song" : ["content": "\(self.ytID)", "name": "\(self.ytTitle)" ], "token": "\(resnateToken)"]
         
         let URL = NSURL(string: "https://www.resnate.com/api/songs/")!
@@ -215,6 +219,60 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate {
                 if let activity = json["activity"].string {
                     
                     self.activityID = Int(activity)!
+                    
+                    let req = Router(OAuthToken: resnateToken, userID: activity)
+                    
+                    request(req.buildURLRequest("likes/ifLike/Song/\(resnateID)/", path: "")).responseJSON { response in
+                        
+                        if let re = response.result.value {
+                            
+                            let json = JSON(re)
+                            
+                            print(json)
+                            
+                            if let count = json["count"].int {
+                                
+                                if count > 0 {
+                                    
+                                    for view in self.playerControls.subviews {
+                                        
+                                        if view.tag == -713 {
+                                            let imageView = view as! UIImageView
+                                            imageView.image = UIImage(named: "liked")
+                                            imageView.gestureRecognizers?.removeAll(keepCapacity: false)
+                                            let tapUnlike = UITapGestureRecognizer()
+                                            tapUnlike.addTarget(self, action: "unlikeSong:")
+                                            imageView.addGestureRecognizer(tapUnlike)
+                                            view.tag = -714
+                                            
+                                        }
+                                    }
+                                    
+                                } else {
+                                    
+                                    for view in self.playerControls.subviews {
+                                        
+                                        if view.tag == -714 {
+                                            let imageView = view as! UIImageView
+                                            imageView.image = UIImage(named: "likeWhite")
+                                            imageView.gestureRecognizers?.removeAll(keepCapacity: false)
+                                            let tapLike = UITapGestureRecognizer()
+                                            tapLike.addTarget(self, action: "likeSong:")
+                                            imageView.addGestureRecognizer(tapLike)
+                                            view.tag = -713
+                                            
+                                        }
+                                    }
+                                    
+                                }
+                                
+                                
+                            }
+                            
+                            
+                        }
+                    }
+                    
                     
                 }
         }

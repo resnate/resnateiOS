@@ -5,9 +5,9 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InboxViewController" customModule="Resnate" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NotificationsViewController" customModule="Resnate" customModuleProvider="target">
             <connections>
-                <outlet property="inboxScroll" destination="O9j-1V-BuI" id="ksj-nC-bnt"/>
+                <outlet property="scrollView" destination="kaG-lg-8Wv" id="z9z-WI-zAn"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -16,19 +16,20 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O9j-1V-BuI">
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kaG-lg-8Wv">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <animations/>
                 </scrollView>
             </subviews>
             <animations/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="O9j-1V-BuI" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="7Tj-jC-jrX"/>
-                <constraint firstAttribute="bottom" secondItem="O9j-1V-BuI" secondAttribute="bottom" id="JNO-V8-DED"/>
-                <constraint firstItem="O9j-1V-BuI" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="ZTf-e3-ToF"/>
-                <constraint firstAttribute="trailing" secondItem="O9j-1V-BuI" secondAttribute="trailing" id="cKO-6w-nMr"/>
+                <constraint firstItem="kaG-lg-8Wv" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="F9Z-rr-dUK"/>
+                <constraint firstAttribute="bottom" secondItem="kaG-lg-8Wv" secondAttribute="bottom" id="IkV-jf-HUL"/>
+                <constraint firstAttribute="trailing" secondItem="kaG-lg-8Wv" secondAttribute="trailing" id="d3g-5s-dC1"/>
+                <constraint firstItem="kaG-lg-8Wv" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="eP2-bl-IFp"/>
             </constraints>
-            <point key="canvasLocation" x="181" y="297"/>
+            <point key="canvasLocation" x="420" y="298"/>
         </view>
     </objects>
 </document>
