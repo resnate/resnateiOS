@@ -19,20 +19,19 @@ class PlaylistTableViewController: LPRTableViewController {
     
     var playlistID = 0
     
+    var playlistUserID = 0
+    
     var likes = false
+    
+    var page = 1
+    
+    let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    func insertNewObject(sender: AnyObject) {
-        self.songs.insert(NSDate(), atIndex: 0)
-        let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-        tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-    }
-    
-    // MARK: - Table View
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
@@ -50,6 +49,70 @@ class PlaylistTableViewController: LPRTableViewController {
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+        
+        let resnateID = dictionary!["userID"] as! String
+        
+        let resnateToken = dictionary!["token"] as! String
+        
+        if self.likes == true {
+            
+            self.navigationItem.title = "Likes"
+            
+        } else {
+            
+            self.navigationItem.title = playlistName
+            
+            let playlistUserID = String(playlist["user_id"].int!)
+            
+            if playlistUserID != resnateID {
+                
+                let ifReq = Router(OAuthToken: resnateToken, userID: resnateID)
+                
+                request(ifReq.buildURLRequest("/", path: "/\(self.playlistID)/ifFollow")).responseJSON { response in
+                    
+                    if let re = response.result.value {
+                        
+                        let ifFollow = JSON(re)
+                        
+                        if let ifTrue = ifFollow["ifFollows"].bool {
+                            
+                            if ifTrue == true {
+                                
+                                let unfollowButton = UIBarButtonItem(title: "Unfollow", style: .Plain, target: self, action: "unfollowPlaylist:")
+                                
+                                self.navigationItem.rightBarButtonItem = unfollowButton
+                                
+                                unfollowButton.tag = self.playlistID
+                                
+                            } else {
+                                
+                                let followButton = UIBarButtonItem(title: "Follow", style: .Plain, target: self, action: "followPlaylist:")
+                                
+                                self.navigationItem.rightBarButtonItem = followButton
+                                
+                                followButton.tag = self.playlistID
+                                
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                }
+                
+            } else {
+                
+                let b = UIBarButtonItem(title: "", style: .Plain, target: self, action: "sharePlaylist:")
+                b.image = UIImage(named: "Share")!.imageWithRenderingMode(.AlwaysOriginal)
+                b.tag = self.playlistID
+                self.navigationItem.rightBarButtonItem = b
+                
+            }
+            
+        }
+        
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
         
         cell.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
@@ -63,10 +126,7 @@ class PlaylistTableViewController: LPRTableViewController {
         
         if let song = songs[indexPath.row] as? [String: String] {
             for (name, ytID) in song {
-                
-
-                
-                
+            
                     cell.contentView.subviews.map({ $0.removeFromSuperview() })
                     let width = UIScreen.mainScreen().bounds.width
                     
@@ -119,6 +179,46 @@ class PlaylistTableViewController: LPRTableViewController {
                 
             
         }
+            
+           
+            
+            if (indexPath.row ==  self.songs.count-1) {
+                if self.likes == true {
+                    
+                    self.page += 1
+                    
+                    
+                    
+                    let resnateID = String(self.playlistUserID)
+                    
+                    let req = Router(OAuthToken: resnateToken, userID: resnateID)
+                    
+                    request(req.buildURLRequest("users/", path: "/likes/\(self.page)")).responseJSON { response in
+                        
+                        let songs = JSON(response.result.value!)
+                        
+                        for (_, song) in songs {
+                            
+                            var likedSong = [String: String]()
+                            
+                            let name = song["name"].string!
+                            
+                            let content = song["content"].string!
+                            
+                            likedSong = [ "\(name)" : "\(content)" ]
+                            
+                            self.songs.append(likedSong)
+                            
+                        }
+                        
+                        if songs.count > 0 {
+                            self.tableView.reloadData()
+                        }
+
+                    }
+                    
+                }
+            }
     }
         return cell
     }
@@ -130,13 +230,21 @@ class PlaylistTableViewController: LPRTableViewController {
         
         let resnateID = dictionary!["userID"] as! String
         
-        let playlistUserID = String(playlist["user_id"].int!)
-        
-        if playlistUserID == resnateID && self.likes == false {
-            return true
+        if self.likes == false {
+            
+            let playlistUserID = String(playlist["user_id"].int!)
+            
+            if playlistUserID == resnateID {
+                return true
+            } else {
+                return false
+            }
+
+            
         } else {
             return false
         }
+        
         
     }
     
@@ -145,10 +253,17 @@ class PlaylistTableViewController: LPRTableViewController {
         
         let resnateID = dictionary!["userID"] as! String
         
-        let playlistUserID = String(playlist["user_id"].int!)
-        
-        if playlistUserID == resnateID && self.likes == false {
-            return true
+        if self.likes == false {
+            
+            let playlistUserID = String(playlist["user_id"].int!)
+            
+            if playlistUserID == resnateID {
+                return true
+            } else {
+                return false
+            }
+            
+            
         } else {
             return false
         }
@@ -221,20 +336,29 @@ class PlaylistTableViewController: LPRTableViewController {
         
         let resnateID = dictionary!["userID"] as! String
         
-        let playlistUserID = String(playlist["user_id"].int!)
-        
-        if playlistUserID == resnateID && self.likes == false {
+        if self.likes == false {
             
-            let parameters =  ["token": "\(resnateToken)", "content": string!]
+            let playlistUserID = String(playlist["user_id"].int!)
             
-            let URL = NSURL(string: "https://www.resnate.com/api/playlists/\(self.playlistID)")!
-            let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
-            mutableURLRequest.HTTPMethod = Method.PUT.rawValue
-            mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
-            
-            request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
-
+            if playlistUserID == resnateID {
+                
+                if playlistUserID == resnateID && self.likes == false {
+                    
+                    let parameters =  ["token": "\(resnateToken)", "content": string!]
+                    
+                    let URL = NSURL(string: "https://www.resnate.com/api/playlists/\(self.playlistID)")!
+                    let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                    mutableURLRequest.HTTPMethod = Method.PUT.rawValue
+                    mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                    
+                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                        
+                    }
+                    
+                }
+                
             }
+            
             
         }
         
@@ -257,13 +381,30 @@ class PlaylistTableViewController: LPRTableViewController {
             
             ytPlayer.ytTitle = name
             
-            ytPlayer.shareID = "\(ytID),\(name)"
+            let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+            
+            let resnateToken = dictionary!["token"] as! String
+            
+            let req = Router(OAuthToken: resnateToken, userID: "\(ytPlayer.ytID)/\(self.playlistUserID)")
+            
+            request(req.buildURLRequest("songs/", path: "/findSong")).responseJSON { response in
+                
+                if let re = response.result.value {
+                    
+                    let song = JSON(re)
+                    
+                    if let songID = song["songID"].string {
+                        
+                        ytPlayer.shareID = songID
+                        
+                    }
+                    
+                }
+            }
             
             
         }
         
-       
-        self.tabBarController?.view.addSubview(ytPlayer.playerControls)
         
         
         

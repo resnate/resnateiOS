@@ -37,49 +37,54 @@ extension UIViewController {
         
         let req = Router(OAuthToken: resnateToken, userID: resnateID)
     
-    request(req.buildURLRequest("search/", path: "")).responseJSON { response in
+        request(req.buildURLRequest("search/", path: "")).responseJSON { response in
         
-        if let re = response.result.value {
+            if let re = response.result.value {
             
-            let json = JSON(re)
+                let json = JSON(re)
             
-            let users = json.array
+                let users = json.array
             
-            for user in users! {
-                let name = user["name"].string!
-                let id = user["id"].int!
-                let uid = user["uid"].string!
-                let friend = User(name: name, id: id, uid: uid)
-                if friend.id != Int(resnateID) {
-                    friends.append(friend)
-                }
+                for user in users! {
+                    let name = user["name"].string!
+                    let id = user["id"].int!
+                    let uid = user["uid"].string!
+                    let friend = User(name: name, id: id, uid: uid)
+                    if friend.id != Int(resnateID) {
+                        friends.append(friend)
+                    }
                 
+                }
+            
+            
+                let shareViewController:ShareViewController = ShareViewController(nibName: "ShareViewController", bundle: nil)
+            
+            
+                shareViewController.type = type
+            
+                shareViewController.shareID = shareID
+            
+                shareViewController.users = friends
+            
+                self.presentViewController(shareViewController, animated: true, completion: nil)
+            
             }
-            
-            
-            
-            
-            let shareViewController:ShareViewController = ShareViewController(nibName: "ShareViewController", bundle: nil)
-            
-            
-            shareViewController.type = type
-            
-            shareViewController.shareID = shareID
-            
-            shareViewController.users = friends
-            
-            self.presentViewController(shareViewController, animated: true, completion: nil)
-            
-            
         }
+    }
+    
+    func addToPlaylist(song: [String: String]) {
+        
+        let addPlaylistViewController = AddPlaylistViewController(nibName: "AddPlaylistViewController", bundle: nil)
+        
+        addPlaylistViewController.song = song
+        
+        self.presentViewController(addPlaylistViewController, animated: true, completion: nil)
         
     }
     
     
-}
-    
     func closeShare(sender: AnyObject) {
-        sender.view!!.superview!.superview!.removeFromSuperview()
+        sender.view!.superview!.superview!.removeFromSuperview()
     
     }
     
@@ -95,12 +100,17 @@ extension UIViewController {
         
         share("Review", shareID: String(sender.view!.tag))
         
+    }
+    
+    func sharePlaylist(sender: AnyObject){
         
+        share("Playlist", shareID: String(sender.tag))
+        print(sender.view!.tag)
     }
     
     
     func shareGig(sender: AnyObject){
-        share("Gig", shareID: String(sender.view!!.tag))
+        share("Gig", shareID: String(sender.view!.tag))
     }
     
     
@@ -108,7 +118,7 @@ extension UIViewController {
     
     func fbReview(sender: AnyObject){
         let content = FBSDKShareLinkContent()
-        content.contentURL = NSURL(string: "www.resnate.com/reviews/\(sender.view!!.tag)/pl")
+        content.contentURL = NSURL(string: "www.resnate.com/reviews/\(sender.view!.tag)/pl")
         FBSDKShareDialog.showFromViewController(self, withContent: content, delegate: nil)
     }
     
@@ -117,7 +127,7 @@ extension UIViewController {
 
     func twitter(sender: AnyObject){
         let composer = TWTRComposer()
-        let url = "I've written a review on @resnate! https://www.resnate.com/reviews/\(sender.view!!.tag)/pl"
+        let url = "I've written a review on @resnate! https://www.resnate.com/reviews/\(sender.view!.tag)/pl"
         composer.setText(url)
         composer.setImage(UIImage(named: "fabric"))
         
@@ -135,15 +145,21 @@ extension UIViewController {
         
         let ytPlayer = VideoPlayer.sharedInstance
             
-        ytPlayer.hideControls()
-            
         share("Song", shareID: ytPlayer.shareID)
-            
         
     }
     
+    func checkIfAdding(UIView: VideoPlayer){
+        
+        let ytPlayer = VideoPlayer.sharedInstance
+        
+        addToPlaylist([ytPlayer.ytTitle : ytPlayer.ytID])
+        
+    }
     
-
+    func closeModal() {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
 }
 
 extension String

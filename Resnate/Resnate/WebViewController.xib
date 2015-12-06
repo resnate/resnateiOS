@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="WebViewController" customModule="Resnate" customModuleProvider="target">
@@ -20,10 +20,12 @@
             <subviews>
                 <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uQB-Nr-SnR">
                     <rect key="frame" x="0.0" y="55" width="320" height="513"/>
+                    <animations/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </webView>
                 <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="close" translatesAutoresizingMaskIntoConstraints="NO" id="lud-L7-cfV">
                     <rect key="frame" x="0.0" y="10" width="42" height="46"/>
+                    <animations/>
                     <gestureRecognizers/>
                     <constraints>
                         <constraint firstAttribute="width" constant="42" id="HVX-a4-74N"/>
@@ -35,6 +37,7 @@
                 </imageView>
                 <imageView userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="forward" translatesAutoresizingMaskIntoConstraints="NO" id="edD-No-cqP">
                     <rect key="frame" x="282" y="18" width="30" height="30"/>
+                    <animations/>
                     <constraints>
                         <constraint firstAttribute="width" constant="30" id="2E2-fj-Fwe"/>
                         <constraint firstAttribute="height" constant="30" id="ISs-lJ-mHH"/>
@@ -42,12 +45,14 @@
                 </imageView>
                 <imageView userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="back" translatesAutoresizingMaskIntoConstraints="NO" id="EwT-ra-YSr">
                     <rect key="frame" x="250" y="18" width="30" height="30"/>
+                    <animations/>
                     <constraints>
                         <constraint firstAttribute="height" constant="30" id="Oyl-Jw-wGc"/>
                         <constraint firstAttribute="width" constant="30" id="Vfj-MO-E7I"/>
                     </constraints>
                 </imageView>
             </subviews>
+            <animations/>
             <color key="backgroundColor" red="0.50196078430000002" green="0.074509803920000006" blue="0.21176470589999999" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="uQB-Nr-SnR" secondAttribute="trailing" id="4sJ-Wz-qq9"/>
@@ -74,9 +79,4 @@
         <image name="close" width="512" height="512"/>
         <image name="forward" width="128" height="128"/>
     </resources>
-    <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar"/>
-        <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4"/>
-    </simulatedMetricsContainer>
 </document>

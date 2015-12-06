@@ -8,92 +8,141 @@
 
 import UIKit
 import FBSDKLoginKit
+import ReachabilitySwift
 
 class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
     
+    var reachability: Reachability?
     
+    let noConnection = UILabel(frame: CGRect(x: 0, y: UIScreen.mainScreen().bounds.height/2 - 15, width: UIScreen.mainScreen().bounds.width, height: 30))
+    
+    let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+    
+    let appDelegate: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     
     func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
-        println("User Logged In")
+        print("User Logged In")
         
         if ((error) != nil)
         {
             // Process error
-            println("error is \(error)")
+            print("error is \(error)")
         }
         else if result.isCancelled {
             // Handle cancellations
+        } else {
+            loginView.hidden = true
         }
-        else {
-            request(.GET, "https://www.resnate.com/api/userSearch/\(FBSDKAccessToken.currentAccessToken().tokenString)")
-                .responseJSON { (_, _, JSON, error) in
-                    if JSON != nil {
-                        let userID = JSON!["id"] as! String
-                        let userToken = JSON!["access_token"] as! String
-                        let userName = JSON!["name"] as! String
-                        let userFirstName = JSON!["first_name"] as! String
-                        
-                        println(userID)
-                        
-                        let req = Router(OAuthToken: userToken, userID: userID)
-                        request(req.buildURLRequest("users/", path: "")).responseJSON { (_, _, JSON, errorMsg) in
-                            if JSON != nil {
-                                
-                                let resnateUserID = JSON!["id"] as! Int
-                                
-                                let error = Locksmith.saveData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"],forUserAccount: "resnateAccount", inService: "resnate")
-                            }
-                                
-                            else {
-                                println(errorMsg)
-                            }
-                        }
-                        
-                        
-                    } else {
-                        println(error)
-                    }
-            }
-            let appDelegate: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            appDelegate.window?.rootViewController = self.navigationController
-        }
+
     }
     
     func loginButtonDidLogOut(loginButton: FBSDKLoginButton!) {
-        println("User Logged Out")
+                print("User Logged Out")
     }
     
     
     @IBOutlet weak var loginView: FBSDKLoginButton!
     
+    override func viewWillAppear(animated: Bool) {
+        
+
+        
+            
+            if dictionary != nil {
+                loginView.hidden = true
+            }
+            
+        
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // Do any additional setup after loading the view.
         
+            loginView.readPermissions = ["public_profile", "user_likes", "user_friends"]
+            loginView.delegate = self
         
-        loginView.readPermissions = ["public_profile", "user_likes", "user_friends"]
-        loginView.delegate = self
+        
+        do {
+            let reachability = try Reachability.reachabilityForInternetConnection()
+            self.reachability = reachability
+        } catch {
+            print("Unable to create\nReachability with address")
+            return
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: ReachabilityChangedNotification, object: reachability)
+        
+        
+        do {
+            try reachability?.startNotifier()
+        } catch {
+            print("Unable to start\nnotifier")
+            return
+        }
+        
+        // Initial reachability check
+        if let reachability = reachability {
+            if reachability.isReachable() {
+                print("initialReach")
+            } else {
+                print("noInitialReach")
+                loginView.hidden = true
+                
+                noConnection.text = "No Internet Connection"
+                noConnection.textAlignment = .Center
+                noConnection.textColor = UIColor.whiteColor()
+                self.view.addSubview(noConnection)
+            }
+        }
         
         
         
     }
     
+    deinit {
+        
+        reachability?.stopNotifier()
+        
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: ReachabilityChangedNotification, object: nil)
+        
+    }
+    
+    func reachabilityChanged(note: NSNotification) {
+        let reachability = note.object as! Reachability
+        
+        if reachability.isReachable() {
+            noConnection.hidden = true
+            
+            if dictionary != nil {
+                appDelegate.window?.rootViewController = appDelegate.tabBarController
+            } else {
+                loginView.hidden = false
+                loginView.awakeFromNib()
+            }
+            
+        } else {
+            print("unreachable2")
+        }
+    }
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    
+
     /*
     // MARK: - Navigation
-    
+
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-    // Get the new view controller using segue.destinationViewController.
-    // Pass the selected object to the new view controller.
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
     }
     */
-    
+
 }

@@ -24,6 +24,63 @@ public enum YouTubePlayerEvents: String {
     case PlaybackQualityChange = "onPlaybackQualityChange"
 }
 
+func timeToHHMMSS(doubleTime: Double) -> String {
+    
+    let sec_num = Int(doubleTime)
+    
+    var stringHours = ""
+    var stringMinutes = ""
+    var stringSeconds = ""
+    
+    var time = ""
+    
+    if(doubleTime / 3600 <= 1) {
+        
+        let minutes = Int(sec_num / 60)
+        let seconds = sec_num - minutes * 60
+        
+        if (minutes < 10) {
+            stringMinutes = "0\(minutes)"
+        } else {
+            stringMinutes = String(minutes)
+        }
+        
+        if (seconds < 10) {
+            stringSeconds = "0\(seconds)"
+        } else {
+            stringSeconds = String(seconds)
+        }
+        
+        time    = "\(stringMinutes):\(stringSeconds)"
+        
+    } else {
+        let hours   = Int(sec_num / 3600)
+        let minutes = Int(((sec_num - hours * 3600) / 60))
+        let seconds = sec_num - hours * 3600 - minutes * 60
+        
+        if (hours   < 10) {
+            stringHours   = "0\(hours)"
+        } else {
+            stringHours = String(hours)
+        }
+        if (minutes < 10) {
+            stringMinutes = "0\(minutes)"
+        } else {
+            stringMinutes = String(minutes)
+        }
+        if (seconds < 10) {
+            stringSeconds = "0\(seconds)"
+        } else {
+            stringSeconds = String(seconds)
+        }
+        
+        time    = "\(stringHours):\(stringMinutes):\(stringSeconds)"
+        
+    }
+    
+    return time
+}
+
 public enum YouTubePlaybackQuality: String {
     case Small = "small"
     case Medium = "medium"
@@ -172,6 +229,50 @@ public class YouTubePlayerView: UIView, UIWebViewDelegate {
     public func seekTo(seconds: Float, seekAhead: Bool) {
         evaluatePlayerCommand("seekTo(\(seconds), \(seekAhead))")
     }
+    
+    public func getVideoBytesLoaded(completion:(bytesLoaded: String) -> ()) {
+        
+        dispatch_async(dispatch_get_main_queue(),{
+            if let bytesLoaded = self.webView.stringByEvaluatingJavaScriptFromString("player.getVideoBytesLoaded();") {
+                completion(bytesLoaded: bytesLoaded)
+            }
+        })
+        
+    }
+    
+    public func getCurrentTime(completion:(youTubeTime: String, doubleTime: Double) -> ()) {
+
+        dispatch_async(dispatch_get_main_queue(),{
+            if let currentTime = self.webView.stringByEvaluatingJavaScriptFromString("player.getCurrentTime().toString();") {
+                
+                if let doubleTime = Double(currentTime) {
+                    
+                    let time = timeToHHMMSS(doubleTime)
+                    
+                    completion(youTubeTime: time, doubleTime: doubleTime)
+                }
+            }
+        })
+        
+    }
+    
+    
+    
+    public func getDuration(completion:(youTubeTime: String, doubleTime: Double) -> ()) {
+        
+        dispatch_async(dispatch_get_main_queue(),{
+        if let currentTime = self.webView.stringByEvaluatingJavaScriptFromString("player.getDuration().toString();") {
+        
+            if let doubleTime = Double(currentTime) {
+                
+                let time = timeToHHMMSS(doubleTime)
+                
+                completion(youTubeTime: time, doubleTime: doubleTime)
+            }
+        }
+        })
+        
+    }
 
     // MARK: Playlist controls
 
@@ -185,7 +286,9 @@ public class YouTubePlayerView: UIView, UIWebViewDelegate {
 
     private func evaluatePlayerCommand(command: String) {
         let fullCommand = "player." + command + ";"
+        dispatch_async(dispatch_get_main_queue(),{
         webView.stringByEvaluatingJavaScriptFromString(fullCommand)
+        })
     }
 
 

@@ -20,11 +20,11 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     @IBOutlet weak var send: UILabel!
     
+    @IBOutlet weak var shareTitle: UILabel!
+    
     var type = ""
     
     var shareID = ""
-    
-    var shareTitle = ""
     
     var users: [User] = []
     
@@ -32,6 +32,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var removedUsers = [User]()
     
+    let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
     
     var subTags: [Int] = []
     
@@ -39,9 +40,27 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var autocompleteTableView = UITableView(frame: CGRect(x: 0, y: 180, width: UIScreen.mainScreen().bounds.width, height: 500))
 
     override func viewDidLoad() {
+        
         super.viewDidLoad()
-
-        self.navigationController?.title = self.shareTitle
+        
+        let resnateToken = dictionary!["token"] as! String
+        
+        let req = Router(OAuthToken: resnateToken, userID: String(shareID))
+        
+        if self.type == "Song" {
+            
+            request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
+                
+                let song = JSON(response.result.value!)
+                
+                if let songName = song["name"].string {
+                    
+                    self.shareTitle.text = songName
+                    
+                }
+            }
+            
+        }
         
         let tapClose = UITapGestureRecognizer()
         
@@ -255,11 +274,11 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func removeUser(sender: AnyObject) {
         
-        subTags.removeAtIndex(subTags.indexOf(sender.view!!.tag)!)
+        subTags.removeAtIndex(subTags.indexOf(sender.view!.tag)!)
         
         for user in removedUsers {
             
-            if user.id == sender.view!!.tag {
+            if user.id == sender.view!.tag {
                 
                 users.append(user)
                 
@@ -271,7 +290,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
         }
         
-        let addedUser = sender.view!!.superview!
+        let addedUser = sender.view!.superview!
 
         if addedUser.frame.origin.x == 37.5 {
             
@@ -370,10 +389,6 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         
         
-    }
-    
-    func closeModal() {
-        self.dismissViewControllerAnimated(true, completion: nil)
     }
 
 }

@@ -12,17 +12,21 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
     
     var ID = 0
     
-    var notificationCount = 0
-    
     var resnateToken = ""
     
     var webURL = ""
     
     let ytPlayer = VideoPlayer.sharedInstance
     
-    var notificationView = UILabel(frame: CGRect(x: 10, y: 250, width: 150, height: 40))
-    
     var badgesCount = UILabel(frame: CGRect(x: 105, y: 14, width: 44, height: 30))
+    
+    var percentToNextLevel: Float = 0.0
+    
+    var pointsToNextLevel: Float = 0.0
+    
+    var pointsToNextLevelLabel = UILabel(frame: CGRect(x: 10, y: 245, width: 310, height: 20))
+    
+    var progressLevel: UIProgressView!
     
     @IBOutlet weak var badgesView: UIView!
     
@@ -102,7 +106,15 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
     
     func returnUserData()
     {
-        
+        for subview in self.scrollView.subviews {
+            
+            if subview.tag == -5 {
+                
+                subview.removeFromSuperview()
+                
+            }
+            
+        }
         
         let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
@@ -170,56 +182,8 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                 }
             }
             
-        } else {
-            
-            self.scrollView.addSubview(self.notificationView)
-            
-            self.notificationView.textColor = UIColor.whiteColor()
-            
-            self.notificationView.textAlignment = .Center
-            
-            
-            let profileNav = self.tabBarController?.viewControllers![1] as! UINavigationController
-            
-            let profileView = profileNav.viewControllers[0] as! ScrollProfileViewController
-            
-            
-            let tapNotifications = UITapGestureRecognizer()
-            tapNotifications.addTarget(self, action: "toNotifications:")
-            self.notificationView.tag = Int((dictionary!["userID"] as! String))!
-            self.notificationView.addGestureRecognizer(tapNotifications)
-            self.notificationView.userInteractionEnabled = true
-            
-            
-            if profileView.notificationCount > 0 {
-                
-                self.notificationView.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
-                
-                if profileView.notificationCount == 1 {
-                    
-                    self.notificationView.text = "\(profileView.notificationCount) Notification"
-                    
-                } else {
-                    
-                    self.notificationView.text = "\(profileView.notificationCount) Notifications"
-                    
-                }
-                
-                self.notificationView.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
-                
-                
-            } else {
-                
-                self.notificationView.font = UIFont(name: "HelveticaNeue-Light", size: 18)
-                
-                self.notificationView.text = "Notifications"
-                
-                self.notificationView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
-                
-            }
-            
         }
-    
+        
         let req = Router(OAuthToken: self.resnateToken, userID: String(self.ID))
         
         request(req.buildURLRequest("users/", path: "/level")).responseJSON { response in
@@ -233,7 +197,66 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                 }
                 
                 if let points = json["points"].string {
+                    
                     self.profilePoints.text = points
+                    
+                    if self.ID == Int((dictionary!["userID"] as! String))! {
+                        
+                        let intPoints = Float(points)!
+                        
+                        if intPoints < 5 {
+                            
+                            self.percentToNextLevel = intPoints/5
+                            self.pointsToNextLevel = 5 - intPoints
+                            
+                        } else if intPoints < 10 {
+                            
+                            self.percentToNextLevel = (intPoints - 5)/5
+                            self.pointsToNextLevel = 10 - intPoints
+                            
+                        } else if intPoints < 25 {
+                            
+                            self.percentToNextLevel = (intPoints - 10)/15
+                            self.pointsToNextLevel = 25 - intPoints
+                            
+                        } else if intPoints < 100 {
+                            
+                            self.percentToNextLevel = (intPoints - 25)/75
+                            self.pointsToNextLevel = 100 - intPoints
+                            
+                        } else if intPoints < 500 {
+                            
+                            self.percentToNextLevel = (intPoints - 100)/400
+                            self.pointsToNextLevel = 500 - intPoints
+                            
+                        } else if intPoints < 1000 {
+                            
+                            self.percentToNextLevel = (intPoints - 500)/500
+                            self.pointsToNextLevel = 1000 - intPoints
+                            
+                        } else if intPoints < 10000 {
+                            
+                            self.percentToNextLevel = (intPoints - 1000)/9000
+                            self.pointsToNextLevel = 10000 - intPoints
+                            
+                        }
+                        
+                        self.progressLevel = UIProgressView(progressViewStyle: UIProgressViewStyle.Bar)
+                        
+                        self.progressLevel.progressTintColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
+                        self.progressLevel.trackTintColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
+                        self.progressLevel.progress = self.percentToNextLevel
+                        self.progressLevel.frame = CGRect(x: 10, y: 280, width: Int(UIScreen.mainScreen().bounds.width) - 20, height: 20)
+                        self.progressLevel.transform = CGAffineTransformMakeScale(1.0, 5.0)
+                        self.scrollView.addSubview(self.progressLevel)
+                        
+                        self.pointsToNextLevelLabel.text = "\(Int(self.pointsToNextLevel)) points to next level"
+                        self.pointsToNextLevelLabel.textColor = UIColor.whiteColor()
+                        self.pointsToNextLevelLabel.font = UIFont(name: "HelveticaNeue-Light", size: 16)
+                        self.scrollView.addSubview(self.pointsToNextLevelLabel)
+                        
+                    }
+                    
                 }
                 
                 if let badges = json["badges"].array {
@@ -252,14 +275,19 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                         let reverseBadges = badges.reverse()
                         for badge in reverseBadges {
                             if i <= 2 {
-                                let imageName = "\(badge).png"
-                                let image = UIImage(named: imageName)
-                                let imageView = UIImageView(image: image!)
+                                if let badgeName = badge["name"].string {
+                                    
+                                    let imageName = "\(badgeName).png"
+                                    let image = UIImage(named: imageName)
+                                    let imageView = UIImageView(image: image!)
+                                    
+                                    imageView.frame = CGRect(x: x, y: 60, width: 80, height: 80)
+                                    self.badgesView.addSubview(imageView)
+                                    x += 110
+                                    i += 1
+                                    
+                                }
                                 
-                                imageView.frame = CGRect(x: x, y: 60, width: 80, height: 80)
-                                self.badgesView.addSubview(imageView)
-                                x += 110
-                                i += 1
                             }
                         }
                         
@@ -386,6 +414,7 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                         
                         imageView.frame = CGRect(x: 10, y: 0, width: 100, height: 100)
                         reviewView.addSubview(imageView)
+                        reviewView.tag = -5
                         
                         
                         if self.ID == Int((dictionary!["userID"] as! String))! {
@@ -408,37 +437,65 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                         if let pastGig = json["pastGig"].string {
                             request(.GET, pastGig).responseJSON { response in
                                 
-                                var json = JSON(response.result.value!)
-                                if let artist = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["id"].int {
+                                let pastGigView = UIView(frame: CGRect(x: 0, y: 635, width: 350, height: 100))
+                                self.scrollView.addSubview(pastGigView)
+                                
+                                let userPastGigsLabel = UILabel(frame: CGRect(x: 120, y: 0, width: 200, height: 100))
+                                setSKLabelText(userPastGigsLabel)
+                                pastGigView.addSubview(userPastGigsLabel)
+                                
+                                pastGigView.userInteractionEnabled = true
+                                
+                                if let re = response.result.value {
+                                    
+                                    var json = JSON(re)
+                                    if let artist = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["id"].int {
+                                        
+                                        let artistView = getArtistPic(artist)
+                                        artistView.frame = CGRect(x: 10, y: 0, width: 100, height: 100)
+                                        pastGigView.addSubview(artistView)
+                                        
+                                        userPastGigsLabel.text = "Past Gigs & Reviews"
+                                        
+                                        
+                                        let tapRec = UITapGestureRecognizer()
+                                        
+                                        
+                                        tapRec.addTarget(self, action: "tappedPast:")
+                                        pastGigView.addGestureRecognizer(tapRec)
+                                        pastGigView.tag = self.ID
+                                        
+                                    }
+                                    
+                                } else {
+                                    
+                                    pastGigView.tag = -5
+                                    
+                                    if self.ID == Int((dictionary!["userID"] as! String))! {
+                                        
+                                        userPastGigsLabel.text = "Go to Songkick.com and add your Past Gigs"
+                                        userPastGigsLabel.numberOfLines = 3
+                                        let tapToSongkick = UITapGestureRecognizer()
+                                        tapToSongkick.addTarget(self, action: "loadWeb")
+                                        self.webURL = "https://www.songkick.com"
+                                        pastGigView.addGestureRecognizer(tapToSongkick)
+                                        
+                                    } else {
+                                        
+                                        userPastGigsLabel.text = "\(first_name) has no Past Gigs"
+                                        
+                                    }
                                     
                                     
-                                    let pastGigView = UIView(frame: CGRect(x: 0, y: 635, width: 350, height: 100))
-                                    self.scrollView.addSubview(pastGigView)
                                     
+                                    let songkickLogoView = UIImageView(image: UIImage(named: "songkickLogoWhite"))
                                     
-                                    let artistView = getArtistPic(artist)
-                                    artistView.frame = CGRect(x: 10, y: 0, width: 100, height: 100)
-                                    pastGigView.addSubview(artistView)
+                                    songkickLogoView.frame = CGRect(x: 10, y: 0, width: 100, height: 100)
                                     
-                                    
-                                    
-                                    
-                                    let userPastGigsLabel = UILabel(frame: CGRect(x: 120, y: 30, width: 200, height: 30))
-                                    setSKLabelText(userPastGigsLabel)
-                                    userPastGigsLabel.text = "Past Gigs & Reviews"
-                                    pastGigView.addSubview(userPastGigsLabel)
-                                    
-                                    
-                                    
-                                    let tapRec = UITapGestureRecognizer()
-                                    
-                                    
-                                    tapRec.addTarget(self, action: "tappedPast:")
-                                    pastGigView.addGestureRecognizer(tapRec)
-                                    pastGigView.tag = self.ID
-                                    pastGigView.userInteractionEnabled = true
+                                    pastGigView.addSubview(songkickLogoView)
                                     
                                 }
+                                
                             }
                         }
                         
@@ -492,7 +549,7 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                                         
                                         upcomingGigsLabel.text = "Visit Songkick.com to find concerts!"
                                         
-                                        
+                                        upcomingGigView.tag = -5
                                         
                                         let songkickLogoView = UIImageView(image: UIImage(named: "songkickLogoWhite"))
                                         
@@ -529,6 +586,8 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                     } else {
                         
                         let noSongkickView = UIView(frame: CGRect(x: 0, y: 635, width: 350, height: 220))
+                        
+                        noSongkickView.tag = -5
                         
                         self.scrollView.addSubview(noSongkickView)
                         

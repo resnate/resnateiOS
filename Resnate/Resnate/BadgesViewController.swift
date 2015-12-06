@@ -40,14 +40,39 @@ class BadgesViewController: UIViewController {
                         
                         let reverseBadges = badges.reverse()
                         for badge in reverseBadges {
-
-                                let imageName = "\(badge).png"
+                            
+                            if let badgeName = badge["name"].string {
+                                
+                                let imageName = "\(badgeName).png"
                                 let image = UIImage(named: imageName)
                                 let imageView = UIImageView(image: image!)
                                 
-                                imageView.frame = CGRect(x: 50, y: y, width: Int(UIScreen.mainScreen().bounds.width - 100), height: Int(UIScreen.mainScreen().bounds.width - 100))
+                                imageView.frame = CGRect(x: 10, y: y, width: 100, height: 100)
                                 self.badgesScrollView.addSubview(imageView)
-                                y += Int(UIScreen.mainScreen().bounds.width - 30)
+                                
+                                if let badgeDescription = badge["description"].string {
+                                    
+                                    let badgeNameLabel = UILabel(frame: CGRect(x: 130, y: y + 10, width: 190, height: 20))
+                                    badgeNameLabel.text = badgeName
+                                    badgeNameLabel.textColor = UIColor.whiteColor()
+                                    badgeNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 16)
+                                    self.badgesScrollView.addSubview(badgeNameLabel)
+                                    
+                                    let badgeDescriptionLabel = UILabel(frame: CGRect(x: 130, y: y + 30, width: 190, height: 50))
+                                    badgeDescriptionLabel.numberOfLines = 3
+                                    badgeDescriptionLabel.text = badgeDescription
+                                    badgeDescriptionLabel.textColor = UIColor.whiteColor()
+                                    badgeDescriptionLabel.font = UIFont(name: "HelveticaNeue-Light", size: 14)
+                                    self.badgesScrollView.addSubview(badgeDescriptionLabel)
+                                    
+                                }
+                                
+                                y += 150
+                                
+                            }
+                            
+                            
+                            
                             
                         }
                         

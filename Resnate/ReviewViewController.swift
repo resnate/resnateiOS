@@ -10,7 +10,7 @@ import UIKit
 import TwitterKit
 
 
-class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDelegate, UITableViewDelegate, UITextViewDelegate {
+class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDelegate, UITableViewDelegate, UITextViewDelegate, UIGestureRecognizerDelegate {
     
     var ID = 0
     
@@ -28,42 +28,448 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
     
     var postComment = UILabel(frame: CGRect(x: UIScreen.mainScreen().bounds.width - 50, y: UIScreen.mainScreen().bounds.height - 79, width: 50, height: 30))
     
+    let imgWidth = Int(UIScreen.mainScreen().bounds.width) - 20
+    
+    let imgHeight = Int(Double(UIScreen.mainScreen().bounds.width - 20) / 1.33)
+    
+    var reviewContentHeight: CGFloat = 0
+    
+    let width = UIScreen.mainScreen().bounds.width
+    
+    var resnateID = ""
+    
+    var resnateToken = ""
+    
+    var reviewContent: UILabel!
+    
+    var layoutManager = NSLayoutManager()
+    var textContainer: NSTextContainer!
+    var textStorage: NSTextStorage!
+    
+    var videoLocation = [Int: String]()
+    
+    var reviewSongs = [String: String]()
+    
+    var locations: [Int] = []
+    
+    let ytPlayer = VideoPlayer.sharedInstance
+    
+    
+    func loadComments(reviewContent: UILabel, userID: Int, reviewID: String, review: JSON, songOrSetlistLabel: UILabel){
+        
+        if Int(self.resnateID) == userID {
+            let editLabel = UILabel(frame: CGRect(x: self.width/2 - 50, y: self.reviewContentHeight + self.width + 90, width: 100, height: 40))
+            
+            editLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
+            editLabel.text = "Edit"
+            editLabel.textColor = UIColor.whiteColor()
+            editLabel.textAlignment = .Center
+            editLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+            let tapRecEdit = UITapGestureRecognizer()
+            
+            
+            tapRecEdit.addTarget(self, action: "editReview:")
+            editLabel.addGestureRecognizer(tapRecEdit)
+            editLabel.tag = review["id"].int!
+            
+            editLabel.userInteractionEnabled = true
+            
+            
+            reviewView.addSubview(editLabel)
+            
+            
+            let deleteLabel = UILabel(frame: CGRect(x: self.width - 105, y: self.reviewContentHeight + self.width + 90, width: 100, height: 40))
+            
+            deleteLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
+            
+            deleteLabel.text = "Delete"
+            deleteLabel.textColor = UIColor.whiteColor()
+            deleteLabel.textAlignment = .Center
+            deleteLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+            let tapRecDelete = UITapGestureRecognizer()
+            
+            
+            tapRecDelete.addTarget(self, action: "deleteReview:")
+            deleteLabel.addGestureRecognizer(tapRecDelete)
+            deleteLabel.tag = review["id"].int!
+            
+            deleteLabel.userInteractionEnabled = true
+            
+            songOrSetlistLabel.frame.origin.y = self.reviewContentHeight + self.width + 90
+            reviewView.addSubview(deleteLabel)
+        }
+        
+        
+        let ratingView = UIView(frame: CGRect(x: 5, y: self.reviewContentHeight + width + 30, width: 300, height: 50))
+        
+        
+        
+        let filledStarImage = UIImage(named: "filledStar")
+        let emptyStarImage = UIImage(named: "emptyStar")
+        
+        var x = 0
+        
+        self.ratingButtons.removeAll(keepCapacity: true)
+        
+        for _ in 0..<5 {
+            
+            let button = UIButton(frame: CGRect(x: x, y: 0, width: 44, height: 44))
+            
+            
+            button.setImage(emptyStarImage, forState: .Normal)
+            button.setImage(filledStarImage, forState: .Selected)
+            button.setImage(filledStarImage, forState: [.Highlighted, .Selected])
+            
+            button.adjustsImageWhenHighlighted = false
+            
+            self.ratingButtons += [button]
+            
+            if let rating = review["rating"].int {
+                
+                self.rating = rating
+                
+                ratingView.addSubview(button)
+                
+                for (index, button) in self.ratingButtons.enumerate() {
+                    
+                    if index < self.rating {
+                        
+                        button.selected = true
+                        
+                        
+                    }
+                    
+                }
+                
+                if Int(resnateID) == userID {
+                    
+                    button.addTarget(self, action: "ratingButtonTapped:", forControlEvents: .TouchDown)
+                    
+                    ratingView.addSubview(button)
+                    
+                    
+                }
+                
+            } else {
+                
+                if Int(resnateID) == userID {
+                    
+                    button.addTarget(self, action: "ratingButtonTapped:", forControlEvents: .TouchDown)
+                    
+                    ratingView.addSubview(button)
+                    
+                    
+                }
+                
+            }
+            
+            
+            
+            
+            
+            x += 50
+        }
+        
+        let shareImgSize = CGSize(width: 40, height: 40)
+        
+        let shareView = UIView(frame: CGRect(x: 0, y: self.reviewContentHeight + width + 190, width: width, height: 40))
+        
+        let resnateShare = UIImageView(image: UIImage(named: "Share"))
+        resnateShare.frame.size = shareImgSize
+        
+        shareView.addSubview(resnateShare)
+        
+        let tapRecShare = UITapGestureRecognizer()
+        
+        tapRecShare.addTarget(self, action: "shareReview:")
+        resnateShare.tag = Int(reviewID)!
+        resnateShare.addGestureRecognizer(tapRecShare)
+        resnateShare.userInteractionEnabled = true
+        
+        
+        let fbShare = UIImageView(image: UIImage(named: "facebook.jpg"))
+        fbShare.frame.size = shareImgSize
+        
+        shareView.addSubview(fbShare)
+        
+        
+        
+        let tapRecFb = UITapGestureRecognizer()
+        
+        tapRecFb.addTarget(self, action: "fbReview:")
+        fbShare.tag = Int(reviewID)!
+        fbShare.addGestureRecognizer(tapRecFb)
+        fbShare.userInteractionEnabled = true
+        
+        let twitShare = UIImageView(image: UIImage(named: "twitter"))
+        twitShare.frame.size = shareImgSize
+        
+        shareView.addSubview(twitShare)
+        
+        let tapRecTwit = UITapGestureRecognizer()
+        
+        tapRecTwit.addTarget(self, action: "twitter:")
+        twitShare.tag = Int(reviewID)!
+        twitShare.addGestureRecognizer(tapRecTwit)
+        twitShare.userInteractionEnabled = true
+        
+        reviewView.addSubview(shareView)
+        
+        reviewView.addSubview(ratingView)
+        
+        if resnateID == String(userID) {
+            
+            fbShare.frame.origin.x = width/6 - 20
+            resnateShare.frame.origin.x = reviewView.center.x - 20
+            twitShare.frame.origin.x = (width/6)*5 - 20
+            
+        } else {
+            
+            let likeReview = UIImageView(image: UIImage(named: "like"))
+            
+            likeReview.frame.size = shareImgSize
+            
+            shareView.addSubview(likeReview)
+            
+            likeReview.frame.origin.x = width/8 - 20
+            fbShare.frame.origin.x = (width/8) * 3 - 20
+            resnateShare.frame.origin.x = (width/8)*5 - 20
+            twitShare.frame.origin.x = (width/8)*7 - 20
+            
+        }
+        
+        
+        let reviewCommentsView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 0))
+        
+        let activityReq = Router(OAuthToken: resnateToken, userID: reviewID)
+        
+        request(activityReq.buildURLRequest("Review/", path: "/findActivityComments")).responseJSON { response in
+            
+            let comments = JSON(response.result.value!)
+            
+            let req = Router(OAuthToken: self.resnateToken, userID: String(reviewID))
+            
+            request(req.buildURLRequest("reviews/", path: "/likes")).responseJSON { response in
+                
+                let users = JSON(response.result.value!)
+                let userCount = users.count
+                
+                let userCountLabel = UILabel(frame: CGRect(x: 10, y: reviewContent.frame.height + self.width + 140, width: 0, height: 40))
+                
+                if userCount == 1 {
+                    userCountLabel.text = "1 like"
+                } else if userCount > 1 {
+                    userCountLabel.text = "\(userCount) likes"
+                }
+                
+                userCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+                
+                userCountLabel.sizeToFit()
+                
+                self.reviewView.addSubview(userCountLabel)
+                
+                let commentsCountLabel = UILabel(frame: CGRect(x: userCountLabel.frame.width + 10, y: reviewContent.frame.height + self.width + 140, width: 0, height: 40))
+                
+                if comments.count == 1 {
+                    
+                    commentsCountLabel.text = "\(comments.count) comment"
+                    
+                } else if comments.count > 1 {
+                    
+                    commentsCountLabel.text = "\(comments.count) comments"
+                    
+                }
+                
+                commentsCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+                
+                commentsCountLabel.sizeToFit()
+                
+                self.reviewView.addSubview(commentsCountLabel)
+                
+            }
+            
+            
+            var y = 0
+            
+            
+            
+            for (_, comment) in comments {
+                
+                let commentView = UIView(frame: CGRect(x: 0, y: y, width: Int(self.width), height: 50))
+                
+                commentView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
+                
+                
+                
+                if let commenterID = comment["user_id"].int {
+                    
+                    let req = Router(OAuthToken: self.resnateToken, userID: String(commenterID))
+                    
+                    request(req.buildURLRequest("users/", path: "")).responseJSON { response in
+                        
+                        var user = JSON(response.result.value!)
+                        
+                        if let userName = user["name"].string {
+                            
+                            if let userImageID = user["uid"].string {
+                                
+                                if let userID = user["id"].int {
+                                    
+                                    let userNameLabel = UILabel(frame: CGRect(x: 60, y: 3, width: 190, height: 14))
+                                    
+                                    userNameLabel.text = userName
+                                    userNameLabel.textColor = UIColor.whiteColor()
+                                    userNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
+                                    
+                                    userNameLabel.sizeToFit()
+                                    
+                                    
+                                    let tapRecProfile = UITapGestureRecognizer()
+                                    tapRecProfile.addTarget(self, action: "profile:")
+                                    
+                                    userNameLabel.tag = userID
+                                    userNameLabel.addGestureRecognizer(tapRecProfile)
+                                    userNameLabel.userInteractionEnabled = true
+                                    
+                                    commentView.addSubview(userNameLabel)
+                                    
+                                    let activityUserImg = UIImageView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+                                    
+                                    let userImgUrl = NSURL(string: "https://graph.facebook.com/\(userImageID)/picture?width=100&height=100")
+                                    
+                                    self.getDataFromUrl(userImgUrl!) { data in
+                                        dispatch_async(dispatch_get_main_queue()) {
+                                            activityUserImg.image = UIImage(data: data!)
+                                            
+                                            commentView.addSubview(activityUserImg)
+                                            
+                                            let tapRecProfile = UITapGestureRecognizer()
+                                            tapRecProfile.addTarget(self, action: "profile:")
+                                            
+                                            activityUserImg.tag = userID
+                                            activityUserImg.addGestureRecognizer(tapRecProfile)
+                                            activityUserImg.userInteractionEnabled = true
+                                            
+                                        }
+                                    }
+                                    
+                                    
+                                }
+                                
+                            }
+                            
+                        }
+                    }
+                    
+                    
+                    if let body = comment["body"].string {
+                        
+                        let commentBodyLabel = UILabel(frame: CGRect(x: 60, y: 17, width: self.width - 40, height: 34))
+                        
+                        commentBodyLabel.text = body.stringByReplacingOccurrencesOfString("%0A", withString: "\n")
+                        
+                        commentBodyLabel.lineBreakMode = .ByTruncatingTail
+                        commentBodyLabel.numberOfLines = 0
+                        
+                        commentBodyLabel.sizeToFit()
+                        
+                        
+                        
+                        commentBodyLabel.textColor = UIColor.whiteColor()
+                        
+                        commentBodyLabel.font = UIFont(name: "HelveticaNeue", size: 12)
+                        
+                        commentView.addSubview(commentBodyLabel)
+                        
+                        if let time = comment["updated_at"].string {
+                            
+                            let dateFormatter = NSDateFormatter()
+                            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss z"
+                            
+                            let timeDateString = dateFormatter.dateFromString(time)
+                            
+                            let timeLabel = UILabel(frame: CGRect(x: 60, y: 17, width: self.width - 40, height: 14))
+                            
+                            timeLabel.frame.origin.y = commentBodyLabel.frame.height + 27
+                            
+                            y += Int(commentView.frame.height) + 30
+                            
+                            timeLabel.textColor = UIColor.whiteColor()
+                            
+                            timeLabel.font = UIFont(name: "HelveticaNeue", size: 12)
+                            
+                            timeLabel.text = timeAgoSinceDate(timeDateString!, numericDates: true)
+                            
+                            commentView.addSubview(timeLabel)
+                            
+                            commentView.frame.size.height = timeLabel.frame.height + timeLabel.frame.origin.y + 10
+                            
+                            reviewCommentsView.addSubview(commentView)
+                            
+                            reviewCommentsView.frame.size.height = commentView.frame.height + commentView.frame.origin.y + 10
+                            
+                        }
+                        
+                        
+                        
+                    }
+                    
+                }
+                
+            }
+            var commentsFrame = reviewCommentsView.frame
+            
+            commentsFrame.origin = CGPointMake(0, shareView.frame.origin.y + shareView.frame.height + 20)
+            
+            
+            
+            reviewCommentsView.frame = commentsFrame
+            
+            self.reviewView.addSubview(reviewCommentsView)
+            
+            self.reviewView.contentSize.height = reviewCommentsView.frame.height + reviewCommentsView.frame.origin.y + 50
+            
+            
+        }
+        
+    }
+    
     func loadReviewNComments(){
         
         let reviewID = String(ID)
         
         let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
-        let resnateToken = dictionary!["token"] as! String
+        self.resnateToken = dictionary!["token"] as! String
         
-        let resnateID = dictionary!["userID"] as! String
+        self.resnateID = dictionary!["userID"] as! String
         
         let req = Router(OAuthToken: resnateToken, userID: reviewID)
         
         request(req.buildURLRequest("reviews/", path: "")).responseJSON { response in
-                
-                let width = UIScreen.mainScreen().bounds.width
-                
+            
+            
+            
                 let review = JSON(response.result.value!)
-                
+            
                 let reviewView = self.reviewView
-                
+            
                 let userID = review["user_id"].int!
-                
-                
+            
+            
                 let navHeight = self.navigationController?.navigationBar.frame.height
                 let reviewTitle = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: navHeight!))
                 reviewTitle.textAlignment = .Center
                 reviewTitle.textColor = UIColor.whiteColor()
                 reviewTitle.font = UIFont(name: "Helvetica Neue", size: 12)!
                 reviewTitle.numberOfLines = 3
-                
-                
+            
+            
                 let b = UIBarButtonItem(title: "", style: .Plain, target: self, action: "shareReview:")
                 b.image = UIImage(named: "Share")!.imageWithRenderingMode(.AlwaysOriginal)
                 b.tag = self.ID
                 self.navigationItem.rightBarButtonItem = b
-                
+            
                 let songOrSetlistLabel = UILabel(frame: CGRect(x: 5, y: 0, width: 100, height: 40))
                 songOrSetlistLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
                 songOrSetlistLabel.textColor = UIColor.whiteColor()
@@ -73,21 +479,21 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                 songOrSetlistLabel.addGestureRecognizer(tapSongOrSetlist)
                 songOrSetlistLabel.userInteractionEnabled = true
                 reviewView.addSubview(songOrSetlistLabel)
-                
-                
+            
+            
                 if review["reviewable_type"] == "PastGig" {
                     
                     let pastGigID = String(stringInterpolationSegment: review["reviewable_id"])
                     
                     
-                    let req = Router(OAuthToken: resnateToken, userID: pastGigID)
+                    let req = Router(OAuthToken: self.resnateToken, userID: pastGigID)
                     
                     
                     request(req.buildURLRequest("past_gigs/", path: "")).responseJSON { response in
-                            
-                            
+                        
+                        
                             let pastGig = JSON(response.result.value!)
-                            
+                        
                             if let skID = pastGig["songkick_id"].int {
                                 
                                 songOrSetlistLabel.tag = skID
@@ -97,15 +503,15 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                                 let artistLink = "https://api.songkick.com/api/3.0/events/" + String(skID) + ".json?apikey=Pxms4Lvfx5rcDIuR"
                                 
                                 request(.GET, artistLink).responseJSON { response in
-                                        
+                                    
                                         var json = JSON(response.result.value!)
                                         if let artist = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["id"].int {
                                             
                                             let artistView = getHugeArtistPic(artist)
-                                            artistView.frame = CGRect(x: 0, y: 0, width: width, height: width)
+                                            artistView.frame = CGRect(x: 0, y: 0, width: self.width, height: self.width)
                                             reviewView.addSubview(artistView)
                                         }
-                                        
+                                    
                                         if let gigName = json["resultsPage"]["results"]["event"]["displayName"].string {
                                             
                                             reviewTitle.text = gigName
@@ -122,7 +528,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     let songID = String(stringInterpolationSegment: review["reviewable_id"])
                     
                     
-                    let req = Router(OAuthToken: resnateToken, userID: songID)
+                    let req = Router(OAuthToken: self.resnateToken, userID: songID)
                     
                     request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
                             
@@ -133,7 +539,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                                 let ytLink = "https://img.youtube.com/vi/" + ytID + "/hqdefault.jpg"
                                 
                                 let songImgUrl = NSURL(string: ytLink)
-                                let reviewSongImg = UIImageView(frame: CGRect(x: 0, y: 0, width: width, height: width/1.33))
+                                let reviewSongImg = UIImageView(frame: CGRect(x: 0, y: 0, width: self.width, height: self.width/1.33))
                                 self.getDataFromUrl(songImgUrl!) { data in
                                     dispatch_async(dispatch_get_main_queue()) {
                                         
@@ -152,7 +558,8 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                                     self.ytTitle = ytName
                                     
                                     songOrSetlistLabel.text = "Play"
-                                    tapSongOrSetlist.addTarget(self, action: "playSingleSong")
+                                    tapSongOrSetlist.addTarget(self, action: "playSingleSong:")
+                                    songOrSetlistLabel.tag = Int(songID)!
                                     reviewTitle.text = ytName
                                     self.navigationItem.titleView = reviewTitle
                                     
@@ -171,422 +578,152 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     
                     
                     
-                    let reviewContent = UILabel(frame: CGRect(x: 0, y: 0, width: width - 20, height: CGFloat.max))
+                    self.reviewContent = UILabel(frame: CGRect(x: 0, y: 0, width: self.width - 20, height: CGFloat.max))
                     
-                    reviewContent.lineBreakMode = .ByWordWrapping
-                    reviewContent.numberOfLines = 0
+                    self.reviewContent.lineBreakMode = .ByWordWrapping
+                    self.reviewContent.numberOfLines = 0
                     
-                    reviewContent.text = content
+                    self.reviewContent.text = content
                     
-                    reviewContent.font = UIFont(name: "HelveticaNeue-Light", size: 16)
+                    self.reviewContent.font = UIFont(name: "HelveticaNeue-Light", size: 16)
                     
-                    reviewContent.sizeToFit()
                     
-                    var frame = reviewContent.frame
                     
-                    songOrSetlistLabel.frame.origin.y = reviewContent.frame.height + width + 90
+                    self.reviewContent.sizeToFit()
+                    
+                    var frame = self.reviewContent.frame
+                    
+                    
                     
                     
                     if review["reviewable_type"] == "PastGig" {
                         
-                        frame.origin = CGPointMake(10, width + 5)
+                        frame.origin = CGPointMake(10, self.width + 5)
                         
                     } else {
                         
-                        frame.origin = CGPointMake(10, width/1.33 + 5)
+                        frame.origin = CGPointMake(10, self.width/1.33 + 5)
+                        songOrSetlistLabel.frame.origin.y = self.reviewContent.frame.height + self.width + 90
                         
                     }
                     
                     
+                    let youTubeURLs = self.matchesForRegexInText("(?:https?:\\/\\/)?(?:www\\.)?(?:youtube.com.+v[=/]|youtu.be/)([-a-zA-Z0-9_]+)", text: self.reviewContent.text)
                     
+                    var i = 0
                     
-                    reviewContent.frame = frame
-                    
-                    
-                    reviewView.addSubview(reviewContent)
-                    
-                    if Int(resnateID) == userID {
-                        let editLabel = UILabel(frame: CGRect(x: width/2 - 50, y: reviewContent.frame.height + width + 90, width: 100, height: 40))
+                    if youTubeURLs.count >= 1 {
                         
-                        editLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
-                        editLabel.text = "Edit"
-                        editLabel.textColor = UIColor.whiteColor()
-                        editLabel.textAlignment = .Center
-                        editLabel.font = UIFont(name: "HelveticaNeue", size: 14)
-                        let tapRecEdit = UITapGestureRecognizer()
+                        self.reviewContent.frame = frame
                         
-                        
-                        tapRecEdit.addTarget(self, action: "editReview:")
-                        editLabel.addGestureRecognizer(tapRecEdit)
-                        editLabel.tag = review["id"].int!
-                        
-                        editLabel.userInteractionEnabled = true
-                        
-                        
-                        reviewView.addSubview(editLabel)
-                        
-                        
-                        let deleteLabel = UILabel(frame: CGRect(x: width - 105, y: reviewContent.frame.height + width + 90, width: 100, height: 40))
-                        
-                        deleteLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
-                        
-                        deleteLabel.text = "Delete"
-                        deleteLabel.textColor = UIColor.whiteColor()
-                        deleteLabel.textAlignment = .Center
-                        deleteLabel.font = UIFont(name: "HelveticaNeue", size: 14)
-                        let tapRecDelete = UITapGestureRecognizer()
-                        
-                        
-                        tapRecDelete.addTarget(self, action: "deleteReview:")
-                        deleteLabel.addGestureRecognizer(tapRecDelete)
-                        deleteLabel.tag = review["id"].int!
-                        
-                        deleteLabel.userInteractionEnabled = true
-                        
-                        
-                        reviewView.addSubview(deleteLabel)
-                    }
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    let ratingView = UIView(frame: CGRect(x: 5, y: reviewContent.frame.height + width + 30, width: 300, height: 50))
-                    
-                    
-                    
-                    let filledStarImage = UIImage(named: "filledStar")
-                    let emptyStarImage = UIImage(named: "emptyStar")
-                    
-                    var x = 0
-                    
-                    self.ratingButtons.removeAll(keepCapacity: true)
-                    
-                    for _ in 0..<5 {
-                        
-                        let button = UIButton(frame: CGRect(x: x, y: 0, width: 44, height: 44))
-                        
-                        
-                        button.setImage(emptyStarImage, forState: .Normal)
-                        button.setImage(filledStarImage, forState: .Selected)
-                        button.setImage(filledStarImage, forState: [.Highlighted, .Selected])
-                        
-                        button.adjustsImageWhenHighlighted = false
-                        
-                        self.ratingButtons += [button]
-                        
-                        if let rating = review["rating"].int {
+                        for youTubeURL in youTubeURLs {
                             
-                            self.rating = rating
+                            let youTubeID = youTubeURL.componentsSeparatedByString("v=")[1]
                             
-                            ratingView.addSubview(button)
+                            let reviewImgUrl = NSURL(string: "https://img.youtube.com/vi/\(youTubeID)/hqdefault.jpg")
                             
-                            for (index, button) in self.ratingButtons.enumerate() {
-                                
-                                if index < self.rating {
+                            let titleSearch = "https://www.googleapis.com/youtube/v3/videos?id=\(youTubeID)&key=AIzaSyCa2qY9zSZWCKyX6HftBDvSSszkjJQSd8Y&part=snippet"
+                            
+                            request(.GET, titleSearch).responseJSON { response in
+                                let results = JSON(response.result.value!)
+                             
+                                if let items = results["items"].array {
+                                    for item in items {
+                                        if let item = item.dictionary {
+                                            if let snippet = item["snippet"]!.dictionary {
+                                                if let songTitle = snippet["title"]!.string {
+
+                                                    self.reviewSongs[youTubeID] = songTitle
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            self.getDataFromUrl(reviewImgUrl!) { data in
+                                dispatch_async(dispatch_get_main_queue()) {
+
+                                    let attributedString = NSMutableAttributedString(attributedString: self.reviewContent.attributedText!)
+                                    let textAttachment = NSTextAttachment()
+                                    let youTubeImage = UIImage(data: data!)
                                     
-                                    button.selected = true
+                                    textAttachment.image = youTubeImage
+                                    
+                                    let oldWidth = textAttachment.image!.size.width
+                                    
+                                    let scaleFactor = oldWidth / (self.reviewContent.frame.size.width)
+                                    textAttachment.image = UIImage(CGImage: textAttachment.image!.CGImage!, scale: scaleFactor, orientation: .Up)
+                                    let attrStringWithImage = NSAttributedString(attachment: textAttachment)
+                                    
+                                    
+                                    
+                                    let range = (attributedString.string as NSString).rangeOfString(youTubeURL)
+                                    self.videoLocation[range.location] = youTubeID
+                                    self.locations.append(range.location)
+                                    attributedString.replaceCharactersInRange(range, withAttributedString: attrStringWithImage)
+                                    
+                                    self.reviewContent.attributedText = attributedString
+                                    
+                                    self.reviewContent.frame.size.height += textAttachment.image!.size.height
+                                    
+                                    self.reviewContentHeight = self.reviewContent.frame.height
+                                    
+                                    let tap = UITapGestureRecognizer()
+                                    tap.addTarget(self, action: "handleTapOnLabel:")
+                                    self.reviewContent.addGestureRecognizer(tap)
+                                    self.reviewContent.userInteractionEnabled = true
+                                    
+                                    
+                                    
+                                    // Create instances of NSLayoutManager, NSTextContainer and NSTextStorage
+                                    let layoutManager = NSLayoutManager()
+                                    let textContainer = NSTextContainer(size: CGSizeZero)
+                                    let textStorage = NSTextStorage(attributedString: attributedString)
+                                    
+                                    // Configure layoutManager and textStorage
+                                    layoutManager.addTextContainer(textContainer)
+                                    textStorage.addLayoutManager(layoutManager)
+                                    
+                                    // Configure textContainer
+                                    textContainer.lineFragmentPadding = 0.0;
+                                    textContainer.lineBreakMode = self.reviewContent.lineBreakMode
+                                    textContainer.maximumNumberOfLines = self.reviewContent.numberOfLines
+                                    
+                                    self.textContainer = textContainer
+                                    self.layoutManager = layoutManager
+                                    self.textStorage = textStorage
+                                    
+                                    i += 1
+                                    
+                                    if i == youTubeURLs.count {
+                                        
+                                        self.loadComments(self.reviewContent, userID: userID, reviewID: reviewID, review: review, songOrSetlistLabel: songOrSetlistLabel)
+                                        
+                                    }
+                                    
                                     
                                     
                                 }
-                                
                             }
                             
-                            if Int(resnateID) == userID {
-                                
-                                button.addTarget(self, action: "ratingButtonTapped:", forControlEvents: .TouchDown)
-                                
-                                ratingView.addSubview(button)
-                                
-                                
-                            }
-                            
-                        } else {
-                            
-                            if Int(resnateID) == userID {
-                                
-                                button.addTarget(self, action: "ratingButtonTapped:", forControlEvents: .TouchDown)
-                                
-                                ratingView.addSubview(button)
-                                
-                                
-                            }
                             
                         }
                         
-                        
-                        
-                        
-                        
-                        x += 50
-                    }
-                    
-                    let shareImgSize = CGSize(width: 40, height: 40)
-                    
-                    let shareView = UIView(frame: CGRect(x: 0, y: reviewContent.frame.height + width + 190, width: width, height: 40))
-                    
-                    let resnateShare = UIImageView(image: UIImage(named: "Share"))
-                    resnateShare.frame.size = shareImgSize
-                    
-                    shareView.addSubview(resnateShare)
-                    
-                    let tapRecShare = UITapGestureRecognizer()
-                    
-                    tapRecShare.addTarget(self, action: "shareReview:")
-                    resnateShare.tag = Int(reviewID)!
-                    resnateShare.addGestureRecognizer(tapRecShare)
-                    resnateShare.userInteractionEnabled = true
-                    
-                    
-                    let fbShare = UIImageView(image: UIImage(named: "facebook.jpg"))
-                    fbShare.frame.size = shareImgSize
-                    
-                    shareView.addSubview(fbShare)
-                    
-                    
-                    
-                    let tapRecFb = UITapGestureRecognizer()
-                    
-                    tapRecFb.addTarget(self, action: "fbReview:")
-                    fbShare.tag = Int(reviewID)!
-                    fbShare.addGestureRecognizer(tapRecFb)
-                    fbShare.userInteractionEnabled = true
-                    
-                    let twitShare = UIImageView(image: UIImage(named: "twitter"))
-                    twitShare.frame.size = shareImgSize
-                    
-                    shareView.addSubview(twitShare)
-                    
-                    let tapRecTwit = UITapGestureRecognizer()
-                    
-                    tapRecTwit.addTarget(self, action: "twitter:")
-                    twitShare.tag = Int(reviewID)!
-                    twitShare.addGestureRecognizer(tapRecTwit)
-                    twitShare.userInteractionEnabled = true
-                    
-                    reviewView.addSubview(shareView)
-                    
-                    reviewView.addSubview(ratingView)
-                    
-                    if resnateID == String(userID) {
-                        
-                        fbShare.frame.origin.x = width/6 - 20
-                        resnateShare.frame.origin.x = reviewView.center.x - 20
-                        twitShare.frame.origin.x = (width/6)*5 - 20
-                        
                     } else {
                         
-                        let likeReview = UIImageView(image: UIImage(named: "like"))
-                        
-                        likeReview.frame.size = shareImgSize
-                        
-                        shareView.addSubview(likeReview)
-                        
-                        likeReview.frame.origin.x = width/8 - 20
-                        fbShare.frame.origin.x = (width/8) * 3 - 20
-                        resnateShare.frame.origin.x = (width/8)*5 - 20
-                        twitShare.frame.origin.x = (width/8)*7 - 20
+                        self.reviewContent.frame = frame
+                        self.reviewContentHeight = self.reviewContent.frame.height
+                        self.loadComments(self.reviewContent, userID: userID, reviewID: reviewID, review: review, songOrSetlistLabel: songOrSetlistLabel)
                         
                     }
                     
                     
-                    let reviewCommentsView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 0))
                     
-                    let activityReq = Router(OAuthToken: resnateToken, userID: reviewID)
                     
-                    request(activityReq.buildURLRequest("Review/", path: "/findActivityComments")).responseJSON { response in
-                        
-                            let comments = JSON(response.result.value!)
-                            
-                            let req = Router(OAuthToken: resnateToken, userID: String(reviewID))
-                            
-                            request(req.buildURLRequest("reviews/", path: "/likes")).responseJSON { response in
-                                
-                                    let users = JSON(response.result.value!)
-                                    let userCount = users.count
-                                    
-                                    let userCountLabel = UILabel(frame: CGRect(x: 10, y: reviewContent.frame.height + width + 140, width: 0, height: 40))
-                                    
-                                    if userCount == 1 {
-                                        userCountLabel.text = "1 like"
-                                    } else if userCount > 1 {
-                                        userCountLabel.text = "\(userCount) likes"
-                                    }
-                                    
-                                    userCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
-                                    
-                                    userCountLabel.sizeToFit()
-                                    
-                                    reviewView.addSubview(userCountLabel)
-                                    
-                                    let commentsCountLabel = UILabel(frame: CGRect(x: userCountLabel.frame.width + 10, y: reviewContent.frame.height + width + 140, width: 0, height: 40))
-                                    
-                                    if comments.count == 1 {
-                                        
-                                        commentsCountLabel.text = "\(comments.count) comment"
-                                        
-                                    } else if comments.count > 1 {
-                                        
-                                        commentsCountLabel.text = "\(comments.count) comments"
-                                        
-                                    }
-                                    
-                                    commentsCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
-                                    
-                                    commentsCountLabel.sizeToFit()
-                                    
-                                    reviewView.addSubview(commentsCountLabel)
-                                    
-                                }
-                            
-                            
-                            var y = 0
-                            
-                            
-                            
-                            for (_, comment) in comments {
-                                
-                                let commentView = UIView(frame: CGRect(x: 0, y: y, width: Int(width), height: 50))
-                                
-                                commentView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
-                                
-                                
-                                
-                                if let commenterID = comment["user_id"].int {
-                                    
-                                    let req = Router(OAuthToken: resnateToken, userID: String(commenterID))
-                                    
-                                    request(req.buildURLRequest("users/", path: "")).responseJSON { response in
-                                            
-                                            var user = JSON(response.result.value!)
-                                            
-                                            if let userName = user["name"].string {
-                                                
-                                                if let userImageID = user["uid"].string {
-                                                    
-                                                    if let userID = user["id"].int {
-                                                        
-                                                        let userNameLabel = UILabel(frame: CGRect(x: 60, y: 3, width: 190, height: 14))
-                                                        
-                                                        userNameLabel.text = userName
-                                                        userNameLabel.textColor = UIColor.whiteColor()
-                                                        userNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
-                                                        
-                                                        userNameLabel.sizeToFit()
-                                                        
-                                                        
-                                                        let tapRecProfile = UITapGestureRecognizer()
-                                                        tapRecProfile.addTarget(self, action: "profile:")
-                                                        
-                                                        userNameLabel.tag = userID
-                                                        userNameLabel.addGestureRecognizer(tapRecProfile)
-                                                        userNameLabel.userInteractionEnabled = true
-                                                        
-                                                        commentView.addSubview(userNameLabel)
-                                                        
-                                                        let activityUserImg = UIImageView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-                                                        
-                                                        let userImgUrl = NSURL(string: "https://graph.facebook.com/\(userImageID)/picture?width=100&height=100")
-                                                        
-                                                        self.getDataFromUrl(userImgUrl!) { data in
-                                                            dispatch_async(dispatch_get_main_queue()) {
-                                                                activityUserImg.image = UIImage(data: data!)
-                                                                
-                                                                commentView.addSubview(activityUserImg)
-                                                                
-                                                                let tapRecProfile = UITapGestureRecognizer()
-                                                                tapRecProfile.addTarget(self, action: "profile:")
-                                                                
-                                                                activityUserImg.tag = userID
-                                                                activityUserImg.addGestureRecognizer(tapRecProfile)
-                                                                activityUserImg.userInteractionEnabled = true
-                                                                
-                                                            }
-                                                        }
-                                                        
-                                                        
-                                                    }
-                                                    
-                                                }
-                                                
-                                            }
-                                    }
-                                    
-                                    
-                                    if let body = comment["body"].string {
-                                        
-                                        let commentBodyLabel = UILabel(frame: CGRect(x: 60, y: 17, width: width - 40, height: 34))
-                                        
-                                        commentBodyLabel.text = body.stringByReplacingOccurrencesOfString("%0A", withString: "\n")
-                                        
-                                        commentBodyLabel.lineBreakMode = .ByTruncatingTail
-                                        commentBodyLabel.numberOfLines = 0
-                                        
-                                        commentBodyLabel.sizeToFit()
-                                        
-                                        
-                                        
-                                        commentBodyLabel.textColor = UIColor.whiteColor()
-                                        
-                                        commentBodyLabel.font = UIFont(name: "HelveticaNeue", size: 12)
-                                        
-                                        commentView.addSubview(commentBodyLabel)
-                                        
-                                        if let time = comment["updated_at"].string {
-                                            
-                                            let dateFormatter = NSDateFormatter()
-                                            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss z"
-                                            
-                                            let timeDateString = dateFormatter.dateFromString(time)
-                                            
-                                            let timeLabel = UILabel(frame: CGRect(x: 60, y: 17, width: width - 40, height: 14))
-                                            
-                                            timeLabel.frame.origin.y = commentBodyLabel.frame.height + 27
-                                            
-                                            y += Int(commentView.frame.height) + 30
-                                            
-                                            timeLabel.textColor = UIColor.whiteColor()
-                                            
-                                            timeLabel.font = UIFont(name: "HelveticaNeue", size: 12)
-                                            
-                                            timeLabel.text = timeAgoSinceDate(timeDateString!, numericDates: true)
-                                            
-                                            commentView.addSubview(timeLabel)
-                                            
-                                            commentView.frame.size.height = timeLabel.frame.height + timeLabel.frame.origin.y + 10
-                                            
-                                            reviewCommentsView.addSubview(commentView)
-                                            
-                                            reviewCommentsView.frame.size.height = commentView.frame.height + commentView.frame.origin.y + 10
-                                            
-                                        }
-                                        
-                                        
-                                        
-                                    }
-                                    
-                                }
-                                
-                            }
-                            var commentsFrame = reviewCommentsView.frame
-                            
-                            commentsFrame.origin = CGPointMake(0, shareView.frame.origin.y + shareView.frame.height + 20)
-                            
-                            
-                            
-                            reviewCommentsView.frame = commentsFrame
-                            
-                            reviewView.addSubview(reviewCommentsView)
-                            
-                            reviewView.contentSize.height = reviewCommentsView.frame.height + reviewCommentsView.frame.origin.y + 50
-                        
-                        
-                    }
                     
+                    reviewView.addSubview(self.reviewContent)
                     
                     
                     
@@ -844,11 +981,11 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         
     }
     
-    func playSingleSong(){
+    func playSingleSong(sender: AnyObject){
         
         self.view.endEditing(true)
         
-        let ytPlayer = VideoPlayer.sharedInstance
+        
         
         self.tabBarController?.view.addSubview(ytPlayer.videoPlayer)
         
@@ -858,8 +995,58 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         
         ytPlayer.ytTitle = self.ytTitle
         
-        ytPlayer.shareID = "\(self.ytID),\(self.ytTitle)"
+        ytPlayer.shareID = "\(sender.view!.tag)"
         
     }
-
+    
+    func matchesForRegexInText(regex: String!, text: String!) -> [String] {
+        
+        do {
+            let regex = try NSRegularExpression(pattern: regex, options: [])
+            let nsString = text as NSString
+            let results = regex.matchesInString(text,
+                options: [], range: NSMakeRange(0, nsString.length))
+            return results.map { nsString.substringWithRange($0.range)}
+        } catch {
+            print("invalid regex")
+            return []
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if self.textContainer != nil {
+            self.textContainer.size = self.reviewContent.bounds.size
+        }
+        
+    }
+    
+    func handleTapOnLabel(tapGesture: UITapGestureRecognizer) {
+        
+        let locationOfTouchInLabel = tapGesture.locationInView(tapGesture.view)
+        let labelSize = tapGesture.view!.bounds.size
+        let textBoundingBox = self.layoutManager.usedRectForTextContainer(self.textContainer)
+        let textContainerOffset = CGPointMake((labelSize.width - textBoundingBox.size.width) * 0.5 - textBoundingBox.origin.x,
+            (labelSize.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y)
+        
+        let locationOfTouchInTextContainer = CGPointMake(locationOfTouchInLabel.x - textContainerOffset.x,
+            locationOfTouchInLabel.y - textContainerOffset.y)
+        let indexOfCharacter = self.layoutManager.characterIndexForPoint(locationOfTouchInTextContainer, inTextContainer: self.textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
+        
+        if self.locations.contains(indexOfCharacter) {
+            
+            let youTubeID = self.videoLocation[indexOfCharacter]!
+            
+            self.view.endEditing(true)
+            
+            self.tabBarController?.view.addSubview(ytPlayer.videoPlayer)
+            
+            ytPlayer.playVid(youTubeID)
+            
+            ytPlayer.ytID = youTubeID
+            
+            ytPlayer.ytTitle = self.reviewSongs[youTubeID]!
+            
+        }
+    }
 }

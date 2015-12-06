@@ -238,7 +238,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
             postComment.frame.origin.y = UIScreen.mainScreen().bounds.height - 143
             
         }
-        
+        print(postComment.frame.origin.y)
         returnComments()
         
     }
@@ -448,8 +448,6 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                                                     
                                                                 }
                                                             }
-                                                            
-                                                            
                                                             
                                                         }
                                                         
@@ -884,14 +882,11 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
             
             ytPlayer.ytTitle = name
             
-            ytPlayer.shareID = "\(ytID),\(name)"
+            ytPlayer.shareID = "\(self.ID)"
             
             ytPlayer.playVid(ytID)
             
         }
-        
-        
-        self.tabBarController?.view.addSubview(ytPlayer.playerControls)
         
         
     }

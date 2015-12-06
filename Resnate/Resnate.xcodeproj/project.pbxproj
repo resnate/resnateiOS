@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6401EAD51C0BC4F20084D079 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6401EAD41C0BC4F20084D079 /* Settings.bundle */; settings = {ASSET_TAGS = (); }; };
+		6401EAD81C12077B0084D079 /* WritePlaylistDescriptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6401EAD61C12077A0084D079 /* WritePlaylistDescriptionViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		6401EAD91C12077B0084D079 /* WritePlaylistDescriptionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6401EAD71C12077A0084D079 /* WritePlaylistDescriptionViewController.xib */; settings = {ASSET_TAGS = (); }; };
 		640613911BCF566C00A9E2C5 /* LocksmithAccessibleOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6406138B1BCF566C00A9E2C5 /* LocksmithAccessibleOption.swift */; settings = {ASSET_TAGS = (); }; };
 		640613921BCF566C00A9E2C5 /* LocksmithError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6406138C1BCF566C00A9E2C5 /* LocksmithError.swift */; settings = {ASSET_TAGS = (); }; };
 		640613931BCF566C00A9E2C5 /* LocksmithInternetAuthenticationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6406138D1BCF566C00A9E2C5 /* LocksmithInternetAuthenticationType.swift */; settings = {ASSET_TAGS = (); }; };
@@ -28,6 +31,10 @@
 		640613B61BCF5C2300A9E2C5 /* Upload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640613A71BCF5C2300A9E2C5 /* Upload.swift */; settings = {ASSET_TAGS = (); }; };
 		640613B71BCF5C2300A9E2C5 /* Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640613A81BCF5C2300A9E2C5 /* Validation.swift */; settings = {ASSET_TAGS = (); }; };
 		640613CB1BCFD64500A9E2C5 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640613C41BCFD64400A9E2C5 /* Bolts.framework */; settings = {ASSET_TAGS = (); }; };
+		641D55471BFF4AF800C7F14F /* Follow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641D55461BFF4AF800C7F14F /* Follow.swift */; settings = {ASSET_TAGS = (); }; };
+		641DCE701BFA092000A03DDB /* PlaybackSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641DCE6F1BFA092000A03DDB /* PlaybackSlider.swift */; settings = {ASSET_TAGS = (); }; };
+		641DCE731BFC4A6100A03DDB /* AddPlaylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641DCE711BFC4A6100A03DDB /* AddPlaylistViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		641DCE741BFC4A6100A03DDB /* AddPlaylistViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 641DCE721BFC4A6100A03DDB /* AddPlaylistViewController.xib */; settings = {ASSET_TAGS = (); }; };
 		6436997D1B86B891007A6452 /* ShareViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6436997C1B86B891007A6452 /* ShareViewController.xib */; };
 		6436997F1B86B8A9007A6452 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436997E1B86B8A9007A6452 /* ShareViewController.swift */; };
 		645C80391B5AD8E9001BED10 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 645C80381B5AD8E9001BED10 /* Images.xcassets */; };
@@ -104,6 +111,9 @@
 /* Begin PBXFileReference section */
 		347F67DFC115041C41030377 /* Pods_Resnate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Resnate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		58155C874C8BA95AB416BDEC /* Pods-Resnate.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Resnate.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Resnate/Pods-Resnate.debug.xcconfig"; sourceTree = "<group>"; };
+		6401EAD41C0BC4F20084D079 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		6401EAD61C12077A0084D079 /* WritePlaylistDescriptionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WritePlaylistDescriptionViewController.swift; sourceTree = "<group>"; };
+		6401EAD71C12077A0084D079 /* WritePlaylistDescriptionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WritePlaylistDescriptionViewController.xib; sourceTree = "<group>"; };
 		6406138A1BCF566C00A9E2C5 /* Locksmith.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Locksmith.h; path = Resnate/Locksmith.h; sourceTree = "<group>"; };
 		6406138B1BCF566C00A9E2C5 /* LocksmithAccessibleOption.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocksmithAccessibleOption.swift; path = Resnate/LocksmithAccessibleOption.swift; sourceTree = "<group>"; };
 		6406138C1BCF566C00A9E2C5 /* LocksmithError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocksmithError.swift; path = Resnate/LocksmithError.swift; sourceTree = "<group>"; };
@@ -128,14 +138,18 @@
 		640613A81BCF5C2300A9E2C5 /* Validation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Validation.swift; path = "../../../Downloads/27d6032ed8cfff/Alamofire-master/Source/Validation.swift"; sourceTree = "<group>"; };
 		640613C41BCFD64400A9E2C5 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		640613D41BCFEA5600A9E2C5 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		641D55461BFF4AF800C7F14F /* Follow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Follow.swift; sourceTree = "<group>"; };
+		641DCE6F1BFA092000A03DDB /* PlaybackSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaybackSlider.swift; sourceTree = "<group>"; };
+		641DCE711BFC4A6100A03DDB /* AddPlaylistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddPlaylistViewController.swift; sourceTree = "<group>"; };
+		641DCE721BFC4A6100A03DDB /* AddPlaylistViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddPlaylistViewController.xib; sourceTree = "<group>"; };
 		6436997C1B86B891007A6452 /* ShareViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ShareViewController.xib; path = Resnate.xcodeproj/../ShareViewController.xib; sourceTree = SOURCE_ROOT; };
-		6436997E1B86B8A9007A6452 /* ShareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShareViewController.swift; path = Resnate.xcodeproj/../ShareViewController.swift; sourceTree = SOURCE_ROOT; };
+		6436997E1B86B8A9007A6452 /* ShareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = ShareViewController.swift; path = Resnate.xcodeproj/../ShareViewController.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		645C80381B5AD8E9001BED10 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../../ResnateiOS/ResnateiOS/Images.xcassets; sourceTree = "<group>"; };
 		645C80461B5DA075001BED10 /* YouTubePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YouTubePlayer.swift; sourceTree = "<group>"; };
 		645C80481B5DCA92001BED10 /* YTPlayer.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = YTPlayer.html; sourceTree = "<group>"; };
 		645C804A1B6444A4001BED10 /* PlaylistTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewController.swift; sourceTree = "<group>"; };
 		645C80521B6A3AC7001BED10 /* LPRTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LPRTableView.swift; sourceTree = "<group>"; };
-		647122DF1B6CA05A005408DB /* VideoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayer.swift; sourceTree = "<group>"; };
+		647122DF1B6CA05A005408DB /* VideoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = VideoPlayer.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		649B17701B77761400342B06 /* RatingControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RatingControl.swift; path = Resnate.xcodeproj/../RatingControl.swift; sourceTree = SOURCE_ROOT; };
 		649E439A1BED7A7F00EA287C /* NotificationsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		649E439B1BED7A7F00EA287C /* NotificationsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NotificationsViewController.xib; sourceTree = "<group>"; };
@@ -164,7 +178,7 @@
 		64E974531B4D8C9900A75DFC /* FollowViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FollowViewController.xib; sourceTree = "<group>"; };
 		64E980A11B22739300AB304B /* UserReviewsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserReviewsViewController.swift; sourceTree = "<group>"; };
 		64E980A21B22739300AB304B /* UserReviewsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserReviewsViewController.xib; sourceTree = "<group>"; };
-		64E980A71B28FE2200AB304B /* Review.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
+		64E980A71B28FE2200AB304B /* Review.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Review.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		64EA31F11B31FD84003E132E /* SetlistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetlistViewController.swift; sourceTree = "<group>"; };
 		64EA31F21B31FD84003E132E /* SetlistViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetlistViewController.xib; sourceTree = "<group>"; };
 		64EA31F71B36C8DB003E132E /* PastGigsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PastGigsViewController.swift; sourceTree = "<group>"; };
@@ -176,14 +190,14 @@
 		64EC17021B213E990008FC57 /* SongkickInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongkickInfo.swift; sourceTree = "<group>"; };
 		64EE81F71B2C6C6800CCEF95 /* ReviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReviewViewController.swift; path = ../ReviewViewController.swift; sourceTree = "<group>"; };
 		64EE81F81B2C6C6800CCEF95 /* ReviewViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ReviewViewController.xib; path = ../ReviewViewController.xib; sourceTree = "<group>"; };
-		64EED5E21B2D96A100F20069 /* Share.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Share.swift; sourceTree = "<group>"; };
+		64EED5E21B2D96A100F20069 /* Share.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Share.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		64EF066B1B42E86D008B04E1 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		64EF066C1B42E86D008B04E1 /* TwitterKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwitterKit.framework; sourceTree = "<group>"; };
 		64EF066D1B42E86D008B04E1 /* TwitterKitResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = TwitterKitResources.bundle; path = TwitterKit.framework/Versions/A/Resources/TwitterKitResources.bundle; sourceTree = "<group>"; };
 		64EF066E1B42E86D008B04E1 /* TwitterCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwitterCore.framework; sourceTree = "<group>"; };
 		64EF06731B44D777008B04E1 /* UpcomingGigsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpcomingGigsViewController.swift; sourceTree = "<group>"; };
 		64EF06741B44D777008B04E1 /* UpcomingGigsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UpcomingGigsViewController.xib; sourceTree = "<group>"; };
-		64EF0A4E1B1C1A74001ADA4F /* InboxViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InboxViewController.swift; sourceTree = "<group>"; };
+		64EF0A4E1B1C1A74001ADA4F /* InboxViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = InboxViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		64EF0A4F1B1C1A74001ADA4F /* InboxViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InboxViewController.xib; sourceTree = "<group>"; };
 		64EF0A561B1E8267001ADA4F /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = ../../../Downloads/LoginTabbedApp/SwiftyJSON.swift; sourceTree = "<group>"; };
 		64EF5D341B4AD03500FE70BC /* WebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
@@ -292,6 +306,7 @@
 				64BE7F6A1B127A5000FBA7D8 /* views */,
 				64BE7F481B127A1800FBA7D8 /* AppDelegate.swift */,
 				64EF0A4E1B1C1A74001ADA4F /* InboxViewController.swift */,
+				6401EAD61C12077A0084D079 /* WritePlaylistDescriptionViewController.swift */,
 				649E439A1BED7A7F00EA287C /* NotificationsViewController.swift */,
 				649E43A21BF1BBC000EA287C /* Activity.swift */,
 				64BE7F491B127A1800FBA7D8 /* HomeViewController.swift */,
@@ -300,7 +315,9 @@
 				64BE7F4D1B127A1800FBA7D8 /* Launch Screen.xib */,
 				64BE7F4E1B127A1800FBA7D8 /* ArtistsViewController.swift */,
 				647122DF1B6CA05A005408DB /* VideoPlayer.swift */,
+				641DCE6F1BFA092000A03DDB /* PlaybackSlider.swift */,
 				64BE7F521B127A1800FBA7D8 /* LoginViewController.swift */,
+				641DCE711BFC4A6100A03DDB /* AddPlaylistViewController.swift */,
 				649E439E1BF06D3500EA287C /* BadgesViewController.swift */,
 				64EC16FE1B212BBB0008FC57 /* ScrollProfileViewController.swift */,
 				64EF5D341B4AD03500FE70BC /* WebViewController.swift */,
@@ -308,7 +325,9 @@
 				64E980A71B28FE2200AB304B /* Review.swift */,
 				64EA31FB1B385053003E132E /* WriteReviewViewController.swift */,
 				64EED5E21B2D96A100F20069 /* Share.swift */,
+				641D55461BFF4AF800C7F14F /* Follow.swift */,
 				64E980A11B22739300AB304B /* UserReviewsViewController.swift */,
+				6401EAD41C0BC4F20084D079 /* Settings.bundle */,
 				64E9744E1B4C369500A75DFC /* UserPlaylistsViewController.swift */,
 				645C804A1B6444A4001BED10 /* PlaylistTableViewController.swift */,
 				64EA31F71B36C8DB003E132E /* PastGigsViewController.swift */,
@@ -373,6 +392,8 @@
 				64FF05B11BA9C5A100E83D47 /* ActivityViewController.xib */,
 				649E439B1BED7A7F00EA287C /* NotificationsViewController.xib */,
 				649E439F1BF06D3500EA287C /* BadgesViewController.xib */,
+				641DCE721BFC4A6100A03DDB /* AddPlaylistViewController.xib */,
+				6401EAD71C12077A0084D079 /* WritePlaylistDescriptionViewController.xib */,
 			);
 			name = views;
 			sourceTree = "<group>";
@@ -472,10 +493,12 @@
 				64EE81FA1B2C6C6800CCEF95 /* ReviewViewController.xib in Resources */,
 				64EF06711B42E86D008B04E1 /* TwitterKitResources.bundle in Resources */,
 				649E439D1BED7A7F00EA287C /* NotificationsViewController.xib in Resources */,
+				641DCE741BFC4A6100A03DDB /* AddPlaylistViewController.xib in Resources */,
 				64E974511B4C369500A75DFC /* UserPlaylistsViewController.xib in Resources */,
 				64BE7F5B1B127A1800FBA7D8 /* HomeViewController.xib in Resources */,
 				64BE7F691B127A1800FBA7D8 /* SettingsViewController.xib in Resources */,
 				64EA31F41B31FD84003E132E /* SetlistViewController.xib in Resources */,
+				6401EAD91C12077B0084D079 /* WritePlaylistDescriptionViewController.xib in Resources */,
 				64EC17011B212BBB0008FC57 /* ScrollProfileViewController.xib in Resources */,
 				64EA31FA1B36C8DB003E132E /* PastGigsViewController.xib in Resources */,
 				64FF05B31BA9C5A200E83D47 /* ActivityViewController.xib in Resources */,
@@ -485,6 +508,7 @@
 				64BE7F641B127A1800FBA7D8 /* LoginViewController.xib in Resources */,
 				64E974551B4D8C9900A75DFC /* FollowViewController.xib in Resources */,
 				649E43A11BF06D3500EA287C /* BadgesViewController.xib in Resources */,
+				6401EAD51C0BC4F20084D079 /* Settings.bundle in Resources */,
 				64BE7F5E1B127A1800FBA7D8 /* Launch Screen.xib in Resources */,
 				64E980A41B22739300AB304B /* UserReviewsViewController.xib in Resources */,
 			);
@@ -571,6 +595,7 @@
 				649E439C1BED7A7F00EA287C /* NotificationsViewController.swift in Sources */,
 				640613AE1BCF5C2300A9E2C5 /* MultipartFormData.swift in Sources */,
 				64BE7F671B127A1800FBA7D8 /* Router.swift in Sources */,
+				6401EAD81C12077B0084D079 /* WritePlaylistDescriptionViewController.swift in Sources */,
 				64BE7F631B127A1800FBA7D8 /* LoginViewController.swift in Sources */,
 				64FF05B21BA9C5A200E83D47 /* ActivityViewController.swift in Sources */,
 				64FF05AF1BA64BF200E83D47 /* timeago.swift in Sources */,
@@ -580,6 +605,8 @@
 				64BE7F611B127A1800FBA7D8 /* Locksmith.swift in Sources */,
 				640613A91BCF5C2300A9E2C5 /* Alamofire.swift in Sources */,
 				64EA31FD1B385053003E132E /* WriteReviewViewController.swift in Sources */,
+				641DCE731BFC4A6100A03DDB /* AddPlaylistViewController.swift in Sources */,
+				641DCE701BFA092000A03DDB /* PlaybackSlider.swift in Sources */,
 				640613B21BCF5C2300A9E2C5 /* ResponseSerialization.swift in Sources */,
 				649E43A31BF1BBC000EA287C /* Activity.swift in Sources */,
 				64EA31F91B36C8DB003E132E /* PastGigsViewController.swift in Sources */,
@@ -613,6 +640,7 @@
 				640613AA1BCF5C2300A9E2C5 /* Download.swift in Sources */,
 				649B17711B77761400342B06 /* RatingControl.swift in Sources */,
 				640613981BCF56FF00A9E2C5 /* Dictionary_Initializers.swift in Sources */,
+				641D55471BFF4AF800C7F14F /* Follow.swift in Sources */,
 				645C804C1B6444A4001BED10 /* PlaylistTableViewController.swift in Sources */,
 				640613B11BCF5C2300A9E2C5 /* Response.swift in Sources */,
 				645C80471B5DA075001BED10 /* YouTubePlayer.swift in Sources */,

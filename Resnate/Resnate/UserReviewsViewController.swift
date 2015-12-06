@@ -8,23 +8,29 @@
 
 import UIKit
 
-class UserReviewsViewController: UIViewController {
+class UserReviewsViewController: UIViewController, UIScrollViewDelegate {
     
     var ID = 0
+    
+    var page = 1
+    
+    var y = 0
+    
+    let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
+        self.userReviewsView.delegate = self
+        
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "testBkgd.jpg")!)
         
         let backItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         navigationItem.backBarButtonItem = backItem
         
-        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
-        
-        let resnateToken = dictionary!["token"] as! String
+        let resnateToken = self.dictionary!["token"] as! String
         
         let resnateID = String(ID)
         
@@ -32,19 +38,44 @@ class UserReviewsViewController: UIViewController {
         
         let width = Int(UIScreen.mainScreen().bounds.width)
         
+        loadReviews(req, resnateToken: resnateToken, width: width)
         
-        request(req.buildURLRequest("users/", path: "/reviews")).responseJSON { response in
+        
+        
+        request(req.buildURLRequest("users/", path: "/profile")).responseJSON { response in
+            if let re = response.result.value {
+                let json = JSON(re)
+                
+                let first_name = json["first_name"].string!
+                self.navigationItem.title = "  \(first_name)'s Reviews"
+                
+            }
+        }
+        
+        
+    }
+    
+    func loadReviews(req: Router, resnateToken: String, width: Int){
+        
+        self.userReviewsView.contentSize.height += 10
+        
+        let loadingView = UIActivityIndicatorView(frame: CGRect(x: Int(UIScreen.mainScreen().bounds.width/2 - 25), y: Int(self.userReviewsView.contentSize.height - 30), width: 50, height: 50))
+        
+        self.userReviewsView.addSubview(loadingView)
+        
+        loadingView.startAnimating()
+        
+        self.userReviewsView.tag = -1
+        
+        request(req.buildURLRequest("users/", path: "/reviews/\(page)")).responseJSON { response in
             
             if let re = response.result.value {
                 
                 if let reviews = JSON(re).array {
                     
-                   
-                    var y = 0
-                    
                     for review in reviews {
                         
-                        let reviewView = UIView(frame: CGRect(x: 10, y: y, width: width - 20, height: 150))
+                        let reviewView = UIView(frame: CGRect(x: 10, y: self.y, width: width - 20, height: 150))
                         self.userReviewsView.addSubview(reviewView)
                         
                         let tapRec = UITapGestureRecognizer()
@@ -94,7 +125,7 @@ class UserReviewsViewController: UIViewController {
                         
                         
                         
-                        let reviewTitle = UILabel(frame: CGRect(x: 120, y: y, width: width - 150, height: 70))
+                        let reviewTitle = UILabel(frame: CGRect(x: 120, y: self.y, width: width - 150, height: 70))
                         
                         reviewTitle.lineBreakMode = .ByTruncatingTail
                         reviewTitle.numberOfLines = 3
@@ -206,16 +237,14 @@ class UserReviewsViewController: UIViewController {
                             
                         }
                         
-                        
-                        
-                        
                         if let content = review["content"].string {
                             
-                            let reviewContent = UILabel(frame: CGRect(x: 120, y: y + 55, width: width - 150, height: 100))
+                            let reviewContent = UILabel(frame: CGRect(x: 120, y: self.y + 55, width: width - 150, height: 100))
                             
                             reviewContent.textColor = UIColor.whiteColor()
                             reviewContent.text = content
                             reviewContent.font = UIFont(name: "HelveticaNeue-Light", size: 12)
+                            
                             
                             reviewContent.numberOfLines = 3
                             reviewContent.sizeToFit()
@@ -224,62 +253,39 @@ class UserReviewsViewController: UIViewController {
                             self.userReviewsView.addSubview(reviewContent)
                         }
                         
-                        
-                        y += 180
+                        self.y += 180
                         
                     }
                     
                     
+                    self.page += 1
                     
-                    
-                    self.userReviewsView.contentSize.height = CGFloat(y + 20)
+                    self.userReviewsView.contentSize.height = CGFloat(self.y + 20)
                 }
                 
+                loadingView.stopAnimating()
                 
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                self.userReviewsView.tag = 0
             }
         }
         
+    }
+    
+    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         
-        request(req.buildURLRequest("users/", path: "/profile")).responseJSON { response in
-            if let re = response.result.value {
-                let json = JSON(re)
-                
-                let first_name = json["first_name"].string!
-                self.navigationItem.title = "  \(first_name)'s Reviews"
-                
-            }
+        if (scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.frame.size.height) && scrollView.contentSize.height > 1 && scrollView.tag != -1) {
+            
+            let resnateToken = dictionary!["token"] as! String
+            
+            let resnateID = String(ID)
+            
+            let req = Router(OAuthToken: resnateToken, userID: resnateID)
+            
+            let width = Int(UIScreen.mainScreen().bounds.width)
+            
+            loadReviews(req, resnateToken: resnateToken, width: width)
+
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
     }
 
     override func didReceiveMemoryWarning() {
@@ -290,14 +296,5 @@ class UserReviewsViewController: UIViewController {
     
     @IBOutlet weak var userReviewsView: UIScrollView!
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+    
 }

@@ -33,6 +33,9 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
         
         self.navigationItem.rightBarButtonItem = postButton
         
+        let backItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backItem
+        
         do {
             let reachability = try Reachability.reachabilityForInternetConnection()
             self.reachability = reachability
@@ -266,6 +269,8 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
             textView.textColor = UIColor.blackColor()
         }
         
+        
+        
         let length = textView.text.utf16.count + text.utf16.count - range.length
         
         return length <= 5000
@@ -280,14 +285,5 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
     }
     
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

@@ -17,11 +17,10 @@ class SetlistViewController: UIViewController {
 
         // Do any additional setup after loading the view.
         self.navigationItem.title = "Setlist"
+        let backItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        self.navigationItem.backBarButtonItem = backItem
         
         let width = UIScreen.mainScreen().bounds.width
-        
-        
-        
         
         let pgSK = "https://api.songkick.com/api/3.0/events/\(String(ID)).json?apikey=Pxms4Lvfx5rcDIuR"
         
@@ -46,11 +45,7 @@ class SetlistViewController: UIViewController {
                 let setlistDate = secondFormatter.stringFromDate(setlistDateString!)
                 
                 
-                
-                
-                
                 if let artistName = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["displayName"].string {
-                    
                     
                     let setlistURL = "http://api.setlist.fm/rest/0.1/search/setlists.json"
                     
@@ -72,8 +67,112 @@ class SetlistViewController: UIViewController {
                                 if (json["setlists"]["setlist"].array != nil) {
                                     
                                     
-                                    let show = json["setlists"]["setlist"].array
+                                    let shows = json["setlists"]["setlist"].array!
                                     
+                                    for show in shows {
+                                        
+                                        if let setlists = show["sets"].dictionary {
+                                            
+                                            for (index, setlist) in setlists {
+                                                
+                                                
+                                                
+                                                for indiset in setlist {
+                                                    
+                                                    if let indiSetSongs =  indiset.1["song"].array {
+                                                        
+                                                        for song in indiSetSongs {
+                                                            
+                                                            if let name = song["@name"].string {
+                                                                let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 300, height: 30))
+                                                                setlistSong.center.x = width/2
+                                                                setlistSong.text = name
+                                                                setlistSong.textAlignment = .Center
+                                                                setlistSong.textColor = UIColor.whiteColor()
+                                                                self.setlistScroll.addSubview(setlistSong)
+                                                                y += 40
+                                                            }
+                                                            
+                                                        }
+                                                        
+                                                        
+                                                        
+                                                    } else {
+                                                        
+                                                        if let indiSetSongs =  indiset.1.dictionary {
+                                                            
+                                                            if let song = indiSetSongs["song"]?.dictionary {
+                                                                
+                                                                if let name = song["@name"]!.string {
+                                                                    
+                                                                    let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 300, height: 30))
+                                                                    setlistSong.center.x = width/2
+                                                                    setlistSong.text = name
+                                                                    setlistSong.textAlignment = .Center
+                                                                    setlistSong.textColor = UIColor.whiteColor()
+                                                                    self.setlistScroll.addSubview(setlistSong)
+                                                                    y += 40
+                                                                    
+                                                                }
+                                                                
+                                                            }
+                                                            
+                                                        } else {
+                                                            
+                                                            if let set = indiset.1.array {
+                                                                
+                                                                for song in set {
+                                                                    
+                                                                    if let name = song["@name"].string {
+                                                                        
+                                                                        let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 300, height: 30))
+                                                                        setlistSong.center.x = width/2
+                                                                        setlistSong.text = name
+                                                                        setlistSong.textAlignment = .Center
+                                                                        setlistSong.textColor = UIColor.whiteColor()
+                                                                        self.setlistScroll.addSubview(setlistSong)
+                                                                        y += 40
+                                                                        
+                                                                    }
+                                                                    
+                                                                }
+                                                                
+                                                                y += 80
+                                                                
+                                                                
+                                                            }
+                                                            
+                                                        }
+                                                        
+                                                    }
+                                                    
+                                                }
+                                                
+                                                
+                                                var i = 2
+                                                
+                                                let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 300, height: 30))
+                                                setlistSong.center.x = width/2
+                                                setlistSong.text = "Show #\(i)"
+                                                setlistSong.textAlignment = .Center
+                                                setlistSong.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+                                                setlistSong.textColor = UIColor.whiteColor()
+                                                self.setlistScroll.addSubview(setlistSong)
+                                                y += 40
+                                                
+                                                i += 1
+                                                
+                                                
+                                                
+                                                
+                                                
+                                            }
+                                            
+                                        }
+                                        
+                                        
+                                        
+                                    }
                                     
                                 } else {
                                     
@@ -87,12 +186,10 @@ class SetlistViewController: UIViewController {
                                         } else {
                                             for set in result {
                                                 
-                                                
-                                                
                                                 let indiSet =  set["song"]
                                                 
                                                 if let name = indiSet["@name"].string {
-                                                    let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 200, height: 30))
+                                                    let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 300, height: 30))
                                                     setlistSong.center.x = width/2
                                                     setlistSong.text = name
                                                     setlistSong.textAlignment = .Center
@@ -109,7 +206,7 @@ class SetlistViewController: UIViewController {
                                                         if let song = indiSet[i]["@name"].string {
                                                             if song != "" {
                                                                 let name = song
-                                                                let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 200, height: 30))
+                                                                let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 300, height: 30))
                                                                 setlistSong.center.x = width/2
                                                                 setlistSong.text = name
                                                                 setlistSong.textAlignment = .Center
@@ -139,7 +236,7 @@ class SetlistViewController: UIViewController {
                                             for song in result {
                                                 
                                                 if let name = song["@name"].string {
-                                                    let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 200, height: 30))
+                                                    let setlistSong = UILabel(frame: CGRect(x: 0, y: y, width: 300, height: 30))
                                                     setlistSong.center.x = width/2
                                                     setlistSong.text = name
                                                     setlistSong.textAlignment = .Center
@@ -164,7 +261,7 @@ class SetlistViewController: UIViewController {
                                 
                             } else {
                                 
-                                let setlistSong = UILabel(frame: CGRect(x: width/2 - 100, y: 150, width: 200, height: 30))
+                                let setlistSong = UILabel(frame: CGRect(x: width/2 - 100, y: 150, width: 300, height: 30))
                                 setlistSong.text = "No Setlist Found"
                                 setlistSong.textAlignment = .Center
                                 setlistSong.textColor = UIColor.whiteColor()

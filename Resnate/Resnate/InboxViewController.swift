@@ -21,6 +21,8 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
     
     var songs: [AnyObject] = []
     
+    var songIDs: [Int] = []
+    
     var msgCount = 0
     
     var page = 1
@@ -44,8 +46,6 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
         let resnateToken = dictionary!["token"] as! String
         
         let resnateID = dictionary!["userID"] as! String
-        
-        self.songs.insert(["": ""], atIndex: self.songs.count)
         
         let convoView = UIView(frame: CGRect(x: 0, y: y, width: self.width, height: 240))
         convoView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:0.5)
@@ -159,6 +159,8 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                 
                                                 if let songID = song["id"].int {
                                                     
+                                                    self.songIDs.insert(songID, atIndex: self.songIDs.count)
+                                                    
                                                     likeSong.tag = songID
                                                     
                                                     let shareSongTap = UITapGestureRecognizer()
@@ -225,15 +227,13 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                             
                                                             let ytSong = [songName: songContent]
                                                             
-                                                            self.songs.removeAtIndex(self.songs.count - 1)
+                                                            inboxSongImg.tag = self.songs.count
                                                             
                                                             self.songs.insert(ytSong, atIndex: self.songs.count)
                                                             
                                                             let tapVideo = UITapGestureRecognizer()
                                                             
                                                             tapVideo.addTarget(self, action: "playSong:")
-                                                            
-                                                            inboxSongImg.tag = self.songs.count - 1
                                                             
                                                             inboxSongImg.addGestureRecognizer(tapVideo)
                                                             
@@ -500,6 +500,65 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                             }
                                             
                                             
+                                        }  else if subject[subject.startIndex] == "P" {
+                                            
+                                            let playlistID = subject.componentsSeparatedByString("#")[1]
+                                            
+                                            let req = Router(OAuthToken: resnateToken, userID: playlistID)
+                                            
+                                            let sharePlaylistTap = UITapGestureRecognizer()
+                                            sharePlaylistTap.addTarget(self, action: "sharePlaylist:")
+                                            share.addGestureRecognizer(sharePlaylistTap)
+                                            share.tag = Int(playlistID)!
+                                            share.userInteractionEnabled = true
+                                            
+                                            request(req.buildURLRequest("playlists/", path: "")).responseJSON { response in
+                                                
+                                                var playlist = JSON(response.result.value!)
+                                                
+                                                if let playlistContent = playlist["content"].string {
+                                                    
+                                                    let playlistName = playlist["name"].string!
+                                                    
+                                                    subjectLabel.text = "the playlist \(playlistName)"
+                                                    
+                                                    let inboxPlaylistImg = UIImageView(frame: CGRect(x: 10, y: 130, width: 100, height: 100))
+                                                    
+                                                    let data: NSData = playlistContent.dataUsingEncoding(NSUTF8StringEncoding)!
+                                                    
+                                                    do {
+                                                        let json = try NSJSONSerialization.JSONObjectWithData(data, options: []) as! [AnyObject]
+                                                        
+                                                        let firstSong: AnyObject = json[0]
+                                                        let song = firstSong as! [String: String]
+                                                        for (_, ytID) in song {
+                                                            let playlistUrl = NSURL(string: "https://img.youtube.com/vi/\(ytID)/hqdefault.jpg")
+                                                            self.getDataFromUrl(playlistUrl!) { data in
+                                                                dispatch_async(dispatch_get_main_queue()) {
+                                                                    
+                                                                    inboxPlaylistImg.image = UIImage(data: data!)
+                                                                    
+                                                                    let tapPlaylist = UITapGestureRecognizer()
+                                                                    
+                                                                    tapPlaylist.addTarget(self, action: "toReview:")
+                                                                    
+                                                                    inboxPlaylistImg.tag = Int(playlistID)!
+                                                                    
+                                                                    inboxPlaylistImg.addGestureRecognizer(tapPlaylist)
+                                                                    
+                                                                    inboxPlaylistImg.userInteractionEnabled = true
+                                                                    
+                                                                    convoView.addSubview(inboxPlaylistImg)
+                                                                    
+                                                                }
+                                                            }
+                                                        }
+                                                    } catch let error as NSError {
+                                                        print("json error: \(error.localizedDescription)")
+                                                    }
+                                                    
+                                                }
+                                            }
                                         }
                                         
                                     } else {
@@ -709,7 +768,9 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
         
         self.tabBarController?.view.addSubview(ytPlayer.videoPlayer)
         
-        let song = self.songs[sender.view!!.tag] as! [String: String]
+        let song = self.songs[sender.view!.tag] as! [String: String]
+        
+        let songID = self.songIDs[sender.view!.tag]
         
         for (name, ytID) in song {
             
@@ -717,16 +778,11 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             
             ytPlayer.ytTitle = name
             
-            ytPlayer.shareID = "\(ytID),\(name)"
+            ytPlayer.shareID = "\(songID)"
             
             ytPlayer.playVid(ytID)
             
         }
-        
-        
-        self.tabBarController?.view.addSubview(ytPlayer.playerControls)
-        
-        
         
     }
     
@@ -738,9 +794,7 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             
             let loadingView = UIActivityIndicatorView(frame: CGRect(x: self.width/2 - 25, y: Int(self.inboxScroll.contentSize.height - 30), width: 50, height: 50))
             
-            self.inboxScroll.addSubview(loadingView)
             
-            loadingView.startAnimating()
             
             self.inboxScroll.tag = -1
             
@@ -755,6 +809,14 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                     let conversations = JSON(re)
                     
                     var y = Int(self.inboxScroll.contentSize.height)
+                    
+                    if conversations.count > 0 {
+                        
+                        self.inboxScroll.addSubview(loadingView)
+                        
+                        loadingView.startAnimating()
+                        
+                    }
                     
                     for (_, conversation) in conversations {
                         
@@ -784,16 +846,16 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             
             let resnateToken = dictionary!["token"] as! String
             
-            let parameters =  ["likeable_id" : sender.view!!.tag, "likeable_type" : "Song", "token": "\(resnateToken)"]
+            let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Song", "token": "\(resnateToken)"]
             
             let likedSong = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
             
-            sender.view!!.superview?.addSubview(likedSong)
+            sender.view!.superview?.addSubview(likedSong)
             
             let tapUnlike = UITapGestureRecognizer()
             
             
-            likedSong.tag = sender.view!!.tag
+            likedSong.tag = sender.view!.tag
             
             likedSong.addGestureRecognizer(tapUnlike)
             
@@ -802,7 +864,7 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             likedSong.image = UIImage(named: "liked")
             tapUnlike.addTarget(self, action: "unlikeSong:")
             
-            sender.view!!.removeFromSuperview()
+            sender.view!.removeFromSuperview()
             
             let mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: "https://www.resnate.com/api/likes/")!)
             mutableURLRequest.HTTPMethod = Method.POST.rawValue
@@ -834,16 +896,16 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             
             let resnateToken = dictionary!["token"] as! String
             
-            let parameters =  ["likeable_id" : sender.view!!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
+            let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
             
             let likedGig = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
             
-            sender.view!!.superview?.addSubview(likedGig)
+            sender.view!.superview?.addSubview(likedGig)
             
             let tapUnlikeGig = UITapGestureRecognizer()
             
             
-            likedGig.tag = sender.view!!.tag
+            likedGig.tag = sender.view!.tag
             
             likedGig.addGestureRecognizer(tapUnlikeGig)
             
@@ -852,7 +914,7 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             likedGig.image = UIImage(named: "liked")
             tapUnlikeGig.addTarget(self, action: "unlikeGig:")
             
-            sender.view!!.removeFromSuperview()
+            sender.view!.removeFromSuperview()
             
             let mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: "https://www.resnate.com/api/likes/")!)
             mutableURLRequest.HTTPMethod = Method.POST.rawValue
@@ -882,16 +944,16 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
         
         let resnateToken = dictionary!["token"] as! String
         
-        let parameters =  ["likeable_id" : sender.view!!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
+        let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
         
         let unlikedGig = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
         
-        sender.view!!.superview?.addSubview(unlikedGig)
+        sender.view!.superview?.addSubview(unlikedGig)
         
         let tapLikeGig = UITapGestureRecognizer()
         
         
-        unlikedGig.tag = sender.view!!.tag
+        unlikedGig.tag = sender.view!.tag
         
         unlikedGig.addGestureRecognizer(tapLikeGig)
         
@@ -900,7 +962,7 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
         unlikedGig.image = UIImage(named: "likeWhite")
         tapLikeGig.addTarget(self, action: "likeGig:")
         
-        sender.view!!.removeFromSuperview()
+        sender.view!.removeFromSuperview()
         
         let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
         let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))

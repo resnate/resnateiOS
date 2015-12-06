@@ -17,7 +17,7 @@ extension UIViewController {
             
             let scrollProfileViewController:ScrollProfileViewController = ScrollProfileViewController(nibName: "ScrollProfileViewController", bundle: nil)
             
-            scrollProfileViewController.ID = sender.view!!.tag
+            scrollProfileViewController.ID = sender.view!.tag
             
             
             self.navigationController?.pushViewController(scrollProfileViewController, animated: true)
@@ -77,7 +77,7 @@ func toReview(sender:AnyObject) {
     
     
     
-    reviewViewController.ID = sender.view!!.tag
+    reviewViewController.ID = sender.view!.tag
     
     
     self.navigationController?.pushViewController(reviewViewController, animated: true)
@@ -91,7 +91,7 @@ func toReview(sender:AnyObject) {
         
         let setlistViewController:SetlistViewController = SetlistViewController(nibName: "SetlistViewController", bundle: nil)
         
-        setlistViewController.ID = sender.view!!.tag
+        setlistViewController.ID = sender.view!.tag
         
         self.navigationController?.pushViewController(setlistViewController, animated: true)
         
@@ -232,7 +232,7 @@ func toReview(sender:AnyObject) {
     func loadGig(sender: AnyObject){
         let webViewController:WebViewController = WebViewController(nibName: "WebViewController", bundle: nil)
         
-        webViewController.webURL = "https://www.songkick.com/concerts/\(sender.view!!.tag)"
+        webViewController.webURL = "https://www.songkick.com/concerts/\(sender.view!.tag)"
         
         self.presentViewController(webViewController, animated: true, completion: nil)
     }
