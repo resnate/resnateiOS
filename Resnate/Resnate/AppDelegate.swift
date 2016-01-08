@@ -37,11 +37,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         homeVC.tabBarItem.selectedImage = UIImage(named: "homeSelected.pdf")!.imageWithRenderingMode(.AlwaysOriginal)
         
         
-        // Settings controller
-        let settingsVC = SettingsViewController(nibName: "SettingsViewController", bundle: nil)
-        settingsVC.tabBarItem.title = "Settings"
-        settingsVC.tabBarItem.image = UIImage(named: "settings")!.imageWithRenderingMode(.AlwaysOriginal)
-        settingsVC.tabBarItem.selectedImage = UIImage(named: "settingsSelected.pdf")!.imageWithRenderingMode(.AlwaysOriginal)
+        // Notifications controller
+        let notificationsVC = NotificationsViewController(nibName: "NotificationsViewController", bundle: nil)
+        notificationsVC.tabBarItem.title = "Notifications"
+        notificationsVC.tabBarItem.image = UIImage(named: "notification")!.imageWithRenderingMode(.AlwaysOriginal)
+        notificationsVC.tabBarItem.selectedImage = UIImage(named: "notificationSelected")!.imageWithRenderingMode(.AlwaysOriginal)
         
         
         
@@ -89,16 +89,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         artistsNavControl.navigationBar.barTintColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
         
         
-        let settingsNavControl = UINavigationController(rootViewController: settingsVC)
+        let notificationsNavControl = UINavigationController(rootViewController: notificationsVC)
         
-        settingsNavControl.navigationBar.barTintColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
+        notificationsNavControl.navigationBar.barTintColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
         
         
         
         self.window!.backgroundColor = UIColor(patternImage: UIImage(named: "testBkgd.jpg")!)
         
         self.tabBarController = UITabBarController()
-        self.tabBarController!.setViewControllers([homeNavControl, profileNavControl, inboxNavControl, artistsNavControl, settingsNavControl], animated: false);
+        self.tabBarController!.setViewControllers([homeNavControl, profileNavControl, inboxNavControl, notificationsNavControl, artistsNavControl], animated: false);
         
         self.tabBarController!.tabBar.barTintColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
         
@@ -168,56 +168,60 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 .responseJSON { response in
                     if let re = response.result.value {
                         let json = JSON(re)
-                        let userID = json["id"].string!
-                        let userToken = json["access_token"].string!
-                        let userName = json["name"].string!
-                        let userFirstName = json["first_name"].string!
-                        
-                        
-                        let req = Router(OAuthToken: userToken, userID: userID)
-                        request(req.buildURLRequest("users/", path: "/login")).responseJSON { response in
+                        if let userID = json["id"].string {
                             
-                            let appDelegate: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+                            let userToken = json["access_token"].string!
+                            let userName = json["name"].string!
+                            let userFirstName = json["first_name"].string!
                             
-                            if let re = response.result.value {
+                            
+                            let req = Router(OAuthToken: userToken, userID: userID)
+                            request(req.buildURLRequest("users/", path: "/login")).responseJSON { response in
                                 
-                                let json = JSON(re)
+                                let appDelegate: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
                                 
-                                
-                                let resnateUserID = json["id"].int!
-                                
-                                let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
-                                
-                                if dictionary != nil {
+                                if let re = response.result.value {
                                     
-                                    do {
-                                        try Locksmith.updateData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"], forUserAccount: "resnateAccount")
-                                    } catch let error as NSError {
-                                        print("json error: \(error.localizedDescription)")
-                                    }
+                                    let json = JSON(re)
                                     
                                     
-                                    appDelegate.window?.rootViewController = appDelegate.tabBarController
-                                } else {
+                                    let resnateUserID = json["id"].int!
                                     
-                                    do {
-                                        try Locksmith.saveData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"], forUserAccount: "resnateAccount")
-                                        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+                                    let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
                                     
-                                        if dictionary != nil {
-                                            
-                                            appDelegate.window?.rootViewController = appDelegate.tabBarController
-                                            
+                                    if dictionary != nil {
+                                        
+                                        do {
+                                            try Locksmith.updateData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"], forUserAccount: "resnateAccount")
+                                        } catch let error as NSError {
+                                            print("json error: \(error.localizedDescription)")
                                         }
-                                    } catch let error as NSError {
-                                        print("json error: \(error.localizedDescription)")
+                                        
+                                        
+                                        appDelegate.window?.rootViewController = appDelegate.tabBarController
+                                    } else {
+                                        
+                                        do {
+                                            try Locksmith.saveData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"], forUserAccount: "resnateAccount")
+                                            let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+                                            print(dictionary)
+                                            if dictionary != nil {
+                                                
+                                                appDelegate.window?.rootViewController = appDelegate.tabBarController
+                                                
+                                            }
+                                        } catch let error as NSError {
+                                            print("json error: \(error.localizedDescription)")
+                                        }
+                                        
+                                        
                                     }
-                                    
-                                    
                                 }
+                                
                             }
                             
-                        }   
+                        }
+                        
                     }
             }
             
@@ -225,7 +229,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                           
         } else {
             let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
-                        print(dictionary)
+                        print("asd")
         }
         
     }
@@ -238,12 +242,53 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
                     
                     if ytPlayer.videoPlayer.playerState == .Playing {
+                        
+                        ytPlayer.videoPlayer.getVideoBytesLoaded({ (bytesLoaded) -> () in
+                            
+                            if let floatLoaded = Float(bytesLoaded) {
+                                
+                                self.ytPlayer.videoSlider.currentBuffer = floatLoaded
+                                
+                            }
+                            
+                            
+                        })
+                        
                         ytPlayer.videoPlayer.getCurrentTime({ (youTubeTime) -> () in
-                            print(youTubeTime)
+                            
+                         
+                            
+                            if self.ytPlayer.playerOverlay.backgroundColor == UIColor(white: 0, alpha: 0.5) {
+                                
+                                self.ytPlayer.playerOverlay.addSubview(self.ytPlayer.currentTime)
+                                self.ytPlayer.currentTime.text = youTubeTime.youTubeTime
+                                
+                                let currentTime = youTubeTime.doubleTime
+                                
+                                
+                                self.ytPlayer.videoPlayer.getDuration({ (youTubeTime) -> () in
+                                    
+                                    let duration = youTubeTime.doubleTime
+                                    
+                                    self.ytPlayer.videoSlider.currentPosition = Float(currentTime/duration)
+                                   
+                                })
+                                
+                            }
+                            
+
                         })
                        
+                    } else if ytPlayer.videoPlayer.playerState == .Paused {
+                        
+                        ytPlayer.fadeInOverlay()
+                        print("paused")
+                        
                     } else if ytPlayer.videoPlayer.playerState == .Ended {
                         
+                        ytPlayer.videoPlayer.seekTo(0, seekAhead: true)
+                        ytPlayer.videoPlayer.pause()
+                        print("ended")
                     }
                 
     }
@@ -259,9 +304,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if(UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation))
         {
-                    self.ytPlayer.reviewTextView.endEditing(true)
+            
+
+                    self.ytPlayer.hideReviewView()
                     if self.ytPlayer.videoPlayer.tag == 1 {
-                        self.ytPlayer.hideReviewView()
+                        self.ytPlayer.reviewTextView.endEditing(true)
                         UIView.animateWithDuration(0.2,
                             delay: 0,
                             options: [.CurveEaseInOut, .AllowUserInteraction],
@@ -277,6 +324,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 
                                 self.ytPlayer.videoPlayer.frame = CGRect(x: 0, y: 0, width: width, height: height)
                                 self.ytPlayer.playerOverlay.frame = CGRect(x: 0, y: 0, width: width, height: height)
+                                
                                     
                                 if self.ytPlayer.videoPlayer.playerState == .Playing {
                                     
@@ -288,19 +336,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             },
                             completion: { finished in
                                 self.ytPlayer.videoPlayer.layer.borderWidth = 0
-                                UIApplication.sharedApplication().statusBarHidden = true
+                                
+                                self.ytPlayer.videoSlider.frame = CGRect(x: 10, y: UIScreen.mainScreen().bounds.width - 65, width: UIScreen.mainScreen().bounds.height - 20, height: 30)
+
+                                self.ytPlayer.currentTime.frame = CGRect(x: 5, y: UIScreen.mainScreen().bounds.width - 35, width: 70, height: 30)
+                                
+                                self.ytPlayer.duration.frame = CGRect(x: UIScreen.mainScreen().bounds.height - 45, y: UIScreen.mainScreen().bounds.width - 35, width: 70, height: 30)
                                 
                                     for subview in self.ytPlayer.playerOverlay.subviews {
-                                        
-                                        if subview.tag == -1 {
+
+                                        if subview.tag == -1 || subview.tag == -2 {
                                             
                                             subview.frame.origin.x = UIScreen.mainScreen().bounds.height/2 - 25
                                             subview.frame.origin.y = UIScreen.mainScreen().bounds.width/2 - 25
                                             
                                         }
                                         
+                                        
                                     }
-                                
+                                UIApplication.sharedApplication().statusBarHidden = true
                         })
                         
                     }
@@ -332,13 +386,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 },
                                 completion: { finished in
                                     UIApplication.sharedApplication().statusBarHidden = false
+
                                     self.ytPlayer.videoPlayer.layer.borderWidth = 1
                                     
                                     self.ytPlayer.videoPlayer.layer.borderColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0).CGColor
                                     
+                                    if self.ytPlayer.videoPlayer.frame.width > 160 {
+                                        
+                                        self.ytPlayer.currentTime.frame = CGRect(x: 5, y: UIScreen.mainScreen().bounds.width/1.85 - 35, width: 70, height: 30)
+                                        
+                                        self.ytPlayer.duration.frame = CGRect(x: UIScreen.mainScreen().bounds.width - 45, y: UIScreen.mainScreen().bounds.width/1.85 - 35, width: 70, height: 30)
+                                        
+                                        self.ytPlayer.videoSlider.frame = CGRect(x: 10, y: UIScreen.mainScreen().bounds.width/1.85 - 55, width: UIScreen.mainScreen().bounds.width - 20, height: 30)
+                                        
+                                        
+                                    } else {
+                                        
+                                        self.ytPlayer.currentTime.frame = CGRect(x: -UIScreen.mainScreen().bounds.height, y: -UIScreen.mainScreen().bounds.width, width: 70, height: 30)
+                                        
+                                        self.ytPlayer.duration.frame = CGRect(x: -UIScreen.mainScreen().bounds.height, y: -UIScreen.mainScreen().bounds.width, width: 70, height: 30)
+                                        
+                                        self.ytPlayer.videoSlider.frame = CGRect(x: -UIScreen.mainScreen().bounds.height, y: -UIScreen.mainScreen().bounds.width, width: UIScreen.mainScreen().bounds.width - 20, height: 30)
+                                        
+                                    }
+                                    
+                                    
+                                    
                                     for subview in self.ytPlayer.playerOverlay.subviews {
                                         
-                                        if subview.tag == -1 {
+                                        if subview.tag == -1 || subview.tag == -2 {
                                             
                                             subview.frame = CGRect(x: 55, y: 21, width: 50, height: 50)
                                             

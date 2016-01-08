@@ -7,6 +7,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SettingsViewController" customModule="Resnate" customModuleProvider="target">
             <connections>
+                <outlet property="privateListening" destination="B8z-cV-iY3" id="cax-n5-gmL"/>
+                <outlet property="songkickEntry" destination="2Np-PQ-Y3W" id="bBm-6J-rGk"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -15,15 +17,70 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7M4-7f-SBC">
-                    <rect key="frame" x="139" y="233" width="42" height="21"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OVC-So-Fq3">
+                    <rect key="frame" x="0.0" y="91" width="320" height="45"/>
+                    <subviews>
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Add your gigography" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2Np-PQ-Y3W">
+                            <rect key="frame" x="140" y="0.0" width="180" height="45"/>
+                            <animations/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits"/>
+                        </textField>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Songkick ID" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1o6-JP-USa">
+                            <rect key="frame" x="12" y="11" width="91" height="21"/>
+                            <animations/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
                     <animations/>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
+                    <color key="backgroundColor" red="0.50196078430000002" green="0.074509803920000006" blue="0.21176470589999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="1o6-JP-USa" firstAttribute="top" secondItem="OVC-So-Fq3" secondAttribute="top" constant="11" id="66D-Mt-EYy"/>
+                        <constraint firstItem="1o6-JP-USa" firstAttribute="leading" secondItem="OVC-So-Fq3" secondAttribute="leading" constant="12" id="6U6-b1-P8e"/>
+                        <constraint firstItem="2Np-PQ-Y3W" firstAttribute="top" secondItem="OVC-So-Fq3" secondAttribute="top" id="7FA-CW-Rxw"/>
+                        <constraint firstAttribute="bottom" secondItem="2Np-PQ-Y3W" secondAttribute="bottom" id="Erh-R1-qOE"/>
+                        <constraint firstItem="2Np-PQ-Y3W" firstAttribute="leading" secondItem="1o6-JP-USa" secondAttribute="trailing" constant="40" id="HMX-QF-ZjD"/>
+                        <constraint firstAttribute="trailing" secondItem="2Np-PQ-Y3W" secondAttribute="trailing" id="gjI-y0-ZDE"/>
+                        <constraint firstAttribute="height" constant="45" id="mxe-X0-A6k"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2r7-JB-KT0">
+                    <rect key="frame" x="0.0" y="153" width="320" height="45"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Private Listening" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="es0-z3-BpM">
+                            <rect key="frame" x="8" y="11" width="137" height="21"/>
+                            <animations/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="B8z-cV-iY3">
+                            <rect key="frame" x="251" y="7" width="51" height="31"/>
+                            <animations/>
+                            <color key="onTintColor" red="0.8980392157" green="0.0" blue="0.28627450980000002" alpha="1" colorSpace="calibratedRGB"/>
+                        </switch>
+                    </subviews>
+                    <animations/>
+                    <color key="backgroundColor" red="0.50196078430000002" green="0.074509803920000006" blue="0.21176470589999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="B8z-cV-iY3" firstAttribute="top" secondItem="2r7-JB-KT0" secondAttribute="top" constant="7" id="3M5-vy-8eP"/>
+                        <constraint firstAttribute="height" constant="45" id="7S9-mY-MIJ"/>
+                        <constraint firstAttribute="trailing" secondItem="B8z-cV-iY3" secondAttribute="trailing" constant="20" id="nKJ-rv-pC5"/>
+                    </constraints>
+                </view>
             </subviews>
             <animations/>
+            <constraints>
+                <constraint firstItem="OVC-So-Fq3" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="3jn-hV-NlZ"/>
+                <constraint firstItem="2r7-JB-KT0" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="3qu-pV-cjs"/>
+                <constraint firstItem="2r7-JB-KT0" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="153" id="7yW-4t-fbn"/>
+                <constraint firstAttribute="trailing" secondItem="OVC-So-Fq3" secondAttribute="trailing" id="H2S-bh-k4b"/>
+                <constraint firstAttribute="trailing" secondItem="2r7-JB-KT0" secondAttribute="trailing" id="odq-ll-jEG"/>
+                <constraint firstItem="OVC-So-Fq3" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="91" id="vS8-aE-QOg"/>
+            </constraints>
             <point key="canvasLocation" x="139" y="154"/>
         </view>
     </objects>

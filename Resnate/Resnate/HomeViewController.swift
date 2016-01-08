@@ -48,14 +48,126 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
     var songIDs: [Int] = []
     
     
+    var playlistSongs: [AnyObject] = []
+    
+    var playlist: [JSON] = []
+    
+    var playlistNames: [String] = []
+    
+    var playlistUserIDs: [Int] = []
+    
+    var playlistCount = 0
+    
+    
+    
+    
+    func feedToPlaylist(sender: AnyObject){
+        
+        let playlistTableViewController:PlaylistTableViewController = PlaylistTableViewController(nibName: nil, bundle: nil)
+        
+        playlistTableViewController.songs = self.playlistSongs[sender.view!.tag] as! [AnyObject]
+        
+        playlistTableViewController.likes = false
+        
+        playlistTableViewController.playlist = self.playlist[sender.view!.tag]
+        
+        playlistTableViewController.playlistName = self.playlistNames[sender.view!.tag]
+        
+        if let playlistID = self.playlist[sender.view!.tag]["id"].int {
+            playlistTableViewController.playlistID = playlistID
+            playlistTableViewController.playlistUserID = self.playlistUserIDs[sender.view!.tag]
+        }
+        
+        self.navigationController?.pushViewController(playlistTableViewController, animated: true)
+        
+    }
+    
+    func getPlaylistInfo(req: Router, activityView: UIView){
+        
+        request(req.buildURLRequest("playlists/", path: "")).responseJSON { response in
+            
+            if let re = response.result.value {
+                
+                let playlist = JSON(re)
+                
+                self.playlist.append(playlist)
+                
+                if let playlistName = playlist["name"].string {
+                    
+                    let playlistNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                    
+                    playlistNameLabel.text = playlistName
+                    
+                    self.playlistNames.append(playlistName)
+                    
+                    playlistNameLabel.textColor = UIColor.whiteColor()
+                    playlistNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
+                    playlistNameLabel.numberOfLines = 2
+                    
+                    activityView.addSubview(playlistNameLabel)
+                    
+                }
+                
+                if let playlistContent = playlist["content"].string {
+                    
+                    let playlistID = playlist["id"].int!
+                    
+                    let playlistUserID = playlist["user_id"].int!
+                    
+                    self.playlistUserIDs.append(playlistUserID)
+                    
+                    let activityPlaylistImg = UIImageView(frame: CGRect(x: 10, y: 125, width: self.imgWidth, height: self.imgHeight))
+                    
+                    activityView.addSubview(activityPlaylistImg)
+                    
+                    let data: NSData = playlistContent.dataUsingEncoding(NSUTF8StringEncoding)!
+                    
+                    do {
+                        let json = try NSJSONSerialization.JSONObjectWithData(data, options: []) as! [AnyObject]
+                        
+                        self.playlistSongs.append(json)
+                        
+                        let firstSong: AnyObject = json[0]
+                        let song = firstSong as! [String: String]
+                        for (_, ytID) in song {
+                            let playlistUrl = NSURL(string: "https://img.youtube.com/vi/\(ytID)/hqdefault.jpg")
+                            self.getDataFromUrl(playlistUrl!) { data in
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    
+                                    activityPlaylistImg.image = UIImage(data: data!)
+                                    
+                                    let tapPlaylist = UITapGestureRecognizer()
+                                    tapPlaylist.addTarget(self, action: "feedToPlaylist:")
+                                    activityPlaylistImg.addGestureRecognizer(tapPlaylist)
+                                    activityPlaylistImg.tag = self.playlistCount
+                                    
+                                    self.playlistCount += 1
+                                    activityPlaylistImg.userInteractionEnabled = true
+                                    
+                                }
+                            }
+                        }
+                    }  catch let error as NSError {
+                        print("json error: \(error.localizedDescription)")
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+    
     func getSongInfo(songID: Int, view: UIView, token: String, currentUserID: String, likerID: String)  {
         
         let req = Router(OAuthToken: token, userID: String(songID))
         
         request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
-                
+            
                 let song = JSON(response.result.value!)
-                
+            
                 if let songID = song["id"].int {
                     
                     self.songIDs.insert(songID, atIndex: self.songIDs.count)
@@ -63,7 +175,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                     if let songName = song["name"].string {
                         
                         if let songContent = song["content"].string {
-                                
+                            
                                 let likeSong = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
                                 
                                 view.addSubview(likeSong)
@@ -451,6 +563,12 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                                 }
                                             }
                                             
+                                        } else if followable_type == "Playlist" {
+                                            
+                                            let followedPlaylistReq = Router(OAuthToken: resnateToken, userID: String(followable_id))
+                                            
+                                            self.getPlaylistInfo(followedPlaylistReq, activityView: activityView)
+                                            
                                         }
                                         
                                     }
@@ -485,7 +603,19 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                     }
                     
                     
-                } else if type == "User" {
+                } else if type == "Playlist" {
+                    
+                    verbLabel.text = "created a playlist"
+                    
+                    if let playlistID = activity["trackable_id"].int {
+                        
+                        let req = Router(OAuthToken: resnateToken, userID: String(playlistID))
+                        
+                        self.getPlaylistInfo(req, activityView: activityView)
+                        
+                    }
+                    
+                }else if type == "User" {
                     
                     if let userID = activity["trackable_id"].int {
                         
@@ -534,7 +664,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                 
                 if let activityID = activity["id"].int {
                     
-                    if type != "Socialization::ActiveRecordStores::Follow" {
+                    if type != "Socialization::ActiveRecordStores::Follow" && type != "User" {
                         
                         commentImgView.tag = activityID
                         
@@ -672,11 +802,11 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         
         let inboxTab = tabArray.objectAtIndex(2) as! UITabBarItem
         
-        let profileTab = tabArray.objectAtIndex(1) as! UITabBarItem
+        let notificationsTab = tabArray.objectAtIndex(3) as! UITabBarItem
         
-        let profileNav = self.tabBarController?.viewControllers![1] as! UINavigationController
+        let notificationNav = self.tabBarController?.viewControllers![3] as! UINavigationController
         
-        let profileView = profileNav.viewControllers[0] as! ScrollProfileViewController
+        let notificationView = notificationNav.viewControllers[0] as! NotificationsViewController
         
         let tokenReq = Router(OAuthToken: resnateToken, userID: resnateToken)
         
@@ -704,10 +834,10 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                     
                     if Int(newPoints) > 0 {
                         
-                        profileTab.badgeValue = newPoints
-                        profileView.notificationCount = Int(newPoints)!
+                        notificationsTab.badgeValue = newPoints
+                        notificationView.notificationCount = Int(newPoints)!
                         
-                        self.repositionBadge(2)
+                        self.repositionBadge(4)
                     }
                     
                 }
@@ -750,62 +880,125 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                     if let re = response.result.value {
                         
                         let conversations = JSON(re)
-               
-                        if inboxView.inboxScroll != nil {
                     
-                            if String(newMessage) == resnateID {
-                                
-                                
-                                for (_, conversation) in conversations {
+                        if String(newMessage) == resnateID {
+                            
+                            for (_, conversation) in conversations {
                                     
-                                    if let message = conversation["message"].dictionary {
+                                if let message = conversation["message"].dictionary {
                                         
-                                        let subject = message["subject"]!.string!
+                                    let subject = message["subject"]!.string!
                                         
-                                        let index = subject.startIndex.advancedBy(1)
-                                        
-                                        if subject[index] == "#" {
+                                    let index = subject.startIndex.advancedBy(1)
+                                    
+                                    if subject[index] == "#" {
                                             
-                                            for view in inboxView.inboxScroll.subviews {
-                                                view.frame.origin.y += 250
+                                        if inboxView.inboxScroll != nil {
+                                            
+                                        for view in inboxView.inboxScroll.subviews {
+                                            view.frame.origin.y += 250
+                                        }
+                                            
+                                        inboxView.loadMessage(conversation, y: 10)
+                                            
+                                        inboxView.msgCount += 1
+                                            
+                                        inboxTab.badgeValue = String(inboxView.msgCount)
+                                            
+                                        self.repositionBadge(3)
+                                            
+                                        inboxView.inboxScroll.contentSize.height += 250
+                                            
+                                        if self.tabBarController?.selectedIndex == 2 {
+                                                
+                                            let delay = 2.5 * Double(NSEC_PER_SEC)
+                                            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+                                            dispatch_after(time, dispatch_get_main_queue()) {
+                                                    
+                                                let parameters = ["token" : "\(resnateToken)", "type" : "message"]
+                                                    
+                                                let mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: "https://www.resnate.com/api/markAsRead/")!)
+                                                mutableURLRequest.HTTPMethod = Method.POST.rawValue
+                                                mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                                                    
+                                                request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                                                        
+                                                    inboxView.msgCount = 0
+                                                    inboxTab.badgeValue = nil
+                                                        
+                                                }
                                             }
+                                                
+                                        }
                                             
-                                            inboxView.loadMessage(conversation, y: 10)
+                                        newMessageAlert.text = "New Message"
                                             
-                                            inboxView.msgCount += 1
+                                        inboxView.view.addSubview(newMessageAlert)
                                             
-                                            inboxTab.badgeValue = String(inboxView.msgCount)
+                                        UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+                                                
+                                            newMessageAlert.alpha = 1.0
+                                                
+                                            }, completion: {
+                                                (finished: Bool) -> Void in
+                                                    
+                                                UIView.animateWithDuration(0.75, delay: 1.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                                                        
+                                                    newMessageAlert.alpha = 0.0
+                                                        
+                                                    }, completion: nil )
+                                        })
+
+                                            
+                                        } else {
+                                            
+                                            self.msgCount += 1
+                                            
+                                            inboxTab.badgeValue = String(self.msgCount)
                                             
                                             self.repositionBadge(3)
                                             
-                                            inboxView.inboxScroll.contentSize.height += 250
+                                        }
+                                        
+                                    } else {
+                                        
+                                        notificationView.notificationCount += 1
+                                        notificationsTab.badgeValue = String(notificationView.notificationCount)
+                                        self.repositionBadge(4)
+                                        
+                                        if notificationView.scrollView != nil {
                                             
-                                            if self.tabBarController?.selectedIndex == 2 {
+                                            for view in notificationView.scrollView.subviews {
+                                                view.frame.origin.y += 70
+                                            }
+                                            
+                                            notificationView.getNotification(conversation, y: 10)
+
+                                            if self.tabBarController?.selectedIndex == 3 {
                                                 
                                                 let delay = 2.5 * Double(NSEC_PER_SEC)
                                                 let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
                                                 dispatch_after(time, dispatch_get_main_queue()) {
                                                     
-                                                    let parameters = ["token" : "\(resnateToken)", "type" : "message"]
+                                                    let parameters = ["token" : "\(resnateToken)", "type" : "notification"]
                                                     
                                                     let mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: "https://www.resnate.com/api/markAsRead/")!)
                                                     mutableURLRequest.HTTPMethod = Method.POST.rawValue
                                                     mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
                                                     
-                                                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                                                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters ).0).responseJSON { response in
                                                         
-                                                        inboxView.msgCount = 0
-                                                        inboxTab.badgeValue = nil
-                                                        
+                                                        notificationView.notificationCount = 0
+                                                        notificationsTab.badgeValue = nil
                                                         
                                                     }
                                                 }
                                                 
                                             }
                                             
-                                            newMessageAlert.text = "New Message"
+                                            newMessageAlert.text = "New Notification"
                                             
-                                            inboxView.view.addSubview(newMessageAlert)
+                                            notificationView.view.addSubview(newMessageAlert)
                                             
                                             UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                                                 
@@ -822,53 +1015,21 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                             })
 
                                             
-                                        } else {
-                                            
-                                            profileView.notificationCount += 1
-                                            
-                                            profileTab.badgeValue = String(profileView.notificationCount)
-                                            
-                                            self.repositionBadge(2)
-                                            
-                                            if self.tabBarController?.selectedIndex == 1 {
-                                                
-                                                let delay = 2.5 * Double(NSEC_PER_SEC)
-                                                let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-                                                dispatch_after(time, dispatch_get_main_queue()) {
-                                                    
-                                                    let parameters = ["token" : "\(resnateToken)", "type" : "notification"]
-                                                    
-                                                    let mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: "https://www.resnate.com/api/markAsRead/")!)
-                                                    mutableURLRequest.HTTPMethod = Method.POST.rawValue
-                                                    mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
-                                                    
-                                                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
-                                                        
-                                                        profileView.notificationCount = 0
-                                                        profileTab.badgeValue = nil
-                                                        
-                                                        
-                                                    }
-                                                }
-                                                
-                                            }
-                                            
                                         }
                                         
                                     }
                                     
-                                }
-                                
-                                
-                            
-                            
+                            }
                         
-                        
+                        }
+                            
                     } else {
+                            
+                        // if sender is current user
                         
                         if let sender = channelEvent.data.objectForKey("sender") {
                             
-                            if String(sender) == resnateID {
+                            if String(sender) == resnateID && inboxView.inboxScroll != nil {
                                         
                                         for view in inboxView.inboxScroll.subviews {
                                             view.frame.origin.y += 250
@@ -880,58 +1041,14 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                             inboxView.loadMessage(conversation, y: 10)
                                             
                                         }
-                                        
-                                        
-                                        
+                                
                                         inboxView.inboxScroll.contentSize.height += 250
-                                        
-                                    
-                                    
                                 
-                                
-                            }
-                            
-                        }
-                        
-                    }
-                    
-                } else {
-                    
-                    if String(newMessage) == resnateID {
-                        
-                        for (_, conversation) in conversations {
-                            
-                            if let message = conversation["message"].dictionary {
-                                
-                                let subject = message["subject"]!.string!
-                                
-                                let index = subject.startIndex.advancedBy(1)
-                                
-                                if subject[index] == "#" {
-                                    
-                                    self.msgCount += 1
-                                    
-                                    inboxTab.badgeValue = String(self.msgCount)
-                                    
-                                    self.repositionBadge(3)
-                                    
-                                } else {
-                                    
-                                    profileView.notificationCount += 1
-                                    profileTab.badgeValue = String(profileView.notificationCount)
-                                    
-                                    self.repositionBadge(2)
-                                    
                                 }
+                            
                             }
+                        
                         }
-                        
-                        
-                        
-                    }
-                    
-                    
-                }
                     }
                 
                 }
@@ -1096,6 +1213,250 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         self.navigationItem.leftBarButtonItem = leftNavBarButton
         
         self.homeScroll.delegate = self
+        
+        
+        
+        let userReq = Router(OAuthToken: resnateToken, userID: resnateID)
+        
+        request(userReq.buildURLRequest("users/", path: "/profile")).responseJSON { response in
+            
+            if let re = response.result.value {
+                
+                let user = JSON(re)
+                
+                let userDefaults = NSUserDefaults.standardUserDefaults()
+                
+                if user["songkickID"] != nil && user["songkickID"] != "" {
+                    
+                    let songkickID = user["songkickID"].string!
+                    
+                    userDefaults.setObject(songkickID, forKey: "songkick_id")
+                    
+                    let upcomingGigsLink = "https://api.songkick.com/api/3.0/users/\(songkickID)/calendar.json?reason=attendance&apikey=Pxms4Lvfx5rcDIuR&"
+                    
+                    request(.GET, upcomingGigsLink).responseJSON { response in
+                        
+                        if let re = response.result.value {
+                            
+                            let json = JSON(re)
+                            
+                            if let totalEntries = json["resultsPage"]["totalEntries"].int {
+                                
+                                var totalPages = 1
+                                
+                                if totalEntries > 50 {
+                                    
+                                    totalPages = totalEntries % 50
+                                    
+                                }
+                                    
+                                    for i in 1...totalPages {
+                                        
+                                        let pageUrl = "https://api.songkick.com/api/3.0/users/\(songkickID)/calendar.json?reason=attendance&apikey=Pxms4Lvfx5rcDIuR&page=\(i)"
+                                        
+                                        request(.GET, pageUrl).responseJSON { response in
+                                            
+                                            if let re = response.result.value {
+                                                
+                                                let json = JSON(re)
+                                                
+                                                
+                                                if let gigs = json["resultsPage"]["results"]["calendarEntry"].array {
+                                                    
+                                                    var allGigs: [Dictionary<String, String>] = []
+                                                    var allGigsIDs: [Int] = []
+                                                    var uGInts: [Int] = []
+                                                    
+                                                    if let databaseUpcomingGigs = user["previousUpcomingGigs"].array {
+                                                        for uG in databaseUpcomingGigs {
+                                                            if let uGInt = uG.int {
+                                                                uGInts.append(uGInt)
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    for gig in gigs {
+                                                        
+                                                        if let gigID = gig["event"]["id"].int {
+                                                            
+                                                            if let date = gig["event"]["start"]["date"].string {
+                                                                
+                                                                allGigsIDs.append(gigID)
+                                                                
+                                                                if uGInts.indexOf(gigID) == nil {
+                                                                    
+                                                                    allGigs.append([ "songkick_id" : "\(gigID)", "gig_date" : "\(date)" ])
+                                                                    
+                                                                }
+                                                                
+                                                            }
+                                                        }
+                                                        
+                                                    }
+                                                    
+                                                    if allGigs.count > 0 {
+                                                        
+                                                        let data = try? NSJSONSerialization.dataWithJSONObject(allGigs, options: [])
+                                                        let string = NSString(data: data!, encoding: NSUTF8StringEncoding)
+                                                        
+                                                        let parameters =  ["token": "\(resnateToken)", "multiGigs": string!]
+                                                        
+                                                        let URL = NSURL(string: "https://www.resnate.com/api/apiMultipleCreate/")!
+                                                        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                                                        mutableURLRequest.HTTPMethod = Method.POST.rawValue
+                                                        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                                                        
+                                                        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                                                            
+                                                        }
+                                                        
+                                                    }
+                                                    
+                                                    for previousGig in uGInts {
+                                                        
+                                                        if allGigsIDs.indexOf(previousGig) == nil {
+                                                            
+                                                            let parameters =  ["songkick_id": "\(previousGig)"]
+                                                            
+                                                            let URL = NSURL(string: "https://www.resnate.com/api/gigUndo/")!
+                                                            let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                                                            mutableURLRequest.HTTPMethod = Method.POST.rawValue
+                                                            mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                                                            
+                                                            request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                                                                
+                                                            }
+                                                            
+                                                        }
+                                                        
+                                                    }
+                                                    
+                                                }
+                                                
+                                            }
+                                        }
+                                        
+                                    }
+                                    
+                                
+                                
+                            }
+                            
+                        }
+                        
+                        
+                    }
+                    
+                    
+                    let pastGigsLink = "https://api.songkick.com/api/3.0/users/\(songkickID)/gigography.json?apikey=Pxms4Lvfx5rcDIuR"
+                    
+                    request(.GET, pastGigsLink).responseJSON { response in
+                        
+                        if let re = response.result.value {
+                            
+                            let json = JSON(re)
+                            
+                            if let totalEntries = json["resultsPage"]["totalEntries"].int {
+                                    
+                                    let totalPages = totalEntries % 50
+                                    
+                                    for i in 1...totalPages {
+                                        
+                                        let pageUrl = "https://api.songkick.com/api/3.0/users/\(songkickID)/gigography.json?apikey=Pxms4Lvfx5rcDIuR&page=\(i)"
+                                        
+                                        request(.GET, pageUrl).responseJSON { response in
+                                            
+                                            if let re = response.result.value {
+                                                
+                                                let json = JSON(re)
+                                                
+                                                if let pastGigs = json["resultsPage"]["results"]["event"].array {
+                                                    
+                                                    var allPastGigs: [Dictionary<String, String>] = []
+                                                    var allPastGigsIDs: [Int] = []
+                                                    var pGInts: [Int] = []
+                                                    
+                                                    if let databasePastGigs = user["previousPastGigs"].array {
+                                                        for pG in databasePastGigs {
+                                                            if let pGInt = pG.int {
+                                                                pGInts.append(pGInt)
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    for pastGig in pastGigs {
+                                                        
+                                                        if let pastGigID = pastGig["id"].int {
+                                                            
+                                                            if pGInts.indexOf(pastGigID) == -1 {
+                                                                
+                                                                if let date = pastGig["start"]["date"].string {
+                                                                    
+                                                                    allPastGigs.append([ "songkick_id" : "\(pastGigID)", "gig_date" : "\(date)" ])
+                                                                    allPastGigsIDs.append(pastGigID)
+                                                                    
+                                                                }
+                                                                
+                                                            }
+                                                            
+                                                        }
+                                                        
+                                                    }
+                                                    
+                                                    if allPastGigs.count > 0 {
+                                                        
+                                                        let data = try? NSJSONSerialization.dataWithJSONObject(allPastGigs, options: [])
+                                                        let string = NSString(data: data!, encoding: NSUTF8StringEncoding)
+                                                        
+                                                        let parameters =  ["token": "\(resnateToken)", "multiGigs": string!]
+                                                        
+                                                        let URL = NSURL(string: "https://www.resnate.com/api/apiPastMultipleCreate/")!
+                                                        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                                                        mutableURLRequest.HTTPMethod = Method.POST.rawValue
+                                                        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                                                        
+                                                        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                                                            
+                                                        }
+                                                        
+                                                    }
+                                                    
+                                                }
+                                                
+                                            }
+                                        }
+                                        
+                                    }
+                                    
+                            }
+                            
+                        }
+                    }
+
+                    
+                } else {
+                    
+                    let songkickID = userDefaults.stringForKey("songkick_id")
+                    
+                    let parameters =  ["token": "\(resnateToken)", "songkickID": "\(songkickID)"]
+                    
+                    let URL = NSURL(string: "https://www.resnate.com/api/users/\(resnateID)")!
+                    let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                    mutableURLRequest.HTTPMethod = Method.PUT.rawValue
+                    mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                    
+                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                        
+                    }
+                    
+                }
+                
+            }
+            
+            
+        }
+        
+        
     }
     
     deinit {
@@ -1227,7 +1588,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         
         self.tabBarController?.view.addSubview(ytPlayer.videoPlayer)
         
-        let song = self.songs[sender.view!!.tag] as! [String: String]
+        let song = self.songs[sender.view!.tag] as! [String: String]
         
         let songID = self.songIDs[sender.view!.tag]
         
@@ -1278,16 +1639,16 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         
             let resnateToken = dictionary!["token"] as! String
         
-            let parameters =  ["likeable_id" : sender.view!!.tag, "likeable_type" : "Song", "token": "\(resnateToken)"]
+            let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Song", "token": "\(resnateToken)"]
         
         let likedSong = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
         
-        sender.view!!.superview?.addSubview(likedSong)
+        sender.view!.superview?.addSubview(likedSong)
         
         let tapUnlike = UITapGestureRecognizer()
         
         
-        likedSong.tag = sender.view!!.tag
+        likedSong.tag = sender.view!.tag
         
         likedSong.addGestureRecognizer(tapUnlike)
         
@@ -1296,7 +1657,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         likedSong.image = UIImage(named: "liked")
         tapUnlike.addTarget(self, action: "unlikeSong:")
         
-        sender.view!!.removeFromSuperview()
+        sender.view!.removeFromSuperview()
         
         let mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: "https://www.resnate.com/api/likes/")!)
         mutableURLRequest.HTTPMethod = Method.POST.rawValue
@@ -1324,16 +1685,16 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         
         let resnateToken = dictionary!["token"] as! String
         
-        let parameters =  ["likeable_id" : sender.view!!.tag, "likeable_type" : "Song", "token": "\(resnateToken)"]
+        let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Song", "token": "\(resnateToken)"]
         
         let unlikedSong = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
         
-        sender.view!!.superview?.addSubview(unlikedSong)
+        sender.view!.superview?.addSubview(unlikedSong)
         
         let tapLike = UITapGestureRecognizer()
         
         
-        unlikedSong.tag = sender.view!!.tag
+        unlikedSong.tag = sender.view!.tag
         
         unlikedSong.addGestureRecognizer(tapLike)
         
@@ -1342,7 +1703,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         unlikedSong.image = UIImage(named: "likeWhite")
         tapLike.addTarget(self, action: "likeSong:")
         
-        sender.view!!.removeFromSuperview()
+        sender.view!.removeFromSuperview()
         
         let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
         let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
@@ -1358,16 +1719,16 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         
         let resnateToken = dictionary!["token"] as! String
         
-        let parameters =  ["likeable_id" : sender.view!!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
+        let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
         
         let likeGig = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
         
-        sender.view!!.superview?.addSubview(likeGig)
+        sender.view!.superview?.addSubview(likeGig)
         
         let tapLike = UITapGestureRecognizer()
         
         
-        likeGig.tag = sender.view!!.tag
+        likeGig.tag = sender.view!.tag
         
         likeGig.addGestureRecognizer(tapLike)
         
@@ -1376,7 +1737,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         likeGig.image = UIImage(named: "liked")
         tapLike.addTarget(self, action: "unlikeGig:")
         
-        sender.view!!.removeFromSuperview()
+        sender.view!.removeFromSuperview()
         
         let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
         let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
@@ -1395,16 +1756,16 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         
         let resnateToken = dictionary!["token"] as! String
         
-        let parameters =  ["likeable_id" : sender.view!!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
+        let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
         
         let unlikedGig = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
         
-        sender.view!!.superview?.addSubview(unlikedGig)
+        sender.view!.superview?.addSubview(unlikedGig)
         
         let tapLikeGig = UITapGestureRecognizer()
         
         
-        unlikedGig.tag = sender.view!!.tag
+        unlikedGig.tag = sender.view!.tag
         
         unlikedGig.addGestureRecognizer(tapLikeGig)
         
@@ -1413,7 +1774,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         unlikedGig.image = UIImage(named: "likeWhite")
         tapLikeGig.addTarget(self, action: "likeSong:")
         
-        sender.view!!.removeFromSuperview()
+        sender.view!.removeFromSuperview()
         
         let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
         let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
@@ -1424,6 +1785,8 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
             
         }
     }
+    
+    
     
     func repositionBadge(tab: Int){
         

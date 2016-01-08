@@ -87,7 +87,8 @@ class UserPlaylistsViewController: UIViewController, UIScrollViewDelegate {
                             
                             let playlistUserID = String(playlist["user_id"].int!)
                             
-                            let playlistLabel = UILabel(frame: CGRect(x: 120, y: 30, width: 150, height: 30))
+                            let playlistLabel = UILabel(frame: CGRect(x: 120, y: 0, width: 200, height: 60))
+                            playlistLabel.numberOfLines = 2
                             setSKLabelText(playlistLabel)
                             playlistLabel.text = playlistName
                             playlistUberView.addSubview(playlistLabel)
@@ -110,7 +111,7 @@ class UserPlaylistsViewController: UIViewController, UIScrollViewDelegate {
                                 self.playlistDescriptions.append(description)
                                 
                                 playlistLabel.frame.origin.y = 0
-                                let playlistDescriptionLabel = UILabel(frame: CGRect(x: 120, y: 40, width: 150, height: 50))
+                                let playlistDescriptionLabel = UILabel(frame: CGRect(x: 120, y: 60, width: 150, height: 50))
                                 playlistDescriptionLabel.numberOfLines = 3
                                 playlistDescriptionLabel.textColor = UIColor.whiteColor()
                                 playlistDescriptionLabel.font = UIFont(name: "HelveticaNeue-Light", size: 14)
@@ -297,7 +298,7 @@ class UserPlaylistsViewController: UIViewController, UIScrollViewDelegate {
                                                 
                                                 let user = JSON(re)
                                                 
-                                                let playlistLabel = UILabel(frame: CGRect(x: 120, y: 0, width: 150, height: 100))
+                                                let playlistLabel = UILabel(frame: CGRect(x: 120, y: 0, width: 200, height: 100))
                                                 playlistLabel.numberOfLines = 2
                                                 setSKLabelText(playlistLabel)
                                                 let userName = user["name"].string!
@@ -439,7 +440,8 @@ class UserPlaylistsViewController: UIViewController, UIScrollViewDelegate {
                                     }
                                 }
                                 
-                                let playlistLabel = UILabel(frame: CGRect(x: 120, y: 30, width: 200, height: 30))
+                                let playlistLabel = UILabel(frame: CGRect(x: 120, y: 0, width: 200, height: 60))
+                                playlistLabel.numberOfLines = 2
                                 setSKLabelText(playlistLabel)
                                 playlistLabel.text = "Followed Playlists"
                                 playlistUberView.addSubview(playlistLabel)

@@ -435,6 +435,7 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                     if json["songkickID"] != "" {
                         
                         if let pastGig = json["pastGig"].string {
+                            
                             request(.GET, pastGig).responseJSON { response in
                                 
                                 let pastGigView = UIView(frame: CGRect(x: 0, y: 635, width: 350, height: 100))

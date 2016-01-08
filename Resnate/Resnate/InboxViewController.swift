@@ -23,6 +23,12 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
     
     var songIDs: [Int] = []
     
+    var playlist: [JSON] = []
+    
+    var playlistSongs: [AnyObject] = []
+    
+    var playlistCount = 0
+    
     var msgCount = 0
     
     var page = 1
@@ -502,19 +508,17 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                             
                                         }  else if subject[subject.startIndex] == "P" {
                                             
+                                            share.hidden = true
+                                            
                                             let playlistID = subject.componentsSeparatedByString("#")[1]
                                             
                                             let req = Router(OAuthToken: resnateToken, userID: playlistID)
                                             
-                                            let sharePlaylistTap = UITapGestureRecognizer()
-                                            sharePlaylistTap.addTarget(self, action: "sharePlaylist:")
-                                            share.addGestureRecognizer(sharePlaylistTap)
-                                            share.tag = Int(playlistID)!
-                                            share.userInteractionEnabled = true
-                                            
                                             request(req.buildURLRequest("playlists/", path: "")).responseJSON { response in
                                                 
                                                 var playlist = JSON(response.result.value!)
+                                                
+                                                self.playlist.append(playlist)
                                                 
                                                 if let playlistContent = playlist["content"].string {
                                                     
@@ -529,6 +533,8 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                     do {
                                                         let json = try NSJSONSerialization.JSONObjectWithData(data, options: []) as! [AnyObject]
                                                         
+                                                        self.playlistSongs.append(json)
+                                                        
                                                         let firstSong: AnyObject = json[0]
                                                         let song = firstSong as! [String: String]
                                                         for (_, ytID) in song {
@@ -540,9 +546,11 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                                     
                                                                     let tapPlaylist = UITapGestureRecognizer()
                                                                     
-                                                                    tapPlaylist.addTarget(self, action: "toReview:")
+                                                                    tapPlaylist.addTarget(self, action: "toPlaylist:")
                                                                     
-                                                                    inboxPlaylistImg.tag = Int(playlistID)!
+                                                                    inboxPlaylistImg.tag = self.playlistCount
+                                                                    
+                                                                    self.playlistCount += 1
                                                                     
                                                                     inboxPlaylistImg.addGestureRecognizer(tapPlaylist)
                                                                     
@@ -973,6 +981,35 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             
         }
     }
+    
+    func toPlaylist(sender: AnyObject){
+        
+        let playlistTableViewController:PlaylistTableViewController = PlaylistTableViewController(nibName: nil, bundle: nil)
+        
+        playlistTableViewController.songs = self.playlistSongs[sender.view!.tag] as! [AnyObject]
+        
+        playlistTableViewController.likes = false
+        
+        playlistTableViewController.playlist = self.playlist[sender.view!.tag]
+        
+        if let playlistName = self.playlist[sender.view!.tag]["name"].string {
+            
+            playlistTableViewController.playlistName = playlistName
+            
+        }
+        
+        if let playlistID = self.playlist[sender.view!.tag]["id"].int {
+            playlistTableViewController.playlistID = playlistID
+        }
+        
+        if let playlistUserID = self.playlist[sender.view!.tag]["user_id"].int {
+            playlistTableViewController.playlistUserID = playlistUserID
+        }
+        
+        self.navigationController?.pushViewController(playlistTableViewController, animated: true)
+        
+    }
+    
     
     func searchAutocompleteEntriesWithSubstring(substring: String)
     {

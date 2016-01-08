@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -10,12 +11,31 @@
         <view contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AxlDesat5 copy" translatesAutoresizingMaskIntoConstraints="NO" id="n5d-5g-YJF">
+                    <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="480" id="6s1-bt-sXR"/>
+                        <constraint firstAttribute="height" constant="480" id="KpT-vt-MJy"/>
+                        <constraint firstAttribute="width" secondItem="n5d-5g-YJF" secondAttribute="height" multiplier="1:1" id="hRe-O9-cA2"/>
+                    </constraints>
+                </imageView>
+            </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="n5d-5g-YJF" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="CIo-pP-Rs8"/>
+                <constraint firstItem="n5d-5g-YJF" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="R5Q-Ku-Nq3"/>
+                <constraint firstAttribute="trailing" secondItem="n5d-5g-YJF" secondAttribute="trailing" id="bnq-We-3WM"/>
+                <constraint firstAttribute="bottom" secondItem="n5d-5g-YJF" secondAttribute="bottom" id="gOd-CX-7oJ"/>
+            </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="404" y="445"/>
         </view>
     </objects>
+    <resources>
+        <image name="AxlDesat5 copy" width="720" height="960"/>
+    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

@@ -598,6 +598,8 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
     
     func fbSong(){
         
+        print(self.ytID)
+        
         let content = FBSDKShareLinkContent()
         
         content.contentURL = NSURL(string: "https://youtu.be/\(self.ytID)")
@@ -666,7 +668,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
                 animations: {
                     
                     self.videoPlayer.frame.origin.x = -UIScreen.mainScreen().bounds.width - 190
-                    self.playerOverlay.frame.origin.x = -UIScreen.mainScreen().bounds.width - 190
+                    self.playerOverlay.frame.origin.x = UIScreen.mainScreen().bounds.width + 10
                     self.videoReviewView.frame.origin.x = UIScreen.mainScreen().bounds.width
                 },
                 completion: { finished in
