@@ -287,7 +287,7 @@ public class YouTubePlayerView: UIView, UIWebViewDelegate {
     private func evaluatePlayerCommand(command: String) {
         let fullCommand = "player." + command + ";"
         dispatch_async(dispatch_get_main_queue(),{
-        webView.stringByEvaluatingJavaScriptFromString(fullCommand)
+        self.webView.stringByEvaluatingJavaScriptFromString(fullCommand)
         })
     }
 

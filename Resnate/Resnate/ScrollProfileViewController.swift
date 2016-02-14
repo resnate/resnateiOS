@@ -324,7 +324,7 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
         }
         
         request(req.buildURLRequest("users/", path: "/profile")).responseJSON { response in
-            
+
             if let re = response.result.value {
                 
                 let json = JSON(re)

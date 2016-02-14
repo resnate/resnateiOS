@@ -60,6 +60,84 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 }
             }
             
+        } else if self.type == "Gig" {
+            
+            request(req.buildURLRequest("gigs/", path: "")).responseJSON { response in
+                
+                let gig = JSON(response.result.value!)
+                
+                if let songkickID = gig["songkick_id"].int {
+                    
+                    let ugSK = "https://api.songkick.com/api/3.0/events/\(String(songkickID)).json?apikey=Pxms4Lvfx5rcDIuR"
+                    
+                    request(.GET, ugSK).responseJSON { response in
+                        
+                        var json = JSON(response.result.value!)
+                        
+                        if let gigName = json["resultsPage"]["results"]["event"]["displayName"].string {
+                            
+                            self.shareTitle.text = gigName
+                            
+                        }
+                    }
+                    
+                }
+            }
+        } else if self.type == "Review" {
+            
+            request(req.buildURLRequest("reviews/", path: "")).responseJSON { response in
+                
+                let review = JSON(response.result.value!)
+                
+                if let reviewType = review["reviewable_type"].string {
+                    
+                    let reviewable_id = review["reviewable_id"].int!
+                    
+                    let req = Router(OAuthToken: resnateToken, userID: String(reviewable_id))
+                    
+                    if reviewType == "Song" {
+                        
+                        request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
+                            
+                            let song = JSON(response.result.value!)
+                            
+                            if let songName = song["name"].string {
+                                
+                                self.shareTitle.text = songName
+                                
+                            }
+                            
+                        }
+                        
+                    } else {
+                        
+                        request(req.buildURLRequest("past_gigs/", path: "")).responseJSON { response in
+                            
+                            let gig = JSON(response.result.value!)
+                            
+                            if let songkickID = gig["songkick_id"].int {
+                                
+                                let ugSK = "https://api.songkick.com/api/3.0/events/\(String(songkickID)).json?apikey=Pxms4Lvfx5rcDIuR"
+                                
+                                request(.GET, ugSK).responseJSON { response in
+                                    
+                                    var json = JSON(response.result.value!)
+                                    
+                                    if let gigName = json["resultsPage"]["results"]["event"]["displayName"].string {
+                                        
+                                        self.shareTitle.text = gigName
+                                        
+                                    }
+                                }
+                                
+                            }
+                        }
+                        
+                    }
+                    
+                }
+            }
+            
         }
         
         let tapClose = UITapGestureRecognizer()

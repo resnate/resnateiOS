@@ -98,7 +98,16 @@ extension UIViewController {
     
     func shareReview(sender: AnyObject){
         
-        share("Review", shareID: String(sender.view!.tag))
+        if sender.isKindOfClass(UIBarButtonItem) {
+            
+            share("Review", shareID: String(sender.tag))
+            
+        } else {
+            
+            share("Review", shareID: String(sender.view!.tag))
+            
+        }
+        
         
     }
     

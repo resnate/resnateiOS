@@ -160,65 +160,161 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         FBSDKAppEvents.activateApp()
+        
+        let appDelegate: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        
+        let params = ["fields": "name, email, friends, likes", "limit": "1000"]
+        
+        var musicLikes: [String] = []
+        var musicLikesString = ""
+        
         if (FBSDKAccessToken.currentAccessToken() != nil)
         {
-
-                
+            
             request(.GET, "https://www.resnate.com/api/userSearch/\(FBSDKAccessToken.currentAccessToken().tokenString)")
                 .responseJSON { response in
                     if let re = response.result.value {
                         let json = JSON(re)
                         if let userID = json["id"].string {
                             
-                            let userToken = json["access_token"].string!
-                            let userName = json["name"].string!
-                            let userFirstName = json["first_name"].string!
                             
-                            
-                            let req = Router(OAuthToken: userToken, userID: userID)
-                            request(req.buildURLRequest("users/", path: "/login")).responseJSON { response in
+                            FBSDKGraphRequest.init(graphPath: "/\(userID)/music", parameters: params).startWithCompletionHandler({ (connection, result, error) -> Void in
                                 
-                                let appDelegate: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-                                
-                                if let re = response.result.value {
-                                    
-                                    let json = JSON(re)
-                                    
-                                    
-                                    let resnateUserID = json["id"].int!
-                                    
-                                    let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
-                                    
-                                    if dictionary != nil {
+                                let musicJson = JSON(result)
+
+                                if let jsonData = musicJson["data"].array {
+                                    for entry in jsonData {
                                         
-                                        do {
-                                            try Locksmith.updateData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"], forUserAccount: "resnateAccount")
-                                        } catch let error as NSError {
-                                            print("json error: \(error.localizedDescription)")
+                                        if let name = entry["name"].string {
+                                            
+                                            musicLikes.append(name)
                                         }
-                                        
-                                        
-                                        appDelegate.window?.rootViewController = appDelegate.tabBarController
-                                    } else {
-                                        
-                                        do {
-                                            try Locksmith.saveData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"], forUserAccount: "resnateAccount")
-                                            let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
-                                            print(dictionary)
-                                            if dictionary != nil {
-                                                
-                                                appDelegate.window?.rootViewController = appDelegate.tabBarController
-                                                
-                                            }
-                                        } catch let error as NSError {
-                                            print("json error: \(error.localizedDescription)")
-                                        }
-                                        
-                                        
                                     }
+                                    
                                 }
                                 
-                            }
+                                musicLikesString = musicLikes.joinWithSeparator(",#!")
+                                let userToken = json["access_token"].string!
+                                let userName = json["name"].string!
+                                let userFirstName = json["first_name"].string!
+                                
+                                
+                                let req = Router(OAuthToken: userToken, userID: userID)
+                                request(req.buildURLRequest("users/", path: "/login")).responseJSON { response in
+                                    
+                                    
+                                    
+                                    if let re = response.result.value {
+                                        
+                                        let json = JSON(re)
+                                        
+                                        
+                                        if let resnateUserID = json["id"].int {
+                                            
+                                            let parameters =  ["musicLikes": "\(musicLikesString)", "oauth_token": "\(FBSDKAccessToken.currentAccessToken().tokenString)", "token": "\(userToken)" ]
+                                            
+                                            let URL = NSURL(string: "https://www.resnate.com/api/users/update")!
+                                            let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                                            mutableURLRequest.HTTPMethod = Method.PUT.rawValue
+                                            mutableURLRequest.setValue("Token \(userToken)", forHTTPHeaderField: "Authorization")
+                                            request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+
+                                                
+                                            }
+                                            
+                                            let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+                                            
+                                            if dictionary != nil {
+                                                
+                                                do {
+                                                    try Locksmith.updateData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"], forUserAccount: "resnateAccount")
+                                                } catch let error as NSError {
+                                                    print("json error: \(error.localizedDescription)")
+                                                }
+                                                
+                                                
+                                                appDelegate.window?.rootViewController = appDelegate.tabBarController
+                                            } else {
+                                                
+                                                do {
+                                                    try Locksmith.saveData(["userID": "\(resnateUserID)", "token": "\(userToken)", "name": "\(userName)", "first_name": "\(userFirstName)"], forUserAccount: "resnateAccount")
+                                                    let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+                                                    
+                                                    if dictionary != nil {
+                                                        
+                                                        appDelegate.window?.rootViewController = appDelegate.tabBarController
+                                                        
+                                                    }
+                                                } catch let error as NSError {
+                                                    print("json error: \(error.localizedDescription)")
+                                                }
+                                                
+                                                
+                                            }
+                                            
+                                        }  else {
+                                            
+                                            
+                                            FBSDKGraphRequest.init(graphPath: "me", parameters: params).startWithCompletionHandler({ (connection, result, error) -> Void in
+                                                print("3asdasdasd")
+                                                if let re = result {
+                                                    let json = JSON(re)
+                                                    let name = json["name"].string!
+                                                    var first_name = ""
+                                                    if let jsonFirst = json["first_name"].string {
+                                                        first_name = jsonFirst
+                                                    }
+                                                    var email = ""
+                                                    
+                                                    if let jsonEmail = json["email"].string {
+                                                        email = jsonEmail
+                                                    }
+                                                    
+                                                    let fbID = json["id"].string!
+                                                    
+                                                    
+                                                    let parameters =  ["email":"\(email)", "uid": "\(fbID)", "name": "\(name)", "first_name": "\(first_name)", "musicLikes": "\(musicLikes)", "oauth_token": "\(FBSDKAccessToken.currentAccessToken().tokenString)" ]
+                                                    
+                                                    let URL = NSURL(string: "https://www.resnate.com/api/users/create")!
+                                                    let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                                                    mutableURLRequest.HTTPMethod = Method.POST.rawValue
+                                                    
+                                                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                                                        
+                                                        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+                                                        
+                                                        if dictionary != nil {
+                                                            
+                                                            do {
+                                                                try Locksmith.updateData(["userID": "\(fbID)", "token": "\(FBSDKAccessToken.currentAccessToken().tokenString)", "name": "\(name)", "first_name": "\(first_name)"], forUserAccount: "resnateAccount")
+                                                            } catch let error as NSError {
+                                                                print("json error: \(error.localizedDescription)")
+                                                            }
+                                                            
+                                                        } else {
+                                                            
+                                                            do {
+                                                                try Locksmith.saveData(["userID": "\(fbID)", "token": "\(FBSDKAccessToken.currentAccessToken().tokenString)", "name": "\(name)", "first_name": "\(first_name)"], forUserAccount: "resnateAccount")
+                                                            } catch let error as NSError {
+                                                                print("json error: \(error.localizedDescription)")
+                                                            }
+                                                            
+                                                            
+                                                        }
+                                                        appDelegate.window?.rootViewController = appDelegate.tabBarController
+                                                        
+                                                    }
+                                                    
+                                                }
+                                                
+                                                
+                                            })
+                                        }
+                                        
+                                    }
+                                    
+                                }
+                            })
                             
                         }
                         
@@ -228,8 +324,95 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
                           
         } else {
-            let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
-                        print("asd")
+
+     
+            FBSDKGraphRequest.init(graphPath: "me", parameters: params).startWithCompletionHandler({ (connection, result, error) -> Void in
+                print("2asdasdasd")
+                if let re = result {
+       
+                    let json = JSON(re)
+                    
+                    let name = json["name"].string!
+                    var first_name = ""
+                    if let jsonFirst = json["first_name"].string {
+                        first_name = jsonFirst
+                    }
+                    var email = ""
+                    
+                    if let jsonEmail = json["email"].string {
+                        email = jsonEmail
+                    }
+                    
+                    let fbID = json["id"].string!
+                    
+
+                    
+                    FBSDKGraphRequest.init(graphPath: "/\(fbID)/music", parameters: params).startWithCompletionHandler({ (connection, result, error) -> Void in
+                        
+                        let json = JSON(result)
+                        if let jsonData = json["data"].array {
+                            for entry in jsonData {
+                                if let name = entry["name"].string {
+                                    musicLikes.append(name)
+                                }
+                            }
+                            
+                        }
+                        
+                    })
+                    
+                    
+                    musicLikesString = musicLikes.joinWithSeparator(",#!")
+                    let parameters =  ["email":"\(email)", "uid": "\(fbID)", "name": "\(name)", "first_name": "\(first_name)", "musicLikes": "\(musicLikesString)", "oauth_token": "\(FBSDKAccessToken.currentAccessToken().tokenString)" ]
+                    
+                    let URL = NSURL(string: "https://www.resnate.com/api/users/create")!
+                    let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                    mutableURLRequest.HTTPMethod = Method.POST.rawValue
+                    
+                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                        
+                        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+                        
+                        if dictionary != nil {
+                            
+                            do {
+                                try Locksmith.updateData(["userID": "\(fbID)", "token": "\(FBSDKAccessToken.currentAccessToken().tokenString)", "name": "\(name)", "first_name": "\(first_name)"], forUserAccount: "resnateAccount")
+                            } catch let error as NSError {
+                                print("json error: \(error.localizedDescription)")
+                            }
+                            
+                        } else {
+                            
+                            do {
+                                try Locksmith.saveData(["userID": "\(fbID)", "token": "\(FBSDKAccessToken.currentAccessToken().tokenString)", "name": "\(name)", "first_name": "\(first_name)"], forUserAccount: "resnateAccount")
+                            } catch let error as NSError {
+                                print("json error: \(error.localizedDescription)")
+                            }
+                            
+                            
+                        }
+                        appDelegate.window?.rootViewController = appDelegate.tabBarController
+                        
+                    }
+
+                } else {
+                    
+                    let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+                    
+                    if dictionary != nil {
+                        
+                        do {
+                            try Locksmith.updateData(["token": "error"], forUserAccount: "resnateAccount")
+                        } catch let error as NSError {
+                            print("json error: \(error.localizedDescription)")
+                        }
+                        
+                    }
+                    
+                }
+                
+                
+            })
         }
         
     }
@@ -240,7 +423,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func playing(){
         
-                    
+        
                     if ytPlayer.videoPlayer.playerState == .Playing {
                         
                         ytPlayer.videoPlayer.getVideoBytesLoaded({ (bytesLoaded) -> () in

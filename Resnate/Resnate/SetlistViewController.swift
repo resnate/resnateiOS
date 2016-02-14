@@ -261,7 +261,7 @@ class SetlistViewController: UIViewController {
                                 
                             } else {
                                 
-                                let setlistSong = UILabel(frame: CGRect(x: width/2 - 100, y: 150, width: 300, height: 30))
+                                let setlistSong = UILabel(frame: CGRect(x: width/2 - 150, y: 150, width: 300, height: 30))
                                 setlistSong.text = "No Setlist Found"
                                 setlistSong.textAlignment = .Center
                                 setlistSong.textColor = UIColor.whiteColor()

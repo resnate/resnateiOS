@@ -107,7 +107,7 @@ class UserReviewsViewController: UIViewController, UIScrollViewDelegate {
                                         userCountLabel.text = "\(userCount) likes"
                                     }
                                     
-                                    userCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+                                    userCountLabel.font = UIFont(name: "HelveticaNeue-Light", size: 18)
                                     
                                     userCountLabel.textColor = UIColor.whiteColor()
                                     

@@ -45,6 +45,8 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
     
     var removedUsers = [User]()
     
+    let noConvos = UILabel(frame: CGRect(x: Int(UIScreen.mainScreen().bounds.width)/2 - 150, y: 140, width: 300, height: 67))
+    
     @IBOutlet weak var inboxScroll: UIScrollView!
     
     func loadMessage(conversation: JSON, y: Int){
@@ -680,19 +682,30 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                 
                 let conversations = JSON(re)
                 
-                var y = 10
-                
-                for (_, conversation) in conversations {
+                if conversations.first == nil {
                     
-                    self.loadMessage(conversation, y: y)
+                    self.noConvos.textColor = UIColor.whiteColor()
+                    self.noConvos.textAlignment = .Center
+                    self.noConvos.font = UIFont(name: "HelveticaNeue-Light", size: 18)
+                    self.noConvos.text = "No messages.\nShare some music or a concert review\nwith your friends!"
+                    self.noConvos.numberOfLines = 3
+                    self.inboxScroll.addSubview(self.noConvos)
                     
-                    y += 250
+                } else {
+                    self.noConvos.removeFromSuperview()
+                    var y = 10
                     
+                    for (index, conversation) in conversations {
+                        self.loadMessage(conversation, y: y)
+                        
+                        y += 250
+                        
+                    }
+                    
+                    self.inboxScroll.contentSize.height = CGFloat(y)
+                    
+                    self.page += 1
                 }
-                
-                self.inboxScroll.contentSize.height = CGFloat(y)
-                
-                self.page += 1
                 
             }
             

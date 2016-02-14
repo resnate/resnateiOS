@@ -29,6 +29,8 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
     
     var page = 1
     
+    var followPage = 1
+    
     var autocompleteTableView = UITableView(frame: CGRect(x: 0, y: 0, width: UIScreen.mainScreen().bounds.width, height: UIScreen.mainScreen().bounds.height))
     
     lazy var searchUsersBar:UISearchBar = UISearchBar(frame: CGRectMake(0, 0, UIScreen.mainScreen().bounds.width - 30, 20))
@@ -664,7 +666,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                 
                 if let activityID = activity["id"].int {
                     
-                    if type != "Socialization::ActiveRecordStores::Follow" && type != "User" {
+                    if type == "Song" || type == "Gig" {
                         
                         commentImgView.tag = activityID
                         
@@ -761,6 +763,9 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
     override func viewDidLoad() {
         
         super.viewDidLoad()
+        
+        let backItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backItem
         
         noConnection.textAlignment = .Center
         noConnection.textColor = UIColor.whiteColor()
@@ -895,6 +900,8 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                             
                                         if inboxView.inboxScroll != nil {
                                             
+                                            inboxView.noConvos.removeFromSuperview()
+                                            
                                         for view in inboxView.inboxScroll.subviews {
                                             view.frame.origin.y += 250
                                         }
@@ -967,7 +974,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                         self.repositionBadge(4)
                                         
                                         if notificationView.scrollView != nil {
-                                            
+                                            notificationView.noNotifs.removeFromSuperview()
                                             for view in notificationView.scrollView.subviews {
                                                 view.frame.origin.y += 70
                                             }
@@ -990,7 +997,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                                         
                                                         notificationView.notificationCount = 0
                                                         notificationsTab.badgeValue = nil
-                                                        
+                                                        self.repositionBadge(4)
                                                     }
                                                 }
                                                 
@@ -1072,6 +1079,13 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                         
                         let activity = JSON(re)
                         
+                        for subview in self.homeScroll.subviews {
+                            //remove noActivityView
+                            if subview.tag == -3 {
+                                subview.removeFromSuperview()
+                            }
+                        }
+                        
                         if let owner = activity["owner_id"].int {
                             
                             if self.followees.indexOf(owner) != nil || String(owner) == resnateID {
@@ -1122,26 +1136,35 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         let req = Router(OAuthToken: resnateToken, userID: resnateID)
         
         
-        request(req.buildURLRequest("users/", path: "/followees")).responseJSON { response in
-            if let re = response.result.value {
-                
-                let users = JSON(re)
-                
-                for (index, user) in users {
+        func getAllFollowees(var fPage: Int){
+            
+            request(req.buildURLRequest("users/", path: "/followees/\(fPage)")).responseJSON { response in
+                if let re = response.result.value {
                     
-                    if let userID = user["id"].int {
+                    let users = JSON(re)
+                    
+                    for (index, user) in users {
                         
-                        self.followees.insert(userID, atIndex: Int(index)!)
+                        if let userID = user["id"].int {
+                            
+                            self.followees.insert(userID, atIndex: Int(index)!)
+                            
+                        }
                         
                     }
                     
+                    if users.count > 5 {
+                        fPage += 1
+                        getAllFollowees(fPage)
+                    }
+                    
+                    
+                    
                 }
-                
-                
-                
             }
         }
         
+        getAllFollowees(self.followPage)
         
         request(req.buildURLRequest("search/", path: "")).responseJSON { response in
             if let re = response.result.value {
@@ -1149,12 +1172,13 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                 let userResults = JSON(re)
                 
                 for (_, user) in userResults {
-                    let name = user["name"].string!
-                    let id = user["id"].int!
-                    let uid = user["uid"].string!
-                    let result = User(name: name, id: id, uid: uid)
-                    if result.id != Int(resnateID) {
-                        self.users.append(result)
+                    if let name = user["name"].string {
+                        let id = user["id"].int!
+                        let uid = user["uid"].string!
+                        let result = User(name: name, id: id, uid: uid)
+                        if result.id != Int(resnateID) {
+                            self.users.append(result)
+                        }
                     }
                     
                 }
@@ -1167,7 +1191,16 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
             if let re = response.result.value {
                 
                 let activities = JSON(re)
-                
+                if activities.count == 0 {
+                    let noActivityView = UILabel(frame: CGRect(x: 0, y: 0, width: self.width, height: 200))
+                    noActivityView.text = "Search for people to follow,\nsee their activity here"
+                    noActivityView.textColor = UIColor.whiteColor()
+                    noActivityView.textAlignment = NSTextAlignment.Center
+                    noActivityView.font = UIFont(name: "HelveticaNeue-Light", size: 20)
+                    noActivityView.numberOfLines = 2
+                    noActivityView.tag = -3
+                    self.homeScroll.addSubview(noActivityView)
+                }
                 var y = 10
                
                 
@@ -1226,29 +1259,29 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                 
                 let userDefaults = NSUserDefaults.standardUserDefaults()
                 
-                if user["songkickID"] != nil && user["songkickID"] != "" {
+                if let songkickID = user["songkickID"].string {
                     
-                    let songkickID = user["songkickID"].string!
-                    
-                    userDefaults.setObject(songkickID, forKey: "songkick_id")
-                    
-                    let upcomingGigsLink = "https://api.songkick.com/api/3.0/users/\(songkickID)/calendar.json?reason=attendance&apikey=Pxms4Lvfx5rcDIuR&"
-                    
-                    request(.GET, upcomingGigsLink).responseJSON { response in
+                    if songkickID != "nil" {
                         
-                        if let re = response.result.value {
+                        userDefaults.setObject(songkickID, forKey: "songkick_id")
+                        
+                        let upcomingGigsLink = "https://api.songkick.com/api/3.0/users/\(songkickID)/calendar.json?reason=attendance&apikey=Pxms4Lvfx5rcDIuR&"
+                        
+                        request(.GET, upcomingGigsLink).responseJSON { response in
                             
-                            let json = JSON(re)
-                            
-                            if let totalEntries = json["resultsPage"]["totalEntries"].int {
+                            if let re = response.result.value {
                                 
-                                var totalPages = 1
+                                let json = JSON(re)
                                 
-                                if totalEntries > 50 {
+                                if let totalEntries = json["resultsPage"]["totalEntries"].int {
                                     
-                                    totalPages = totalEntries % 50
+                                    var totalPages = 1
                                     
-                                }
+                                    if totalEntries > 50 {
+                                        
+                                        totalPages = totalEntries % 50
+                                        
+                                    }
                                     
                                     for i in 1...totalPages {
                                         
@@ -1338,25 +1371,25 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                         
                                     }
                                     
-                                
+                                    
+                                    
+                                }
                                 
                             }
+                            
                             
                         }
                         
                         
-                    }
-                    
-                    
-                    let pastGigsLink = "https://api.songkick.com/api/3.0/users/\(songkickID)/gigography.json?apikey=Pxms4Lvfx5rcDIuR"
-                    
-                    request(.GET, pastGigsLink).responseJSON { response in
+                        let pastGigsLink = "https://api.songkick.com/api/3.0/users/\(songkickID)/gigography.json?apikey=Pxms4Lvfx5rcDIuR"
                         
-                        if let re = response.result.value {
+                        request(.GET, pastGigsLink).responseJSON { response in
                             
-                            let json = JSON(re)
-                            
-                            if let totalEntries = json["resultsPage"]["totalEntries"].int {
+                            if let re = response.result.value {
+                                
+                                let json = JSON(re)
+                                
+                                if let totalEntries = json["resultsPage"]["totalEntries"].int {
                                     
                                     let totalPages = totalEntries % 50
                                     
@@ -1428,15 +1461,18 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                         
                                     }
                                     
+                                }
+                                
                             }
-                            
                         }
-                    }
 
+                        
+                    }
+                    
                     
                 } else {
                     
-                    let songkickID = userDefaults.stringForKey("songkick_id")
+                    let songkickID = userDefaults.stringForKey("songkick_id")!
                     
                     let parameters =  ["token": "\(resnateToken)", "songkickID": "\(songkickID)"]
                     
@@ -1794,7 +1830,12 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
             
             if NSStringFromClass(badgeView.classForCoder) == "_UIBadgeView" {
                 badgeView.layer.transform = CATransform3DIdentity
-                badgeView.layer.transform = CATransform3DMakeTranslation(-17.0, 1.0, 1.0)
+                if tab == 3 {
+                    badgeView.layer.transform = CATransform3DMakeTranslation(-14.0, 1.0, 1.0)
+                } else if tab == 4 {
+                    badgeView.layer.transform = CATransform3DMakeTranslation(-40.0, 1.0, 1.0)
+                }
+
             }
         }
         
@@ -1854,20 +1895,6 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
     
     func getReviewInfo(reviewID: Int, activityView: UIView, resnateToken: String, like: Bool, verbLabel: UILabel) {
         
-        let shareReview = UIImageView(frame: CGRect(x: self.width/4 * 3 - 15, y: self.imgWidth + 120, width: 30, height: 30))
-        
-        shareReview.image = UIImage(named: "Share")
-        
-        activityView.addSubview(shareReview)
-        
-        let tapShareReview = UITapGestureRecognizer()
-        
-        shareReview.tag = reviewID
-        
-        shareReview.addGestureRecognizer(tapShareReview)
-        
-        shareReview.userInteractionEnabled = true
-        
         let req = Router(OAuthToken: resnateToken, userID: String(reviewID))
         
         request(req.buildURLRequest("reviews/", path: "")).responseJSON { response in
@@ -1896,8 +1923,6 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                             activityView.addSubview(reviewNameLabel)
                             
                             if reviewType == "PastGig" {
-                                
-                                tapShareReview.addTarget(self, action: "shareReview:")
                                 
                                 request(req.buildURLRequest("past_gigs/", path: "")).responseJSON { response in
                                     if let re = response.result.value {

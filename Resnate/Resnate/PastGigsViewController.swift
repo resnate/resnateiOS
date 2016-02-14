@@ -87,7 +87,7 @@ class PastGigsViewController: UIViewController, UIScrollViewDelegate {
                         
                         
                         var json = JSON(response.result.value!)
-                        
+                        print(json)
                         let reviewLabel = UILabel(frame: CGRect(x: 110, y: 130, width: 100, height: 40))
                         
                         reviewLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:0.9)
@@ -96,6 +96,7 @@ class PastGigsViewController: UIViewController, UIScrollViewDelegate {
                         reviewLabel.textAlignment = .Center
                         reviewLabel.font = UIFont(name: "HelveticaNeue", size: 14)
                         reviewLabel.numberOfLines = 2
+                        reviewLabel.tag = id
                         
                         let tapReview = UITapGestureRecognizer()
                         reviewLabel.addGestureRecognizer(tapReview)

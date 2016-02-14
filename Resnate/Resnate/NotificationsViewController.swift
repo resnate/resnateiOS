@@ -30,6 +30,8 @@ class NotificationsViewController: UIViewController, UIScrollViewDelegate {
     
     let loadingView = UIActivityIndicatorView(frame: CGRect(x: UIScreen.mainScreen().bounds.width/2 - 25, y: 30, width: 50, height: 50))
     
+    let noNotifs = UILabel(frame: CGRect(x: Int(UIScreen.mainScreen().bounds.width)/2 - 150, y: 140, width: 300, height: 67))
+    
     func getNotification(notification: JSON, y: Int){
         
         let notificationView = UIView(frame: CGRect(x: 0, y: y, width: self.width, height: 60))
@@ -467,22 +469,32 @@ class NotificationsViewController: UIViewController, UIScrollViewDelegate {
             if let re = response.result.value {
                 
                 let notifications = JSON(re)
-                
-                for (_, notification) in notifications {
+                if notifications.count == 0 {
+                    self.loadingView.stopAnimating()
+                    self.noNotifs.textColor = UIColor.whiteColor()
+                    self.noNotifs.textAlignment = .Center
+                    self.noNotifs.font = UIFont(name: "HelveticaNeue-Light", size: 18)
+                    self.noNotifs.text = "No notifications.\nShare some music or a concert review\nwith your friends!"
+                    self.noNotifs.numberOfLines = 3
+                    self.scrollView.addSubview(self.noNotifs)
+                } else {
+                    self.noNotifs.removeFromSuperview()
+                    for (_, notification) in notifications {
+                        
+                        self.getNotification(notification, y: self.totalY)
+                        
+                    }
                     
-                    self.getNotification(notification, y: self.totalY)
+                    self.loadingView.stopAnimating()
                     
+                    self.scrollView.contentSize.height = CGFloat(self.totalY)
+                    
+                    self.loadingView.frame.origin.y = CGFloat(self.totalY)
+                    
+                    self.page += 1
+                    
+                    self.scrollView.tag = 0
                 }
-                
-                self.loadingView.stopAnimating()
-                
-                self.scrollView.contentSize.height = CGFloat(self.totalY)
-                
-                self.loadingView.frame.origin.y = CGFloat(self.totalY)
-                
-                self.page += 1
-                
-                self.scrollView.tag = 0
                 
             }
         }

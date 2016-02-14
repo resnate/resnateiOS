@@ -23,7 +23,7 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        
+        print(self.ID)
         noConnection.text = "No Internet Connection"
         noConnection.textAlignment = .Center
         noConnection.textColor = UIColor.whiteColor()

@@ -47,11 +47,12 @@ class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
     override func viewWillAppear(animated: Bool) {
         
 
-        
-            
-            if dictionary != nil {
+        if dictionary != nil { 
+            let resnateToken = dictionary!["token"] as! String
+            if resnateToken != "error" {
                 loginView.hidden = true
             }
+        }
             
         
         

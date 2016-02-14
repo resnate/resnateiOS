@@ -100,6 +100,26 @@ class UserPlaylistsViewController: UIViewController, UIScrollViewDelegate {
                             addEditDescriptionLabel.font = UIFont(name: "HelveticaNeue", size: 14)
                             addEditDescriptionLabel.numberOfLines = 2
                             
+                            let deleteLabel = UILabel(frame: CGRect(x: 240, y: 130, width: 100, height: 40))
+                            deleteLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:0.9)
+                            deleteLabel.textColor = UIColor.whiteColor()
+                            deleteLabel.textAlignment = .Center
+                            deleteLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+                            deleteLabel.numberOfLines = 2
+                            deleteLabel.text = "Delete \nPlaylist"
+                            
+                            let tapDelete = UITapGestureRecognizer()
+                            tapDelete.addTarget(self, action: "deletePlaylist:")
+                            deleteLabel.addGestureRecognizer(tapDelete)
+                            deleteLabel.userInteractionEnabled = true
+                            deleteLabel.tag = i
+                            
+                            if playlistUserID == resnateID {
+                                
+                                playlistUberView.addSubview(deleteLabel)
+                                
+                            }
+                            
                             let addEditTap = UITapGestureRecognizer()
                             addEditTap.addTarget(self, action: "addEditDescription:")
                             addEditDescriptionLabel.addGestureRecognizer(addEditTap)
@@ -139,11 +159,10 @@ class UserPlaylistsViewController: UIViewController, UIScrollViewDelegate {
                             }
                             
                             if let playlistID = playlist["id"].int {
-                                
+
                                 self.getFollowers(resnateToken, playlistID: playlistID, playlistUberView: playlistUberView)
                                 
                             }
-                            
                             
                             
                             playlistUberView.addSubview(playlistView)
@@ -186,7 +205,7 @@ class UserPlaylistsViewController: UIViewController, UIScrollViewDelegate {
     func getFollowers(resnateToken: String, playlistID: Int, playlistUberView: UIView){
         
         let followerCountLabel = UILabel(frame: CGRect(x: 10, y: 110, width: 100, height: 40))
-        followerCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+        followerCountLabel.font = UIFont(name: "HelveticaNeue-Light", size: 18)
         followerCountLabel.textColor = UIColor.whiteColor()
         followerCountLabel.textAlignment = .Center
         playlistUberView.addSubview(followerCountLabel)
@@ -549,6 +568,48 @@ class UserPlaylistsViewController: UIViewController, UIScrollViewDelegate {
             let playlistDescription = self.playlistDescriptions[sender.view!.tag]
             writePlaylistDescriptionViewController.playlistDescription = playlistDescription
             self.navigationController?.pushViewController(writePlaylistDescriptionViewController, animated: true)
+        }
+        
+    }
+    
+    func deletePlaylist(sender: AnyObject){
+        
+        let playlistID = self.playlist[sender.view!.tag]["id"].int!
+        
+        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
+        
+        let resnateToken = dictionary!["token"] as! String
+        
+        let parameters =  ["token": "\(resnateToken)"]
+        
+        if UIApplication.sharedApplication().respondsToSelector(Selector("registerUserNotificationSettings:")) {
+            
+            let deletePlaylistAlert = UIAlertController(title: "Delete Playlist", message: "Are you sure you want to delete this playlist?", preferredStyle: UIAlertControllerStyle.Alert)
+            
+            deletePlaylistAlert.addAction(UIAlertAction(title: "Delete", style: .Default, handler: { (action: UIAlertAction) in
+                
+
+                    
+                    let URL = NSURL(string: "https://www.resnate.com/api/playlists/\(playlistID)")!
+                    let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                    mutableURLRequest.HTTPMethod = Method.DELETE.rawValue
+                    mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                    
+                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                      self.viewWillAppear(true)
+                    }
+                    
+
+                
+                
+                
+            }))
+            
+            deletePlaylistAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
+            
+            presentViewController(deletePlaylistAlert, animated: true, completion: nil)
+            self.viewWillAppear(true)
+            
         }
         
     }

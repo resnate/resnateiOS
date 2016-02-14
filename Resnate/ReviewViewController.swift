@@ -12,6 +12,8 @@ import TwitterKit
 
 class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDelegate, UITableViewDelegate, UITextViewDelegate, UIGestureRecognizerDelegate {
     
+    let window = UIApplication.sharedApplication().keyWindow
+    
     var ID = 0
     
     var activityID = 0
@@ -54,11 +56,12 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
     
     let ytPlayer = VideoPlayer.sharedInstance
     
+    let tapLike = UITapGestureRecognizer()
     
     func loadComments(reviewContent: UILabel, userID: Int, reviewID: String, review: JSON, songOrSetlistLabel: UILabel){
         
         if Int(self.resnateID) == userID {
-            let editLabel = UILabel(frame: CGRect(x: self.width/2 - 50, y: self.reviewContentHeight + self.width + 90, width: 100, height: 40))
+            let editLabel = UILabel(frame: CGRect(x: self.width/2 - 50, y: self.reviewContentHeight + self.width + 210, width: 100, height: 40))
             
             editLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
             editLabel.text = "Edit"
@@ -78,7 +81,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
             reviewView.addSubview(editLabel)
             
             
-            let deleteLabel = UILabel(frame: CGRect(x: self.width - 105, y: self.reviewContentHeight + self.width + 90, width: 100, height: 40))
+            let deleteLabel = UILabel(frame: CGRect(x: self.width - 105, y: self.reviewContentHeight + self.width + 210, width: 100, height: 40))
             
             deleteLabel.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
             
@@ -92,15 +95,15 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
             tapRecDelete.addTarget(self, action: "deleteReview:")
             deleteLabel.addGestureRecognizer(tapRecDelete)
             deleteLabel.tag = review["id"].int!
-            
             deleteLabel.userInteractionEnabled = true
             
-            songOrSetlistLabel.frame.origin.y = self.reviewContentHeight + self.width + 90
+            
             reviewView.addSubview(deleteLabel)
         }
         
+        songOrSetlistLabel.frame.origin.y = self.reviewContentHeight + self.width + 210
         
-        let ratingView = UIView(frame: CGRect(x: 5, y: self.reviewContentHeight + width + 30, width: 300, height: 50))
+        let ratingView = UIView(frame: CGRect(x: 5, y: self.reviewContentHeight + width + 20, width: 300, height: 50))
         
         
         
@@ -170,9 +173,68 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
             x += 50
         }
         
+        
+        let reviewerInfo = UIView(frame: CGRect(x: 0, y: self.reviewContentHeight + width + 90, width: width, height: 50))
+        reviewerInfo.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
+        let req = Router(OAuthToken: self.resnateToken, userID: String(userID))
+        request(req.buildURLRequest("users/", path: "/profile")).responseJSON { response in
+            
+            var user = JSON(response.result.value!)
+
+            if let userName = user["name"].string {
+                
+                if let userImageID = user["userID"].string {
+                    
+                    if let userID = user["id"].string {
+                        
+                        let userNameLabel = UILabel(frame: CGRect(x: 60, y: 3, width: 240, height: 50))
+                        let levelName = user["level_name"].string!
+                        userNameLabel.text = "Review by \n\(userName)"
+                        
+                        let miniBadge = UIImageView(frame: CGRect(x: self.width - 55, y: 2.5, width: 45, height: 45))
+                        miniBadge.image = UIImage(named: "\(levelName).png")
+                        reviewerInfo.addSubview(miniBadge)
+                        
+                        userNameLabel.numberOfLines = 3
+                        userNameLabel.font = UIFont(name: "HelveticaNeue-Light", size: 18)
+                        userNameLabel.textColor = UIColor.whiteColor()
+                        userNameLabel.sizeToFit()
+                        
+                        
+                        let tapRecProfile = UITapGestureRecognizer()
+                        tapRecProfile.addTarget(self, action: "profile:")
+                        
+                        reviewerInfo.tag = Int(userID)!
+                        reviewerInfo.addGestureRecognizer(tapRecProfile)
+                        reviewerInfo.userInteractionEnabled = true
+                        
+                        reviewerInfo.addSubview(userNameLabel)
+                        
+                        let activityUserImg = UIImageView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+                        
+                        let userImgUrl = NSURL(string: "https://graph.facebook.com/\(userImageID)/picture?width=100&height=100")
+                        
+                        self.getDataFromUrl(userImgUrl!) { data in
+                            dispatch_async(dispatch_get_main_queue()) {
+                                activityUserImg.image = UIImage(data: data!)
+                                
+                                reviewerInfo.addSubview(activityUserImg)
+                                
+                            }
+                        }
+                        
+                        
+                    }
+                    
+                }
+                
+            }
+        }
+        reviewView.addSubview(reviewerInfo)
+        
         let shareImgSize = CGSize(width: 40, height: 40)
         
-        let shareView = UIView(frame: CGRect(x: 0, y: self.reviewContentHeight + width + 190, width: width, height: 40))
+        let shareView = UIView(frame: CGRect(x: 0, y: self.reviewContentHeight + width + 280, width: width, height: 40))
         
         let resnateShare = UIImageView(image: UIImage(named: "Share"))
         resnateShare.frame.size = shareImgSize
@@ -225,7 +287,36 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
             
         } else {
             
+            let req = Router(OAuthToken: resnateToken, userID: resnateID)
+            
             let likeReview = UIImageView(image: UIImage(named: "like"))
+            
+            likeReview.tag = Int(reviewID)!
+            
+            
+            likeReview.addGestureRecognizer(tapLike)
+            likeReview.userInteractionEnabled = true
+            
+            request(req.buildURLRequest("likes/ifLike/Review/", path: "/\(reviewID)")).responseJSON { response in
+                if let re = response.result.value {
+                    
+                    let json = JSON(re)
+                    
+                    if let count = json["count"].int {
+                        
+                        if count > 0 {
+                            likeReview.image = UIImage(named: "liked")
+                            self.tapLike.removeTarget(self, action: "likeReview:")
+                            self.tapLike.addTarget(self, action: "unlikeReview:")
+                        } else {
+                            self.tapLike.addTarget(self, action: "likeReview:")
+                        }
+                        
+                    }
+                }
+            }
+            
+            
             
             likeReview.frame.size = shareImgSize
             
@@ -254,7 +345,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                 let users = JSON(response.result.value!)
                 let userCount = users.count
                 
-                let userCountLabel = UILabel(frame: CGRect(x: 10, y: reviewContent.frame.height + self.width + 140, width: 0, height: 40))
+                let userCountLabel = UILabel(frame: CGRect(x: 10, y: reviewContent.frame.height + self.width + 150, width: 0, height: 40))
                 
                 if userCount == 1 {
                     userCountLabel.text = "1 like"
@@ -262,13 +353,13 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     userCountLabel.text = "\(userCount) likes"
                 }
                 
-                userCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+                userCountLabel.font = UIFont(name: "HelveticaNeue-Light", size: 18)
                 
                 userCountLabel.sizeToFit()
                 
                 self.reviewView.addSubview(userCountLabel)
                 
-                let commentsCountLabel = UILabel(frame: CGRect(x: userCountLabel.frame.width + 10, y: reviewContent.frame.height + self.width + 140, width: 0, height: 40))
+                let commentsCountLabel = UILabel(frame: CGRect(x: userCountLabel.frame.width + 10, y: reviewContent.frame.height + self.width + 150, width: 0, height: 40))
                 
                 if comments.count == 1 {
                     
@@ -280,7 +371,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     
                 }
                 
-                commentsCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+                commentsCountLabel.font = UIFont(name: "HelveticaNeue-Light", size: 18)
                 
                 commentsCountLabel.sizeToFit()
                 
@@ -603,7 +694,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     } else {
                         
                         frame.origin = CGPointMake(10, self.width/1.33 + 5)
-                        songOrSetlistLabel.frame.origin.y = self.reviewContent.frame.height + self.width + 90
+                        songOrSetlistLabel.frame.origin.y = self.reviewContent.frame.height + self.width + 210
                         
                     }
                     
@@ -733,15 +824,15 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         
     }
     
+    override func viewWillDisappear(animated: Bool) {
+        self.commentTextView.removeFromSuperview()
+        self.postComment.removeFromSuperview()
+    }
+    
     override func viewWillAppear(animated: Bool) {
-        
-        if self.view.frame.origin.y != 0 {
-            
-            commentTextView.frame.origin.y = UIScreen.mainScreen().bounds.height - 143
-            postComment.frame.origin.y = UIScreen.mainScreen().bounds.height - 143
-            
-        }
-        
+
+        self.window!.addSubview(commentTextView)
+        self.window!.addSubview(postComment)
         loadReviewNComments()
         
     }
@@ -749,10 +840,9 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let backItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backItem
         
-        
-        self.view.addSubview(commentTextView)
-
         commentTextView.text = "Write a comment..."
         
         commentTextView.selectedTextRange = commentTextView.textRangeFromPosition(commentTextView.beginningOfDocument, toPosition: commentTextView.beginningOfDocument)
@@ -775,7 +865,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         
         postComment.layer.zPosition = 9999
         
-        self.view.addSubview(postComment)
+        
         
         postComment.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
         
@@ -829,6 +919,45 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
     
     @IBOutlet weak var reviewView: UIScrollView!
     
+    func likeReview(sender: UITapGestureRecognizer){
+        let imageView = sender.view as! UIImageView
+        imageView.image = UIImage(named: "liked")
+        
+        tapLike.removeTarget(self, action: "likeReview:")
+        tapLike.addTarget(self, action: "unlikeReview:")
+        
+        let parameters =  ["likeable_id" : "\(imageView.tag)", "likeable_type" : "Review", "token": "\(resnateToken)"]
+        
+        let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
+        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+        mutableURLRequest.HTTPMethod = Method.POST.rawValue
+        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+        
+        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+            
+        }
+        
+    }
+    
+    func unlikeReview(sender: UITapGestureRecognizer){
+        let imageView = sender.view as! UIImageView
+        imageView.image = UIImage(named: "like")
+        
+        tapLike.removeTarget(self, action: "unlikeReview:")
+        tapLike.addTarget(self, action: "likeReview:")
+
+        let parameters =  ["likeable_id" : "\(imageView.tag)", "likeable_type" : "Review", "token": "\(resnateToken)"]
+        
+        let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
+        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+        mutableURLRequest.HTTPMethod = Method.DELETE.rawValue
+        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+        
+        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+            
+        }
+    }
+    
     
     func ratingButtonTapped(button: UIButton) {
         self.rating = self.ratingButtons.indexOf(button)! + 1
@@ -860,25 +989,16 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         let keyboardHeight:CGFloat = keyboardSize.height
         
         UIView.animateWithDuration(0.25, delay: 0.25, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-            self.commentTextView.frame = CGRectMake(0, (self.view.bounds.height - keyboardHeight - 30), self.view.bounds.width - 50, 30)
-            self.postComment.frame = CGRectMake(self.view.bounds.width - 50, (self.view.bounds.height - keyboardHeight - 30), 50, 30)
+            self.commentTextView.frame = CGRectMake(0, (UIScreen.mainScreen().bounds.height - keyboardHeight - 30), self.view.bounds.width - 50, 30)
+            self.postComment.frame = CGRectMake(self.view.bounds.width - 50, (UIScreen.mainScreen().bounds.height - keyboardHeight - 30), 50, 30)
             }, completion: nil)
         
     }
     
     func keyboardWillHide(sender: NSNotification) {
-        
-        if self.view.frame.origin.y != 0 {
-            
-            self.commentTextView.frame = CGRectMake(0, UIScreen.mainScreen().bounds.height - 143, self.view.bounds.width - 50, 30)
-            self.postComment.frame = CGRectMake(self.view.bounds.width - 50, UIScreen.mainScreen().bounds.height - 143, 50, 30)
-            
-        } else {
             
             self.commentTextView.frame = CGRectMake(0, UIScreen.mainScreen().bounds.height - 79, self.view.bounds.width - 50, 30)
             self.postComment.frame = CGRectMake(self.view.bounds.width - 50, UIScreen.mainScreen().bounds.height - 79, 50, 30)
-            
-        }
         
         
     }
@@ -969,11 +1089,11 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
             postComment.textColor = UIColor.lightGrayColor()
             postComment.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
             
-            self.view.endEditing(true)
+            self.window!.endEditing(true)
             
         } else {
-            
-            self.view.endEditing(true)
+            print("asd")
+            self.window!.endEditing(true)
             
         }
         
@@ -983,7 +1103,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
     
     func playSingleSong(sender: AnyObject){
         
-        self.view.endEditing(true)
+        self.window!.endEditing(true)
         
         
         
@@ -1037,7 +1157,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
             
             let youTubeID = self.videoLocation[indexOfCharacter]!
             
-            self.view.endEditing(true)
+            self.window!.endEditing(true)
             
             self.tabBarController?.view.addSubview(ytPlayer.videoPlayer)
             

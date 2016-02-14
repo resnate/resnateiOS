@@ -110,6 +110,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "Resnate"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

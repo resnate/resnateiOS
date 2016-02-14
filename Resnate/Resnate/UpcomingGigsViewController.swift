@@ -77,6 +77,8 @@ class UpcomingGigsViewController: UIViewController, UIScrollViewDelegate {
                             
                             friendsGoingLabel.textColor = UIColor.whiteColor()
                             
+                            friendsGoingLabel.font = UIFont(name: "HelveticaNeue-Light", size: 18)
+                            
                             friendsGoingLabel.lineBreakMode = .ByWordWrapping
                             
                             friendsGoingLabel.numberOfLines = 2
@@ -222,42 +224,23 @@ class UpcomingGigsViewController: UIViewController, UIScrollViewDelegate {
                     
                     let resnateShare = UIImageView(image: UIImage(named: "Share"))
                     resnateShare.frame.size = shareImgSize
-                    resnateShare.frame.origin.x = width/3 - 20
+                    resnateShare.frame.origin.x = 120
                     shareView.addSubview(resnateShare)
+                    
+                    let shareText = UILabel(frame: CGRect(x: 10, y: -3, width: 100, height: 44))
+                    shareText.text = "Invite Friends"
+                    shareText.font = UIFont(name: "HelveticaNeue-Light", size: 18)
+                    shareText.textColor = UIColor.whiteColor()
+                    shareText.numberOfLines = 2
+                    shareText.lineBreakMode = .ByWordWrapping
+                    shareView.addSubview(shareText)
                     
                     let tapRecShare = UITapGestureRecognizer()
                     
-                    tapRecShare.addTarget(self, action: "share:")
+                    tapRecShare.addTarget(self, action: "shareGig:")
                     resnateShare.tag = gigID
                     resnateShare.addGestureRecognizer(tapRecShare)
                     resnateShare.userInteractionEnabled = true
-                    
-                    
-                    let fbShare = UIImageView(image: UIImage(named: "facebook.jpg"))
-                    fbShare.frame.size = shareImgSize
-                    fbShare.frame.origin.x = (width/2) - 20
-                    shareView.addSubview(fbShare)
-                    
-                    
-                    
-                    let tapRecFb = UITapGestureRecognizer()
-                    
-                    tapRecFb.addTarget(self, action: "fbReview:")
-                    fbShare.tag = gigID
-                    fbShare.addGestureRecognizer(tapRecFb)
-                    fbShare.userInteractionEnabled = true
-                    
-                    let twitShare = UIImageView(image: UIImage(named: "twitter"))
-                    twitShare.frame.size = shareImgSize
-                    twitShare.frame.origin.x = (width/3)*2 - 20
-                    shareView.addSubview(twitShare)
-                    
-                    let tapRecTwit = UITapGestureRecognizer()
-                    
-                    tapRecTwit.addTarget(self, action: "twitter:")
-                    twitShare.tag = gigID
-                    twitShare.addGestureRecognizer(tapRecTwit)
-                    twitShare.userInteractionEnabled = true
                     
                     
                     ugView.addSubview(shareView)

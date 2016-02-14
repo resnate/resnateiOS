@@ -147,7 +147,7 @@ func toReview(sender:AnyObject) {
                     
                     let URL = NSURL(string: "https://www.resnate.com/api/reviews/\(String(sender.view!.tag))")!
                     let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
-                    mutableURLRequest.HTTPMethod = Method.POST.rawValue
+                    mutableURLRequest.HTTPMethod = Method.DELETE.rawValue
                     mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
                     
                     request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
@@ -172,50 +172,6 @@ func toReview(sender:AnyObject) {
         }
         
     }
-    
-    func alertView(View: UIAlertView, clickedButtonAtIndex buttonIndex: Int){
-        
-        let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
-        
-        let resnateToken = dictionary!["token"] as! String
-        
-        switch buttonIndex{
-            
-        case 1:
-            if View.title == "Delete Review"{
-                
-                let parameters =  ["token": "\(resnateToken)"]
-                
-                let URL = NSURL(string: "https://www.resnate.com/api/reviews/\(String(View.tag))")!
-                let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
-                mutableURLRequest.HTTPMethod = Method.DELETE.rawValue
-                mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
-                
-                request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
-
-                        self.navigationController?.popViewControllerAnimated(true)
-                        
-                        let window = UIApplication.sharedApplication().keyWindow
-                        
-                        if window!.rootViewController as? UITabBarController != nil {
-                            let tababarController = window!.rootViewController as! UITabBarController
-                            tababarController.selectedIndex = 0
-                        }
-                }
-                
-            };
-            break;
-        case 0:
-            NSLog("Dismiss");
-            break;
-        default:
-            NSLog("Default");
-            break;
-            //Some code here..
-            
-        }
-    }
-    
     
     func editReview(sender:UITapGestureRecognizer){
         
