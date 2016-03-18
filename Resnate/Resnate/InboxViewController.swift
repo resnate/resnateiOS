@@ -59,21 +59,11 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
         convoView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:0.5)
         self.inboxScroll.addSubview(convoView)
         
-        let likeSong = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
-        
+        let likeThis = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
         
         let tapLike = UITapGestureRecognizer()
-        tapLike.addTarget(self, action: "likeSong:")
-        likeSong.addGestureRecognizer(tapLike)
-        likeSong.userInteractionEnabled = true
-        
-        let likeGig = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
-        
-        
-        let tapGigLike = UITapGestureRecognizer()
-        tapGigLike.addTarget(self, action: "likeGig:")
-        likeGig.addGestureRecognizer(tapGigLike)
-        likeGig.userInteractionEnabled = true
+        likeThis.addGestureRecognizer(tapLike)
+        likeThis.userInteractionEnabled = true
         
         let share = UIImageView(frame: CGRect(x: 175, y: 200, width: 30, height: 30))
         share.image = UIImage(named: "Share")
@@ -95,9 +85,6 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             timeAgoLabel.font = UIFont(name: "HelveticaNeue", size: 12)
             timeAgoLabel.text = timeAgoSinceDate(activityDateString!, numericDates: true)
             convoView.addSubview(timeAgoLabel)
-            
-            
-            
             
             if let body = message["body"]!.string {
                 let bodyLabel = UILabel(frame: CGRect(x: 120, y: 130, width: 200, height: 60))
@@ -169,7 +156,7 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                     
                                                     self.songIDs.insert(songID, atIndex: self.songIDs.count)
                                                     
-                                                    likeSong.tag = songID
+                                                    likeThis.tag = songID
                                                     
                                                     let shareSongTap = UITapGestureRecognizer()
                                                     shareSongTap.addTarget(self, action: "shareSingleSong:")
@@ -179,7 +166,7 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                     
                                                     if sender != Int(resnateID) {
                                                         
-                                                        convoView.addSubview(likeSong)
+                                                        convoView.addSubview(likeThis)
                                                         
                                                         let req = Router(OAuthToken: resnateToken, userID: resnateID)
                                                         
@@ -192,14 +179,14 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                                     
                                                                     if count > 0 {
                                                                         
-                                                                        likeSong.image = UIImage(named: "liked")
+                                                                        likeThis.image = UIImage(named: "liked")
                                                                         tapLike.addTarget(self, action: "unlikeSong:")
                                                                         
                                                                     }
                                                                         
                                                                     else {
                                                                         
-                                                                        likeSong.image = UIImage(named: "likeWhite")
+                                                                        likeThis.image = UIImage(named: "likeWhite")
                                                                         tapLike.addTarget(self, action: "likeSong:")
                                                                     }
                                                                     
@@ -259,6 +246,45 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                             
                                             let reviewID = subject.componentsSeparatedByString("#")[1]
                                             
+                                            if sender != Int(resnateID) {
+                                                
+                                                convoView.addSubview(likeThis)
+                                                
+                                                let likeReq = Router(OAuthToken: resnateToken, userID: resnateID)
+                                                
+                                                request(likeReq.buildURLRequest("likes/ifLike/Review/", path: "/\(reviewID)")).responseJSON { response in
+                                                    if let re = response.result.value {
+                                                        
+                                                        let json = JSON(re)
+                                                        
+                                                        if let count = json["count"].int {
+                                                            
+                                                            if count > 0 {
+                                                                
+                                                                likeThis.image = UIImage(named: "liked")
+                                                                tapLike.addTarget(self, action: "unlikeReview:")
+                                                                
+                                                            }
+                                                                
+                                                            else {
+                                                                
+                                                                likeThis.image = UIImage(named: "likeWhite")
+                                                                tapLike.addTarget(self, action: "likeReview:")
+                                                            }
+                                                            
+                                                            
+                                                        }
+                                                        
+                                                        
+                                                    }
+                                                }
+                                                
+                                            } else {
+                                                
+                                                share.frame.origin.x = 125
+                                                
+                                            }
+                                            
                                             let shareReviewTap = UITapGestureRecognizer()
                                             shareReviewTap.addTarget(self, action: "shareReview:")
                                             share.addGestureRecognizer(shareReviewTap)
@@ -314,58 +340,16 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                         
                                                     } else {
                                                         
-                                                        let title = subject.componentsSeparatedByString("#")[1]
+                                                        let songID = String(stringInterpolationSegment: review["reviewable_id"])
                                                         
-                                                        let req = Router(OAuthToken: resnateToken, userID: title)
+                                                        let req = Router(OAuthToken: resnateToken, userID: songID)
                                                         
                                                         request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
                                                             
                                                             var song = JSON(response.result.value!)
+                                                                
+                                                            likeThis.tag = Int(songID)!
                                                             
-                                                            if let songID = song["id"].int {
-                                                                
-                                                                likeSong.tag = songID
-                                                                
-                                                                if sender != Int(resnateID) {
-                                                                    
-                                                                    convoView.addSubview(likeSong)
-                                                                    
-                                                                    let req = Router(OAuthToken: resnateToken, userID: resnateID)
-                                                                    
-                                                                    request(req.buildURLRequest("likes/ifLike/Song/", path: "/\(songID)")).responseJSON { response in
-                                                                        if let re = response.result.value {
-                                                                            
-                                                                            let json = JSON(re)
-                                                                            
-                                                                            if let count = json["count"].int {
-                                                                                
-                                                                                if count > 0 {
-                                                                                    
-                                                                                    likeSong.image = UIImage(named: "liked")
-                                                                                    tapLike.addTarget(self, action: "unlikeSong:")
-                                                                                    
-                                                                                }
-                                                                                    
-                                                                                else {
-                                                                                    
-                                                                                    likeSong.image = UIImage(named: "likeWhite")
-                                                                                    tapLike.addTarget(self, action: "likeSong:")
-                                                                                }
-                                                                                
-                                                                                
-                                                                            }
-                                                                            
-                                                                            
-                                                                        }
-                                                                    }
-                                                                    
-                                                                } else {
-                                                                    
-                                                                    share.frame.origin.x = 125
-                                                                    
-                                                                }
-                                                                
-                                                            }
                                                             
                                                             if let songContent = song["content"].string {
                                                                 
@@ -422,11 +406,11 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                 
                                                 if let gigID = gig["id"].int {
                                                     
-                                                    likeGig.tag = gigID
+                                                    likeThis.tag = gigID
                                                     
                                                     if sender != Int(resnateID) {
                                                         
-                                                        convoView.addSubview(likeGig)
+                                                        convoView.addSubview(likeThis)
                                                         
                                                         let req = Router(OAuthToken: resnateToken, userID: resnateID)
                                                         
@@ -439,14 +423,14 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                                                                     
                                                                     if count > 0 {
                                                                         
-                                                                        likeGig.image = UIImage(named: "liked")
+                                                                        likeThis.image = UIImage(named: "liked")
                                                                         tapLike.addTarget(self, action: "unlikeGig:")
                                                                         
                                                                     }
                                                                         
                                                                     else {
                                                                         
-                                                                        likeGig.image = UIImage(named: "likeWhite")
+                                                                        likeThis.image = UIImage(named: "likeWhite")
                                                                         tapLike.addTarget(self, action: "likeGig:")
                                                                     }
                                                                     
@@ -634,7 +618,9 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             
             inboxTab.badgeValue = nil
             
+            let application = UIApplication.sharedApplication()
             
+            application.applicationIconBadgeNumber = 0
             
         }
         
@@ -660,6 +646,9 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             return
         }
         
+        let backItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backItem
+        
         self.inboxScroll.subviews.map({ $0.removeFromSuperview() })
         
         noConnection.textAlignment = .Center
@@ -675,13 +664,13 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
         let resnateID = dictionary!["userID"] as! String
         
         let req = Router(OAuthToken: resnateToken, userID: resnateToken)
-        
+
         request(req.buildURLRequest("messages/", path: "/index/\(page)")).responseJSON { response in
-            
+
             if let re = response.result.value {
                 
                 let conversations = JSON(re)
-                
+
                 if conversations.first == nil {
                     
                     self.noConvos.textColor = UIColor.whiteColor()
@@ -707,6 +696,13 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
                     self.page += 1
                 }
                 
+            } else {
+                self.noConvos.textColor = UIColor.whiteColor()
+                self.noConvos.textAlignment = .Center
+                self.noConvos.font = UIFont(name: "HelveticaNeue-Light", size: 18)
+                self.noConvos.text = "No messages.\nShare some music or a concert review\nwith your friends!"
+                self.noConvos.numberOfLines = 3
+                self.inboxScroll.addSubview(self.noConvos)
             }
             
         }
@@ -861,29 +857,42 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
         }
     }
     
-    func likeSong(sender: AnyObject) {
+    func likeThis(type: String, sender: AnyObject) {
         
         if reachability!.isReachable() {
             
             let resnateToken = dictionary!["token"] as! String
             
-            let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Song", "token": "\(resnateToken)"]
+            let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "\(type)", "token": "\(resnateToken)"]
             
-            let likedSong = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
+            let liked = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
             
-            sender.view!.superview?.addSubview(likedSong)
+            sender.view!.superview?.addSubview(liked)
             
             let tapUnlike = UITapGestureRecognizer()
             
             
-            likedSong.tag = sender.view!.tag
+            liked.tag = sender.view!.tag
             
-            likedSong.addGestureRecognizer(tapUnlike)
+            liked.addGestureRecognizer(tapUnlike)
             
-            likedSong.userInteractionEnabled = true
+            liked.userInteractionEnabled = true
             
-            likedSong.image = UIImage(named: "liked")
-            tapUnlike.addTarget(self, action: "unlikeSong:")
+            liked.image = UIImage(named: "liked")
+            
+            if type == "Song" {
+                
+                tapUnlike.addTarget(self, action: "unlikeSong:")
+                
+            } else if type == "Gig" {
+                
+                tapUnlike.addTarget(self, action: "unlikeGig:")
+                
+            } else if type == "Review" {
+                
+                tapUnlike.addTarget(self, action: "unlikeReview:")
+            }
+            
             
             sender.view!.removeFromSuperview()
             
@@ -908,46 +917,76 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             })
             
         }
+    }
+    
+    func likeSong(sender: AnyObject) {
+        
+        likeThis("Song", sender: sender)
         
     }
     
     func likeGig(sender: AnyObject) {
         
+        likeThis("Song", sender: sender)
+        
+    }
+    
+    func likeReview(sender: AnyObject) {
+        
+        likeThis("Review", sender: sender)
+        
+    }
+    
+    func unlikeThis(type: String, sender: AnyObject){
+        
         if reachability!.isReachable() {
             
             let resnateToken = dictionary!["token"] as! String
             
-            let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
+            let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "\(type)", "token": "\(resnateToken)"]
             
-            let likedGig = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
+            let unliked = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
             
-            sender.view!.superview?.addSubview(likedGig)
+            sender.view!.superview?.addSubview(unliked)
             
-            let tapUnlikeGig = UITapGestureRecognizer()
+            let tapUnlike = UITapGestureRecognizer()
             
             
-            likedGig.tag = sender.view!.tag
+            unliked.tag = sender.view!.tag
             
-            likedGig.addGestureRecognizer(tapUnlikeGig)
+            unliked.addGestureRecognizer(tapUnlike)
             
-            likedGig.userInteractionEnabled = true
+            unliked.userInteractionEnabled = true
             
-            likedGig.image = UIImage(named: "liked")
-            tapUnlikeGig.addTarget(self, action: "unlikeGig:")
+            unliked.image = UIImage(named: "likeWhite")
+            
+            if type == "Song" {
+                
+                tapUnlike.addTarget(self, action: "likeSong:")
+                
+            } else if type == "Gig" {
+                
+                tapUnlike.addTarget(self, action: "likeGig:")
+                
+            } else if type == "Review" {
+                
+                tapUnlike.addTarget(self, action: "likeReview:")
+            }
             
             sender.view!.removeFromSuperview()
             
-            let mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: "https://www.resnate.com/api/likes/")!)
-            mutableURLRequest.HTTPMethod = Method.POST.rawValue
+            let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
+            let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+            mutableURLRequest.HTTPMethod = Method.DELETE.rawValue
             mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
             
             request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters as? [String : AnyObject]).0).responseJSON { response in
-                print(response)
                 
             }
             
+        }
             
-        } else {
+        else {
             UIView.animateWithDuration(2.0, animations: {
                 self.noConnection.text = "Cannot Like without Internet Connection"
                 self.noConnection.alpha = 0.0
@@ -958,42 +997,26 @@ class InboxViewController: UIViewController, UIScrollViewDelegate, UISearchBarDe
             })
             
         }
+    }
+    
+    func unlikeSong(sender: AnyObject) {
+        
+        likeThis("Song", sender: sender)
         
     }
     
     func unlikeGig(sender: AnyObject) {
         
-        let resnateToken = dictionary!["token"] as! String
+        likeThis("Song", sender: sender)
         
-        let parameters =  ["likeable_id" : sender.view!.tag, "likeable_type" : "Gig", "token": "\(resnateToken)"]
-        
-        let unlikedGig = UIImageView(frame: CGRect(x: 125, y: 200, width: 30, height: 30))
-        
-        sender.view!.superview?.addSubview(unlikedGig)
-        
-        let tapLikeGig = UITapGestureRecognizer()
-        
-        
-        unlikedGig.tag = sender.view!.tag
-        
-        unlikedGig.addGestureRecognizer(tapLikeGig)
-        
-        unlikedGig.userInteractionEnabled = true
-        
-        unlikedGig.image = UIImage(named: "likeWhite")
-        tapLikeGig.addTarget(self, action: "likeGig:")
-        
-        sender.view!.removeFromSuperview()
-        
-        let URL = NSURL(string: "https://www.resnate.com/api/likes/")!
-        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
-        mutableURLRequest.HTTPMethod = Method.DELETE.rawValue
-        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
-        
-        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters as? [String : AnyObject]).0).responseJSON { response in
-            
-        }
     }
+    
+    func unlikeReview(sender: AnyObject) {
+        
+        likeThis("Review", sender: sender)
+        
+    }
+
     
     func toPlaylist(sender: AnyObject){
         

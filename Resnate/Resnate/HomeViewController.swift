@@ -60,7 +60,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
     
     var playlistCount = 0
     
-    
+    let application = UIApplication.sharedApplication()
     
     
     func feedToPlaylist(sender: AnyObject){
@@ -96,7 +96,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                 
                 if let playlistName = playlist["name"].string {
                     
-                    let playlistNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                    let playlistNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                     
                     playlistNameLabel.text = playlistName
                     
@@ -168,8 +168,10 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         
         request(req.buildURLRequest("songs/", path: "")).responseJSON { response in
             
-                let song = JSON(response.result.value!)
-            
+            if let value = response.result.value {
+                
+                let song = JSON(value)
+                
                 if let songID = song["id"].int {
                     
                     self.songIDs.insert(songID, atIndex: self.songIDs.count)
@@ -178,60 +180,60 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                         
                         if let songContent = song["content"].string {
                             
-                                let likeSong = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
+                            let likeSong = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
+                            
+                            view.addSubview(likeSong)
+                            
+                            let tapLike = UITapGestureRecognizer()
+                            
+                            
+                            likeSong.tag = songID
+                            
+                            likeSong.addGestureRecognizer(tapLike)
+                            
+                            likeSong.userInteractionEnabled = true
+                            
+                            if currentUserID == likerID {
                                 
-                                view.addSubview(likeSong)
+                                likeSong.image = UIImage(named: "liked")
+                                tapLike.addTarget(self, action: "unlikeSong:")
                                 
-                                let tapLike = UITapGestureRecognizer()
+                            } else {
                                 
+                                let req = Router(OAuthToken: token, userID: currentUserID)
                                 
-                                likeSong.tag = songID
-                                
-                                likeSong.addGestureRecognizer(tapLike)
-                                
-                                likeSong.userInteractionEnabled = true
-                                
-                                if currentUserID == likerID {
-                                    
-                                    likeSong.image = UIImage(named: "liked")
-                                    tapLike.addTarget(self, action: "unlikeSong:")
-                                    
-                                } else {
-                                    
-                                    let req = Router(OAuthToken: token, userID: currentUserID)
-                                    
-                                    request(req.buildURLRequest("likes/ifLike/Song/", path: "/\(songID)")).responseJSON { response in
-                                        if let re = response.result.value {
+                                request(req.buildURLRequest("likes/ifLike/Song/", path: "/\(songID)")).responseJSON { response in
+                                    if let re = response.result.value {
+                                        
+                                        let json = JSON(re)
+                                        
+                                        if let count = json["count"].int {
                                             
-                                            let json = JSON(re)
-                                            
-                                            if let count = json["count"].int {
+                                            if count > 0 {
                                                 
-                                                if count > 0 {
-                                                    
-                                                    likeSong.image = UIImage(named: "liked")
-                                                    tapLike.addTarget(self, action: "unlikeSong:")
-                                                    
-                                                }
+                                                likeSong.image = UIImage(named: "liked")
+                                                tapLike.addTarget(self, action: "unlikeSong:")
                                                 
-                                                else {
-                                                    
-                                                    likeSong.image = UIImage(named: "likeWhite")
-                                                    tapLike.addTarget(self, action: "likeSong:")
-                                                }
+                                            }
                                                 
+                                            else {
                                                 
+                                                likeSong.image = UIImage(named: "likeWhite")
+                                                tapLike.addTarget(self, action: "likeSong:")
                                             }
                                             
                                             
                                         }
+                                        
+                                        
                                     }
-                                    
-                                    
-                                    
                                 }
                                 
-
+                                
+                                
+                            }
+                            
+                            
                             
                             
                             
@@ -254,7 +256,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                             
                             
                             
-                            let songNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                            let songNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                             
                             songNameLabel.text = songName
                             
@@ -302,6 +304,8 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                     
                 }
             }
+            
+            }
         
     }
     
@@ -317,7 +321,15 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
         
         let resnateID = dictionary!["userID"] as! String
         
-        let activityView = UIView(frame: CGRect(x: 0, y: y, width: self.width, height: self.imgWidth + 200))
+        let activityView = UIView(frame: CGRect(x: 0, y: y, width: self.width, height: self.imgWidth + 180))
+        
+        activityView.backgroundColor = UIColor(red:0.9, green:0.07, blue:0.29, alpha:0.25)
+        
+        let activityUserImg = UIImageView(frame: CGRect(x: 10, y: 10, width: 60, height: 60))
+        
+        activityUserImg.image = UIImage(named: "userSmall.pdf")!.imageWithRenderingMode(.AlwaysOriginal)
+        
+        activityView.addSubview(activityUserImg)
             
         if let type = activity["trackable_type"].string {
                 
@@ -325,7 +337,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                 
             let commentsAndLikesLabel = UILabel(frame: CGRect(x: 10, y: self.imgWidth + 80, width: 300, height: 20))
                 
-            let verbLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 150, height: 14))
+            let verbLabel = UILabel(frame: CGRect(x: 0, y: 10, width: 230, height: 14))
             verbLabel.textColor = UIColor.whiteColor()
             verbLabel.font = UIFont(name: "HelveticaNeue", size: 12)
                 
@@ -337,7 +349,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                 
             if let date = activity["created_at"].string {
                     
-                    let timeAgoLabel = UILabel(frame: CGRect(x: 80, y: 45, width: 150, height: 14))
+                    let timeAgoLabel = UILabel(frame: CGRect(x: 80, y: 55, width: 150, height: 14))
                     timeAgoLabel.textColor = UIColor.whiteColor()
                     timeAgoLabel.font = UIFont(name: "HelveticaNeue", size: 12)
                 
@@ -368,7 +380,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                     
                                     if let userID = user["id"].int {
                                         
-                                        let userNameLabel = UILabel(frame: CGRect(x: 80, y: 0, width: 190, height: 14))
+                                        let userNameLabel = UILabel(frame: CGRect(x: 80, y: 10, width: 190, height: 14))
                                         
                                         userNameLabel.text = userName
                                         userNameLabel.textColor = UIColor.whiteColor()
@@ -387,21 +399,17 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                         
                                         verbLabel.frame.origin.x = userNameLabel.frame.width + 85
                                         
-                                        verbLabel.sizeToFit()
-                                        
                                         activityView.addSubview(userNameLabel)
                                         
                                         activityView.addSubview(verbLabel)
                                         
-                                        let activityUserImg = UIImageView(frame: CGRect(x: 10, y: 0, width: 60, height: 60))
+                                        
                                         
                                         let userImgUrl = NSURL(string: "https://graph.facebook.com/\(userImageID)/picture?width=200&height=200")
                                         
                                         self.getDataFromUrl(userImgUrl!) { data in
                                             dispatch_async(dispatch_get_main_queue()) {
                                                 activityUserImg.image = UIImage(data: data!)
-                                                
-                                                activityView.addSubview(activityUserImg)
                                                 
                                                 let tapRecProfile = UITapGestureRecognizer()
                                                 tapRecProfile.addTarget(self, action: "profile:")
@@ -473,6 +481,8 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                                 
                                             } else if likeable_type == "Review" {
                                                 
+                                                verbLabel.text = "liked a review of"
+                                                
                                                 self.getReviewInfo(likeable_id, activityView: activityView, resnateToken: resnateToken, like: true, verbLabel: verbLabel)
                                                 
                                             }
@@ -504,7 +514,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                 
                                 let followable = JSON(re)
                                 
-                                let followeeNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                                let followeeNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                                 followeeNameLabel.textColor = UIColor.whiteColor()
                                 followeeNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
                                 followeeNameLabel.numberOfLines = 2
@@ -635,7 +645,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                 
                                 badgeView.image = UIImage(named: badgeName)
                                 
-                                let badgeNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                                let badgeNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                                 
                                 badgeNameLabel.text = "New badge: \(badgeName)"
                                 
@@ -833,18 +843,24 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                         
                     }
                     
-                }
-                
-                if let newPoints = points["newPoints"].string {
-                    
-                    if Int(newPoints) > 0 {
+                    if let newPoints = points["newPoints"].string {
                         
-                        notificationsTab.badgeValue = newPoints
-                        notificationView.notificationCount = Int(newPoints)!
+                        var totalUnread = Int(unreadMessages)! + Int(newPoints)!
+                            
+                        self.application.applicationIconBadgeNumber = totalUnread
                         
-                        self.repositionBadge(4)
+                        if Int(newPoints) > 0 {
+                            
+                            notificationsTab.badgeValue = newPoints
+                            notificationView.notificationCount = Int(newPoints)!
+                            
+                            self.repositionBadge(4)
+                            
+                            
+                        }
+                        
                     }
-                    
+ 
                 }
                 
             }
@@ -891,6 +907,8 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                             for (_, conversation) in conversations {
                                     
                                 if let message = conversation["message"].dictionary {
+                                    
+                                    self.application.applicationIconBadgeNumber += 1
                                         
                                     let subject = message["subject"]!.string!
                                         
@@ -1472,16 +1490,18 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                     
                 } else {
                     
-                    let songkickID = userDefaults.stringForKey("songkick_id")!
-                    
-                    let parameters =  ["token": "\(resnateToken)", "songkickID": "\(songkickID)"]
-                    
-                    let URL = NSURL(string: "https://www.resnate.com/api/users/\(resnateID)")!
-                    let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
-                    mutableURLRequest.HTTPMethod = Method.PUT.rawValue
-                    mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
-                    
-                    request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                    if let songkickID = userDefaults.stringForKey("songkick_id") {
+                        
+                        let parameters =  ["token": "\(resnateToken)", "songkickID": "\(songkickID)"]
+                        
+                        let URL = NSURL(string: "https://www.resnate.com/api/users/\(resnateID)")!
+                        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
+                        mutableURLRequest.HTTPMethod = Method.PUT.rawValue
+                        mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
+                        
+                        request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
+                            
+                        }
                         
                     }
                     
@@ -1914,7 +1934,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                             
                             tapReview.addTarget(self, action: "toReview:")
                             
-                            let reviewNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                            let reviewNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                             
                             reviewNameLabel.textColor = UIColor.whiteColor()
                             reviewNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
@@ -1940,7 +1960,7 @@ class HomeViewController: UIViewController, VideoPlayerUIViewDelegate, UISearchB
                                                     if let artist = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["id"].int {
                                                         
                                                         let artistView = getArtistPic(artist)
-                                                        artistView.frame = CGRect(x: 10, y: 70, width: self.imgWidth, height: self.imgWidth)
+                                                        artistView.frame = CGRect(x: 10, y: 80, width: self.imgWidth, height: self.imgWidth)
                                                         activityView.addSubview(artistView)
                                                         artistView.tag = reviewID
                                                         

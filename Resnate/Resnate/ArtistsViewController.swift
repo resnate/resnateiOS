@@ -36,6 +36,8 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
     
     var y = 0
     
+    var i = 0
+    
     var allSongsView = UIView(frame: CGRect(x: 0, y: 550, width: UIScreen.mainScreen().bounds.width, height: 50))
     
     var userSearch = ""
@@ -116,9 +118,6 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
             if let songs = results["items"].array {
                 
                 
-                
-                var i = 0
-                
                 for song in songs {
                     
                     let songView = UIView(frame: CGRect(x: 0, y: self.y, width: Int(self.width), height: 50))
@@ -129,12 +128,12 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
                     
                     if let videoID = song["id"]["videoId"].string {
                         
-                        self.ytURLs.insert(videoID, atIndex: i)
+                        self.ytURLs.insert(videoID, atIndex: self.i)
                         
                         let tapVideo = UITapGestureRecognizer()
                         
                         tapVideo.addTarget(self, action: "playSong:")
-                        songView.tag = i
+                        songView.tag = self.i
                         songView.addGestureRecognizer(tapVideo)
                         
                         songView.userInteractionEnabled = true
@@ -154,7 +153,7 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
                         
                         if let title = song["snippet"]["title"].string {
                             
-                            self.ytTitles.insert(title, atIndex: i)
+                            self.ytTitles.insert(title, atIndex: self.i)
                             
                             let titleLabel = UILabel(frame: CGRect(x: 75, y: 5, width: self.width - 80, height: 40))
                             
@@ -174,7 +173,7 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
                     
                     self.allSongsView.addSubview(songView)
                     
-                    i += 1
+                    self.i += 1
                     
                     self.allSongsView.frame.size.height = CGFloat(self.y)
                     
@@ -214,6 +213,8 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
         
         self.y = 0
         
+        self.i = 0
+        
         let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
         
         let resnateToken = dictionary!["token"] as! String
@@ -222,6 +223,12 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
         
         let req = Router(OAuthToken: resnateToken, userID: String(resnateID))
         
+        let amazonView = UIView(frame: CGRect(x: 0, y: 300, width: self.width, height: 120))
+        
+        amazonView.backgroundColor = UIColor.whiteColor()
+        
+        self.artistView.addSubview(amazonView)
+        
         request(req.buildURLRequest("AmazonStore/", path: "/\(userSearch)")).responseJSON { response in
             
             if let re = response.result.value {
@@ -229,17 +236,8 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
                 let results = JSON(re)
                 
                 var x = 10
-                
-                
-                
+
                 let thirdWidth = Int(self.width/3)
-                
-                let amazonView = UIView(frame: CGRect(x: 0, y: 300, width: self.width, height: 120))
-                
-                
-                amazonView.backgroundColor = UIColor.whiteColor()
-                
-                self.artistView.addSubview(amazonView)
                 
                 let moreMerchView = UIView(frame: CGRect(x: 0, y: 430, width: self.width, height: 30))
                 
@@ -271,18 +269,12 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
                     self.moreAmazonURL = "https://www.amazon.com/s/ref=sr_nr_n_8?url=search-alias%3Dapparel&field-keywords=\(self.userSearch)"
                 }
                 
-                
-                
-                
                 tapRec.addTarget(self, action: "moreAmazon")
                 moreMerchView.addGestureRecognizer(tapRec)
                 
                 moreMerchView.userInteractionEnabled = true
                 
-                
                 self.artistView.addSubview(moreMerchView)
-                
-                
                 
                 for (index, result) in results {
                     
@@ -332,6 +324,20 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
                     
                 }
                 
+            } else {
+                
+                let noMerchView = UILabel(frame: CGRect(x: 0, y: 20, width: 180, height: 75))
+                
+                noMerchView.center.x = self.width/2
+                
+                noMerchView.textAlignment = .Center
+                
+                noMerchView.text = "No Merch Available"
+                
+                noMerchView.font = UIFont(name: "HelveticaNeue-Light", size: 20)
+                
+                amazonView.addSubview(noMerchView)
+                
             }
 
         }
@@ -344,7 +350,7 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
                 
                 var x = 10
                 
-                for (index, friend) in friends {
+                for (_, friend) in friends {
                     
                     if CGFloat(x + 60) < UIScreen.mainScreen().bounds.width {
                         
@@ -663,6 +669,8 @@ class ArtistsViewController: UIViewController, UISearchBarDelegate, YouTubePlaye
         self.artistView.setContentOffset(CGPointMake(0, -self.artistView.contentInset.top), animated: true)
         
         self.allSongsView.subviews.map({ $0.removeFromSuperview() })
+        
+        self.nextPageToken = ""
         
         self.loadSongs(self.userSearch)
         

@@ -87,7 +87,7 @@ extension UIViewController {
                     if let artist = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["id"].int {
                         
                         let artistView = getHugeArtistPic(artist)
-                        artistView.frame = CGRect(x: 10, y: 70, width: imgWidth, height: imgWidth)
+                        artistView.frame = CGRect(x: 10, y: 80, width: imgWidth, height: imgWidth)
                         view.addSubview(artistView)
                         
                         let tapGigActivity = UITapGestureRecognizer()
@@ -101,7 +101,7 @@ extension UIViewController {
                     
                     if let gigName = json["resultsPage"]["results"]["event"]["displayName"].string {
                         
-                        let gigNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                        let gigNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                         
                         gigNameLabel.text = gigName
                         

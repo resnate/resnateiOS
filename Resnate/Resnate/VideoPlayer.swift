@@ -51,7 +51,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
     
     var activityID = 0
     
-    var playerOverlay = UIView(frame: CGRect(x: -170, y: UIScreen.mainScreen().bounds.height - 200, width: 160, height: 90))
+    var playerOverlay = UIView(frame: CGRect(x: -200, y: -100, width: 160, height: 90))
     
     var touches = false
     
@@ -59,6 +59,8 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
     init() {
         
         super.init(frame: CGRectZero)
+        
+        self.videoPlayer.addSubview(self.playerOverlay)
         
         self.postReview.text = "Post Review"
         
@@ -99,7 +101,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
         
         
         let pauseTap = UITapGestureRecognizer()
-        pauseTap.addTarget(self, action: "fadeInOverlay")
+        pauseTap.addTarget(self, action: "expandOrFade")
         self.playerOverlay.addGestureRecognizer(pauseTap)
         
         let swipeUp = UISwipeGestureRecognizer()
@@ -340,6 +342,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
             view.removeFromSuperview()
             
         }
+        self.touches = false
         
         self.playerOverlay.backgroundColor = UIColor.clearColor()
         
@@ -348,15 +351,9 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
     
     func pauseVid(){
         
-        for view in self.playerOverlay.subviews {
-            
-            if view.tag == -2 {
-            
-                view.removeFromSuperview()
-            
-            }
-            
-        }
+        self.pauseButton.removeFromSuperview()
+        
+        self.playerOverlay.addSubview(playButton)
         
         playButton.layer.zPosition = 999
         
@@ -370,7 +367,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
             
         }
         
-        playButton.tag = -1
+        self.touches = true
         
         playButton.image = UIImage(named: "play")
         
@@ -386,15 +383,27 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
             
             self.videoPlayer.pause()
             
-            self.playerOverlay.backgroundColor = UIColor(white: 0, alpha: 0.5)
+            //no overlay in mini player
             
-            self.playerOverlay.addSubview(playButton)
+            if self.videoPlayer.frame.width == UIScreen.mainScreen().bounds.width && UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation) {
             
-            self.videoPlayer.getDuration({ (youTubeTime) -> () in
-                self.playerOverlay.addSubview(self.duration)
-                self.duration.text = youTubeTime.youTubeTime
-            })
-            
+                self.playerOverlay.backgroundColor = UIColor(white: 0, alpha: 0.5)
+                
+                self.playerOverlay.addSubview(playButton)
+                
+                self.videoPlayer.getDuration({ (youTubeTime) -> () in
+                    self.playerOverlay.addSubview(self.duration)
+                    self.duration.text = youTubeTime.youTubeTime
+                })
+                
+                self.videoPlayer.getCurrentTime({ (youTubeTime) -> () in
+                        
+                        self.playerOverlay.addSubview(self.currentTime)
+                        self.currentTime.text = youTubeTime.youTubeTime
+                    
+                })
+                
+            }
             
         } else if self.videoPlayer.playerState == .Paused {
             
@@ -417,101 +426,118 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
         
     }
     
-    func fadeInOverlay(){
+    func expandOrFade(){
         
-        if self.playerOverlay.subviews.count == 0 {
+        if Int(self.videoPlayer.frame.width) == 160 {
+
+            reviewView()
             
-            if self.videoPlayer.playerState == .Playing {
-                
-                pauseButton.tag = -2
-                
-                pauseButton.image = UIImage(named: "pause")
-                
-                let tapPause = UITapGestureRecognizer()
-                
-                tapPause.addTarget(self, action: "pauseVid")
-                
-                pauseButton.addGestureRecognizer(tapPause)
-                
-                pauseButton.userInteractionEnabled = true
-                
-                self.playerOverlay.addSubview(pauseButton)
-                
-            } else if self.videoPlayer.playerState == .Paused {
-                
-                playButton.tag = -1
-                
-                playButton.image = UIImage(named: "play")
-                
-                let tapPlay = UITapGestureRecognizer()
-                
-                tapPlay.addTarget(self, action: "resumeVid")
-                
-                playButton.addGestureRecognizer(tapPlay)
-                
-                playButton.userInteractionEnabled = true
-                
-                playButton.frame = CGRect(x: UIScreen.mainScreen().bounds.width/2 - 25, y: UIScreen.mainScreen().bounds.width/1.85/2 - 25, width: 50, height: 50)
-                
-                self.playerOverlay.addSubview(playButton)
-                
-                self.videoPlayer.getDuration({ (youTubeTime) -> () in
-                    self.playerOverlay.addSubview(self.duration)
-                    self.duration.text = youTubeTime.youTubeTime
-                })
-                
-            }
-            
-            
-            
-            self.playerOverlay.addSubview(self.videoSlider)
-            
-            if self.videoPlayer.frame.width == UIScreen.mainScreen().bounds.width && UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation) {
-                
-                pauseButton.frame = CGRect(x: UIScreen.mainScreen().bounds.height/2 - 25, y: UIScreen.mainScreen().bounds.width/2 - 25, width: 50, height: 50)
-                
-                self.currentTime.frame = CGRect(x: 5, y: UIScreen.mainScreen().bounds.width - 35, width: 70, height: 30)
-                
-                self.duration.frame = CGRect(x: UIScreen.mainScreen().bounds.height - 45, y: UIScreen.mainScreen().bounds.width - 35, width: 70, height: 30)
-                
-                self.videoSlider.frame = CGRect(x: 5, y: UIScreen.mainScreen().bounds.width - 65, width: UIScreen.mainScreen().bounds.height - 10, height: 30)
-                
-            } else if self.videoPlayer.frame.width == UIScreen.mainScreen().bounds.width && UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation) == false {
-                
-                pauseButton.frame = CGRect(x: UIScreen.mainScreen().bounds.width/2 - 25, y: UIScreen.mainScreen().bounds.width/1.85/2 - 25, width: 50, height: 50)
-                
-                self.currentTime.frame = CGRect(x: 5, y: UIScreen.mainScreen().bounds.width/1.85 - 35, width: 70, height: 30)
-                
-                self.duration.frame = CGRect(x: UIScreen.mainScreen().bounds.width - 45, y: UIScreen.mainScreen().bounds.width/1.85 - 35, width: 70, height: 30)
-                
-                self.videoSlider.frame = CGRect(x: 5, y: self.playerOverlay.frame.height - 55, width: UIScreen.mainScreen().bounds.width - 10, height: 30)
-                
-            }
-            
-            if self.playerOverlay.backgroundColor != UIColor(white: 0, alpha: 0.5) {
-                
-                UIView.animateWithDuration(0.25, animations: {
-                    self.playerOverlay.backgroundColor = UIColor(white: 0, alpha: 0.5)
-                })
-                
-                self.videoPlayer.getDuration({ (youTubeTime) -> () in
-                    self.playerOverlay.addSubview(self.duration)
-                    self.duration.text = youTubeTime.youTubeTime
-                })
-            } else {
-                self.playerOverlay.backgroundColor = UIColor.clearColor()
-                self.playerOverlay.subviews.map({ $0.removeFromSuperview() })
-            }
-            
-        }
+        } else {
         
-        let delay = 2.25 * Double(NSEC_PER_SEC)
-        let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-        dispatch_after(time, dispatch_get_main_queue()) {
-            if self.touches == false && self.videoPlayer.playerState == .Playing {
-            self.playerOverlay.backgroundColor = UIColor.clearColor()
-            self.playerOverlay.subviews.map({ $0.removeFromSuperview() })
+            if self.playerOverlay.subviews.count == 0 {
+                
+                if self.videoPlayer.playerState == .Playing {
+                    
+                    pauseButton.image = UIImage(named: "pause")
+                    
+                    let tapPause = UITapGestureRecognizer()
+                    
+                    tapPause.addTarget(self, action: "pauseVid")
+                    
+                    pauseButton.addGestureRecognizer(tapPause)
+                    
+                    pauseButton.userInteractionEnabled = true
+                    
+                    self.playerOverlay.addSubview(pauseButton)
+                    
+                } else if self.videoPlayer.playerState == .Paused {
+                    
+                    playButton.image = UIImage(named: "play")
+                    
+                    let tapPlay = UITapGestureRecognizer()
+                    
+                    tapPlay.addTarget(self, action: "resumeVid")
+                    
+                    playButton.addGestureRecognizer(tapPlay)
+                    
+                    playButton.userInteractionEnabled = true
+                    
+                    playButton.frame = CGRect(x: UIScreen.mainScreen().bounds.width/2 - 25, y: UIScreen.mainScreen().bounds.width/1.85/2 - 25, width: 50, height: 50)
+                    
+                    self.playerOverlay.addSubview(playButton)
+                    
+                    self.videoPlayer.getDuration({ (youTubeTime) -> () in
+                        self.playerOverlay.addSubview(self.duration)
+                        self.duration.text = youTubeTime.youTubeTime
+                    })
+                    
+                    self.videoPlayer.getCurrentTime({ (youTubeTime) -> () in
+                        
+                        self.playerOverlay.addSubview(self.currentTime)
+                        self.currentTime.text = youTubeTime.youTubeTime
+                        
+                    })
+                    
+                }
+                
+                
+                
+                self.playerOverlay.addSubview(self.videoSlider)
+                
+                if self.videoPlayer.frame.width == UIScreen.mainScreen().bounds.width && UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation) {
+                    
+                    pauseButton.frame = CGRect(x: UIScreen.mainScreen().bounds.height/2 - 25, y: UIScreen.mainScreen().bounds.width/2 - 25, width: 50, height: 50)
+                    
+                    self.currentTime.frame = CGRect(x: 5, y: UIScreen.mainScreen().bounds.width - 35, width: 70, height: 30)
+                    
+                    self.duration.frame = CGRect(x: UIScreen.mainScreen().bounds.height - 45, y: UIScreen.mainScreen().bounds.width - 35, width: 70, height: 30)
+                    
+                    self.videoSlider.frame = CGRect(x: 5, y: UIScreen.mainScreen().bounds.width - 65, width: UIScreen.mainScreen().bounds.height - 10, height: 30)
+                    
+                } else if self.videoPlayer.frame.width == UIScreen.mainScreen().bounds.width && UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation) == false {
+                    
+                    pauseButton.frame = CGRect(x: UIScreen.mainScreen().bounds.width/2 - 25, y: UIScreen.mainScreen().bounds.width/1.85/2 - 25, width: 50, height: 50)
+                    
+                    self.currentTime.frame = CGRect(x: 5, y: UIScreen.mainScreen().bounds.width/1.85 - 35, width: 70, height: 30)
+                    
+                    self.duration.frame = CGRect(x: UIScreen.mainScreen().bounds.width - 45, y: UIScreen.mainScreen().bounds.width/1.85 - 35, width: 70, height: 30)
+                    
+                    self.videoSlider.frame = CGRect(x: 5, y: self.playerOverlay.frame.height - 55, width: UIScreen.mainScreen().bounds.width - 10, height: 30)
+                    
+                }
+                
+                if self.playerOverlay.backgroundColor != UIColor(white: 0, alpha: 0.5) {
+                    
+                    UIView.animateWithDuration(0.25, animations: {
+                        self.playerOverlay.backgroundColor = UIColor(white: 0, alpha: 0.5)
+                    })
+                    
+                    self.videoPlayer.getDuration({ (youTubeTime) -> () in
+                        self.playerOverlay.addSubview(self.duration)
+                        self.duration.text = youTubeTime.youTubeTime
+                    })
+                    self.videoPlayer.getCurrentTime({ (youTubeTime) -> () in
+                        
+                        self.playerOverlay.addSubview(self.currentTime)
+                        self.currentTime.text = youTubeTime.youTubeTime
+                        
+                    })
+                } else {
+                    self.playerOverlay.backgroundColor = UIColor.clearColor()
+                    self.playerOverlay.subviews.map({ $0.removeFromSuperview() })
+                }
+                
             }
+            
+            let delay = 2.25 * Double(NSEC_PER_SEC)
+            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+            dispatch_after(time, dispatch_get_main_queue()) {
+                if self.touches == false && self.videoPlayer.playerState == .Playing {
+                    self.playerOverlay.backgroundColor = UIColor.clearColor()
+                    self.playerOverlay.subviews.map({ $0.removeFromSuperview() })
+                }
+            }
+            
         }
         
     }
@@ -650,7 +676,6 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
                 completion: { finished in
 
                     self.videoPlayer.stop()
-                    self.videoPlayer.tag = -1
                     
             })
             
@@ -675,7 +700,6 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
                     
                     
                     self.videoPlayer.stop()
-                    self.videoPlayer.tag = -1
                     
             })
             
@@ -707,15 +731,12 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
                 },
                 completion: { finished in
                     UIApplication.sharedApplication().statusBarHidden = true
-                    for view in self.playerOverlay.subviews {
                         
-                        if view.tag == -1 || view.tag == -2 {
-                            view.frame.origin.x = UIScreen.mainScreen().bounds.width/2 - 25
-                            view.frame.origin.y = UIScreen.mainScreen().bounds.width/1.85/2 - 25
-                            
-                        }
-                        
-                    }
+                        self.pauseButton.frame.origin.x = UIScreen.mainScreen().bounds.width/2 - 25
+                        self.pauseButton.frame.origin.y = UIScreen.mainScreen().bounds.width/1.85/2 - 25
+
+                        self.playButton.frame.origin.x = UIScreen.mainScreen().bounds.width/2 - 25
+                        self.playButton.frame.origin.y = UIScreen.mainScreen().bounds.width/1.85/2 - 25
                     
             })
             
@@ -736,6 +757,8 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
         
         UIApplication.sharedApplication().statusBarHidden = false
         
+        self.playerOverlay.backgroundColor = UIColor.clearColor()
+        
         if self.videoPlayer.frame.width > 160
         {
             self.reviewTextView.endEditing(true)
@@ -745,7 +768,7 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
                 options: [.CurveEaseInOut, .AllowUserInteraction],
                 animations: {
                     
-                    
+                    //minimise player to bottom right
                     self.videoPlayer.frame = CGRect(x: UIScreen.mainScreen().bounds.width - 170, y: UIScreen.mainScreen().bounds.height - 150, width: 160, height: 90)
                     
                     self.playerOverlay.frame = CGRect(x: UIScreen.mainScreen().bounds.width - 170, y: UIScreen.mainScreen().bounds.height - 150, width: 160, height: 90)
@@ -756,16 +779,14 @@ class VideoPlayer: UIView, UIGestureRecognizerDelegate, FBSDKSharingDelegate, UI
                 },
                 completion: { finished in
                     
-                    if(UIDeviceOrientationIsPortrait(UIDevice.currentDevice().orientation)){
+                    if UIDeviceOrientationIsPortrait(UIDevice.currentDevice().orientation) {
                         
-                        self.videoSlider.frame = CGRect(x: -UIScreen.mainScreen().bounds.height, y: -UIScreen.mainScreen().bounds.width, width: UIScreen.mainScreen().bounds.width - 20, height: 30)
-                        
-                        
-                    UIApplication.sharedApplication().statusBarHidden = false
-                        
-                        self.pauseButton.frame = CGRect(x: 55, y: 21, width: 50, height: 50)
-                        
-                        self.playButton.frame = CGRect(x: 55, y: 21, width: 50, height: 50)
+                        //no buttons in portrait mini player
+                        for view in self.playerOverlay.subviews {
+                            
+                            view.removeFromSuperview()
+                            
+                        }
                         
                     } else {
 

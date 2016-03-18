@@ -199,7 +199,9 @@ class AddPlaylistViewController: UIViewController, UITextFieldDelegate {
             
             let parameters =  ["user_id": resnateID, "content": string!, "token": resnateToken, "name": playlistName! ]
             
+            textField.endEditing(true)
             
+            self.closeModal()
             
             let URL = NSURL(string: "https://www.resnate.com/api/playlists")!
             let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
@@ -207,16 +209,6 @@ class AddPlaylistViewController: UIViewController, UITextFieldDelegate {
             mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
             
             request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
-                
-                if let re = response.result.value {
-                    
-                    let playlist = JSON(re)
-                    
-                    print(playlist)
-                    
-                    self.closeModal()
-                    
-                }
                 
             }
             

@@ -45,6 +45,8 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                     
                     if let songContent = song["content"].string {
                         
+                        self.song = [songName: songContent]
+                        
                         let likeSong = UIImageView(frame: CGRect(x: self.width/4 - 15, y: self.imgWidth + 120, width: 30, height: 30))
                         
                         view.addSubview(likeSong)
@@ -119,7 +121,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                         
                         let ytSong = [songName: songContent]
                         
-                        let songNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                        let songNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                         
                         songNameLabel.text = songName
                         
@@ -226,8 +228,6 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
         
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "testBkgd.jpg")!)
         
-        returnComments()
-        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -238,13 +238,12 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
             postComment.frame.origin.y = UIScreen.mainScreen().bounds.height - 143
             
         }
-        print(postComment.frame.origin.y)
         returnComments()
         
     }
     
     func returnComments(){
-        
+
         self.scrollView.subviews.map({ $0.removeFromSuperview() })
         
         let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
@@ -263,18 +262,21 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                 
                 let activity = JSON(re)
                 
-                let activityView = UIView(frame: CGRect(x: 0, y: 10, width: self.width, height: self.imgHeight + 100))
+                let activityView = UIView(frame: CGRect(x: 0, y: 10, width: self.width, height: self.imgWidth + 180))
+                
+                activityView.backgroundColor = UIColor(red:0.9, green:0.07, blue:0.29, alpha:0.25)
                 
                 self.scrollView.addSubview(activityView)
+                
                 
                 if let type = activity["trackable_type"].string {
                     
                     self.type = type
                     
                     
-                    let verbLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 150, height: 14))
+                    let verbLabel = UILabel(frame: CGRect(x: 0, y: 10, width: 190, height: 14))
                     
-                    let userNameLabel = UILabel(frame: CGRect(x: 80, y: 0, width: 190, height: 14))
+                    let userNameLabel = UILabel(frame: CGRect(x: 80, y: 10, width: 190, height: 14))
                     userNameLabel.textColor = UIColor.whiteColor()
                     userNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
                     
@@ -301,7 +303,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                         
                         let activityDateString = dateFormatter.dateFromString(date)
                         
-                        let timeAgoLabel = UILabel(frame: CGRect(x: 80, y: 45, width: 150, height: 14))
+                        let timeAgoLabel = UILabel(frame: CGRect(x: 80, y: 55, width: 150, height: 14))
                         timeAgoLabel.textColor = UIColor.whiteColor()
                         timeAgoLabel.font = UIFont(name: "HelveticaNeue", size: 12)
                         timeAgoLabel.text = timeAgoSinceDate(activityDateString!, numericDates: true)
@@ -324,7 +326,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                         
                                         if let userID = user["id"].int {
                                             
-                                            let userNameLabel = UILabel(frame: CGRect(x: 80, y: 0, width: 190, height: 14))
+                                            let userNameLabel = UILabel(frame: CGRect(x: 80, y: 10, width: 190, height: 14))
                                             
                                             userNameLabel.text = userName
                                             userNameLabel.textColor = UIColor.whiteColor()
@@ -345,13 +347,11 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                             verbLabel.textColor = UIColor.whiteColor()
                                             verbLabel.font = UIFont(name: "HelveticaNeue", size: 12)
                                             
-                                            verbLabel.sizeToFit()
-                                            
                                             activityView.addSubview(userNameLabel)
                                             
                                             activityView.addSubview(verbLabel)
                                             
-                                            let activityUserImg = UIImageView(frame: CGRect(x: 10, y: 0, width: 60, height: 60))
+                                            let activityUserImg = UIImageView(frame: CGRect(x: 10, y: 10, width: 60, height: 60))
                                             
                                             let userImgUrl = NSURL(string: "https://graph.facebook.com/\(userImageID)/picture?width=200&height=200")
                                             
@@ -407,7 +407,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                     
                                     let followable = JSON(re)
                                     
-                                    let followeeNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                                    let followeeNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                                     followeeNameLabel.textColor = UIColor.whiteColor()
                                     followeeNameLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 12)
                                     followeeNameLabel.numberOfLines = 2
@@ -550,7 +550,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                     
                                     badgeView.image = UIImage(named: badgeName)
                                     
-                                    let badgeNameLabel = UILabel(frame: CGRect(x: 80, y: 13.5, width: 240, height: 30))
+                                    let badgeNameLabel = UILabel(frame: CGRect(x: 80, y: 23.5, width: 240, height: 30))
                                     
                                     badgeNameLabel.text = "New badge: \(badgeName)"
                                     
@@ -623,7 +623,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                     
                                 }
                                 
-                                var y = 190
+                                var y = 40
                                 
                                 if commentsCount > 0 {
                                     
@@ -634,7 +634,7 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                             
                                             for (_, comment) in comments {
                                                 
-                                                let commentView = UIView(frame: CGRect(x: 10, y: y  + self.imgHeight, width: self.width - 20, height: 50))
+                                                let commentView = UIView(frame: CGRect(x: 10, y: y  + Int(activityView.frame.height), width: self.width - 20, height: 50))
                                                 
                                                 commentView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
                                                 
@@ -766,13 +766,13 @@ class ActivityViewController: UIViewController, UITextViewDelegate {
                                     
                                 }
                                 
-                                self.scrollView.contentSize.height = CGFloat(self.imgHeight + y + 240)
+                                self.scrollView.contentSize.height = activityView.frame.height + CGFloat(y + 240)
                                 
                             }
                             
                         } else {
                             
-                            self.scrollView.contentSize.height = CGFloat(self.imgHeight + 270)
+                            self.scrollView.contentSize.height = activityView.frame.height + 240
                          
                         }
                     }

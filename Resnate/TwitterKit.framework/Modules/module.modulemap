@@ -4,9 +4,15 @@ framework module TwitterKit {
     export *
     module * { export * }
 
+    link framework "AVFoundation"
+    link framework "CoreMedia"
+
     header "TWTRAPIClient.h"
+    header "TWTRCardConfiguration.h"
     header "TWTRCollectionTimelineDataSource.h"
     header "TWTRComposer.h"
+    header "TWTRComposerTheme.h"
+    header "TWTRComposerViewController.h"
     header "TWTRListTimelineDataSource.h"
     header "TWTRLogInButton.h"
     header "TWTROAuthSigning.h"

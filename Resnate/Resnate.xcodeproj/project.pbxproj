@@ -43,6 +43,7 @@
 		645C804C1B6444A4001BED10 /* PlaylistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645C804A1B6444A4001BED10 /* PlaylistTableViewController.swift */; };
 		645C80531B6A3AC7001BED10 /* LPRTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645C80521B6A3AC7001BED10 /* LPRTableView.swift */; };
 		647122E01B6CA05A005408DB /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647122DF1B6CA05A005408DB /* VideoPlayer.swift */; };
+		648FA1261C781620000A1FFC /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 648FA1251C781620000A1FFC /* Crashlytics.framework */; };
 		649B17711B77761400342B06 /* RatingControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649B17701B77761400342B06 /* RatingControl.swift */; };
 		649E439C1BED7A7F00EA287C /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649E439A1BED7A7F00EA287C /* NotificationsViewController.swift */; };
 		649E439D1BED7A7F00EA287C /* NotificationsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 649E439B1BED7A7F00EA287C /* NotificationsViewController.xib */; };
@@ -151,6 +152,7 @@
 		645C804A1B6444A4001BED10 /* PlaylistTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewController.swift; sourceTree = "<group>"; };
 		645C80521B6A3AC7001BED10 /* LPRTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LPRTableView.swift; sourceTree = "<group>"; };
 		647122DF1B6CA05A005408DB /* VideoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = VideoPlayer.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		648FA1251C781620000A1FFC /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		649B17701B77761400342B06 /* RatingControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RatingControl.swift; path = Resnate.xcodeproj/../RatingControl.swift; sourceTree = SOURCE_ROOT; };
 		649E439A1BED7A7F00EA287C /* NotificationsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		649E439B1BED7A7F00EA287C /* NotificationsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NotificationsViewController.xib; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 				64EF06721B42E86D008B04E1 /* TwitterCore.framework in Frameworks */,
 				64EF06701B42E86D008B04E1 /* TwitterKit.framework in Frameworks */,
 				640613CB1BCFD64500A9E2C5 /* Bolts.framework in Frameworks */,
+				648FA1261C781620000A1FFC /* Crashlytics.framework in Frameworks */,
 				833AD6B08B3D9F38D2AD8FE1 /* Pods_Resnate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -285,6 +288,7 @@
 		64BE7F1A1B1279BE00FBA7D8 = {
 			isa = PBXGroup;
 			children = (
+				648FA1251C781620000A1FFC /* Crashlytics.framework */,
 				646803471B127B2E0077C754 /* Frameworks */,
 				64BE7F251B1279BE00FBA7D8 /* Resnate */,
 				64BE7F3B1B1279BE00FBA7D8 /* ResnateTests */,
@@ -307,6 +311,7 @@
 			children = (
 				64BE7F6A1B127A5000FBA7D8 /* views */,
 				64BE7F481B127A1800FBA7D8 /* AppDelegate.swift */,
+				64BE7F521B127A1800FBA7D8 /* LoginViewController.swift */,
 				64EF0A4E1B1C1A74001ADA4F /* InboxViewController.swift */,
 				6401EAD61C12077A0084D079 /* WritePlaylistDescriptionViewController.swift */,
 				649E439A1BED7A7F00EA287C /* NotificationsViewController.swift */,
@@ -318,7 +323,6 @@
 				64BE7F4E1B127A1800FBA7D8 /* ArtistsViewController.swift */,
 				647122DF1B6CA05A005408DB /* VideoPlayer.swift */,
 				641DCE6F1BFA092000A03DDB /* PlaybackSlider.swift */,
-				64BE7F521B127A1800FBA7D8 /* LoginViewController.swift */,
 				641DCE711BFC4A6100A03DDB /* AddPlaylistViewController.swift */,
 				649E439E1BF06D3500EA287C /* BadgesViewController.swift */,
 				64EC16FE1B212BBB0008FC57 /* ScrollProfileViewController.swift */,
@@ -457,6 +461,11 @@
 					64BE7F221B1279BE00FBA7D8 = {
 						CreatedOnToolsVersion = 6.3.2;
 						DevelopmentTeam = BP2WKR7N7M;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					64BE7F371B1279BE00FBA7D8 = {
 						CreatedOnToolsVersion = 6.3.2;
@@ -689,7 +698,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Amir Moosavi (78MPRK4385)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Amir Moosavi (78MPRK4385)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

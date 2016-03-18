@@ -99,7 +99,7 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
         
         else {
             
-            reviewTextField.text = "Write a review of the show to your heart's extent (as long as your heart's extent is less than 5000 characters)!"
+            reviewTextField.text = "Write a review for this gig. Paste Imgur links to embed images and YouTube links to embed videos."
             reviewTextField.textColor = UIColor.lightGrayColor()
             
             reviewTextField.becomeFirstResponder()
@@ -158,7 +158,7 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
                 
             } else {
                 
-                if reviewTextField.text != "Write a review of the show to your heart's extent (as long as your heart's extent is less than 5000 characters)!" {
+                if reviewTextField.text != "Write a review for this gig. Paste Imgur links to embed images and YouTube links to embed videos." {
                     
                     let parameters =  ["token": "\(resnateToken)", "review": ["reviewable_id": "\(String(ID))", "content":"\(reviewTextField.text)", "reviewable_type": "\(type)" ]]
                     
@@ -252,7 +252,7 @@ class WriteReviewViewController: UIViewController, UITextViewDelegate {
         // and set the cursor to the beginning of the text view
         if updatedText.characters.count == 0 {
             
-            textView.text = "Write a review of the show to your heart's extent (as long as your heart's extent is less than 5000 characters)!"
+            textView.text = "Write a review for this gig. Paste Imgur links to embed images and YouTube links to embed videos."
             textView.textColor = UIColor.lightGrayColor()
             
             textView.selectedTextRange = textView.textRangeFromPosition(textView.beginningOfDocument, toPosition: textView.beginningOfDocument)

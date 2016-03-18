@@ -142,43 +142,47 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
             
             request(req.buildURLRequest("users/", path: "/followeeIDs")).responseJSON { response in
                 
-                let json = JSON(response.result.value!)
-                
-                var followees = [Int]()
-                
-                if let users = json.array {
+                if let re = response.result.value {
                     
-                    var index = 0
+                    let json = JSON(re)
                     
-                    for user in users {
+                    var followees = [Int]()
+                    
+                    if let users = json.array {
                         
-                        if let followeeID = user["id"].int {
+                        var index = 0
+                        
+                        for user in users {
                             
-                            followees.insert(followeeID, atIndex: index)
-                            
-                            index += 1
+                            if let followeeID = user["id"].int {
+                                
+                                followees.insert(followeeID, atIndex: index)
+                                
+                                index += 1
+                                
+                            }
                             
                         }
                         
+                        if followees.indexOf(self.ID) != nil {
+                            
+                            followView.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
+                            
+                            followView.text = "Unfollow"
+                            
+                            tapFollow.addTarget(self, action: "unfollow:")
+                            
+                        } else {
+                            
+                            followView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
+                            
+                            followView.text = "Follow"
+                            
+                            tapFollow.addTarget(self, action: "follow:")
+                        }
+                        
                     }
-                    
-                    if followees.indexOf(self.ID) != nil {
-                        
-                        followView.backgroundColor = UIColor(red:0.9, green:0.0, blue:0.29, alpha:1.0)
-                        
-                        followView.text = "Unfollow"
-                        
-                        tapFollow.addTarget(self, action: "unfollow:")
-                        
-                    } else {
-                        
-                        followView.backgroundColor = UIColor(red:0.5, green:0.07, blue:0.21, alpha:1.0)
-                        
-                        followView.text = "Follow"
-                        
-                        tapFollow.addTarget(self, action: "follow:")
-                    }
-                    
+ 
                 }
             }
             
@@ -371,11 +375,11 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                                 
                                 request(.GET, review).responseJSON { response in
                                     
-                                    var json = JSON(response.result.value!)
+                                    if let re = response.result.value {
+                                        
+                                        let json = JSON(re)
                                     
                                     if let artist = json["resultsPage"]["results"]["event"]["performance"][0]["artist"]["id"].int {
-                                        
-                                        
                                         
                                         let artistView = getArtistPic(artist)
                                         artistView.frame = CGRect(x: 10, y: 0, width: 100, height: 100)
@@ -383,7 +387,7 @@ class ScrollProfileViewController: UIViewController, VideoPlayerUIViewDelegate {
                                         
                                     }
                                 }
-                                
+                            }
                             } else if type == "Song" {
                                 
                                 let songImgUrl = NSURL(string: "\(review)")

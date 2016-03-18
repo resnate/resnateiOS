@@ -42,15 +42,15 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
     
     var resnateToken = ""
     
-    var reviewContent: UILabel!
+    var reviewContent: UITextView!
     
     var layoutManager = NSLayoutManager()
     var textContainer: NSTextContainer!
     var textStorage: NSTextStorage!
     
-    var videoLocation = [Int: String]()
-    
     var reviewSongs = [String: String]()
+    
+    var embeds = [[String: String]]()
     
     var locations: [Int] = []
     
@@ -58,7 +58,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
     
     let tapLike = UITapGestureRecognizer()
     
-    func loadComments(reviewContent: UILabel, userID: Int, reviewID: String, review: JSON, songOrSetlistLabel: UILabel){
+    func loadComments(reviewContent: UITextView, userID: Int, reviewID: String, review: JSON, songOrSetlistLabel: UILabel){
         
         if Int(self.resnateID) == userID {
             let editLabel = UILabel(frame: CGRect(x: self.width/2 - 50, y: self.reviewContentHeight + self.width + 210, width: 100, height: 40))
@@ -179,13 +179,15 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         let req = Router(OAuthToken: self.resnateToken, userID: String(userID))
         request(req.buildURLRequest("users/", path: "/profile")).responseJSON { response in
             
-            var user = JSON(response.result.value!)
+            if let re = response.result.value {
+            
+                var user = JSON(re)
 
-            if let userName = user["name"].string {
+                if let userName = user["name"].string {
                 
-                if let userImageID = user["userID"].string {
+                    if let userImageID = user["userID"].string {
                     
-                    if let userID = user["id"].string {
+                        if let userID = user["id"].string {
                         
                         let userNameLabel = UILabel(frame: CGRect(x: 60, y: 3, width: 240, height: 50))
                         let levelName = user["level_name"].string!
@@ -227,7 +229,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     }
                     
                 }
-                
+              }
             }
         }
         reviewView.addSubview(reviewerInfo)
@@ -359,7 +361,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                 
                 self.reviewView.addSubview(userCountLabel)
                 
-                let commentsCountLabel = UILabel(frame: CGRect(x: userCountLabel.frame.width + 10, y: reviewContent.frame.height + self.width + 150, width: 0, height: 40))
+                let commentsCountLabel = UILabel(frame: CGRect(x: userCountLabel.frame.width + 20, y: reviewContent.frame.height + self.width + 150, width: 0, height: 40))
                 
                 if comments.count == 1 {
                     
@@ -483,8 +485,6 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                             
                             timeLabel.frame.origin.y = commentBodyLabel.frame.height + 27
                             
-                            y += Int(commentView.frame.height) + 30
-                            
                             timeLabel.textColor = UIColor.whiteColor()
                             
                             timeLabel.font = UIFont(name: "HelveticaNeue", size: 12)
@@ -494,6 +494,8 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                             commentView.addSubview(timeLabel)
                             
                             commentView.frame.size.height = timeLabel.frame.height + timeLabel.frame.origin.y + 10
+                            
+                            y += Int(commentView.frame.height) + 30
                             
                             reviewCommentsView.addSubview(commentView)
                             
@@ -635,8 +637,11 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                                     dispatch_async(dispatch_get_main_queue()) {
                                         
                                         reviewSongImg.image = UIImage(data: data!)
-                                        
-                                        
+                                        reviewSongImg.tag = Int(songID)!
+                                        let tapReviewImg = UITapGestureRecognizer()
+                                        reviewSongImg.addGestureRecognizer(tapReviewImg)
+                                        reviewSongImg.userInteractionEnabled = true
+                                        tapReviewImg.addTarget(self, action: "playSingleSong:")
                                         
                                     }
                                 }
@@ -669,11 +674,8 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     
                     
                     
-                    self.reviewContent = UILabel(frame: CGRect(x: 0, y: 0, width: self.width - 20, height: CGFloat.max))
-                    
-                    self.reviewContent.lineBreakMode = .ByWordWrapping
-                    self.reviewContent.numberOfLines = 0
-                    
+                    self.reviewContent = UITextView(frame: CGRect(x: 0, y: 0, width: self.width - 20, height: CGFloat.max))
+                    self.reviewContent.editable = false
                     self.reviewContent.text = content
                     
                     self.reviewContent.font = UIFont(name: "HelveticaNeue-Light", size: 16)
@@ -699,108 +701,167 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     }
                     
                     
-                    let youTubeURLs = self.matchesForRegexInText("(?:https?:\\/\\/)?(?:www\\.)?(?:youtube.com.+v[=/]|youtu.be/)([-a-zA-Z0-9_]+)", text: self.reviewContent.text)
+                    let imgurURLs = self.matchesForRegexInText("(?:https?:\\/\\/)?(?:www\\.)?(?:i\\.imgur\\.com\\/|imgur\\.com\\/)([-a-zA-Z0-9_]+)?(?:\\.(gif|jpg|png)|)", text: self.reviewContent.text)
+                    
+                    for imgurURL in imgurURLs {
+                        self.embeds.append(["Imgur": imgurURL])
+                    }
                     
                     var i = 0
                     
-                    if youTubeURLs.count >= 1 {
+                    let youTubeURLs = self.matchesForRegexInText("(?:https?:\\/\\/)?(?:www\\.)?(?:youtube.com.+v[=/]|youtu.be/)([-a-zA-Z0-9_]+)", text: self.reviewContent.text)
+                    
+                    for youTubeURL in youTubeURLs {
+                        self.embeds.append(["YouTube": youTubeURL])
+                    }
+                    
+                    
+                    
+                    var j = 0
+                    
+                    if self.embeds.count >= 1 {
                         
                         self.reviewContent.frame = frame
                         
-                        for youTubeURL in youTubeURLs {
+                        if imgurURLs.count > 0 {
                             
-                            let youTubeID = youTubeURL.componentsSeparatedByString("v=")[1]
-                            
-                            let reviewImgUrl = NSURL(string: "https://img.youtube.com/vi/\(youTubeID)/hqdefault.jpg")
-                            
-                            let titleSearch = "https://www.googleapis.com/youtube/v3/videos?id=\(youTubeID)&key=AIzaSyCa2qY9zSZWCKyX6HftBDvSSszkjJQSd8Y&part=snippet"
-                            
-                            request(.GET, titleSearch).responseJSON { response in
-                                let results = JSON(response.result.value!)
-                             
-                                if let items = results["items"].array {
-                                    for item in items {
-                                        if let item = item.dictionary {
-                                            if let snippet = item["snippet"]!.dictionary {
-                                                if let songTitle = snippet["title"]!.string {
+                            for imgurURL in imgurURLs {
+                                
+                                var imgurID = imgurURL.componentsSeparatedByString(".com/")[1]
+                                let index = imgurID.startIndex.advancedBy(7)
+                                imgurID = imgurID.substringWithRange(Range<String.Index>(start: imgurID.startIndex, end: index))
+                                let reviewImgUrl = NSURL(string: "http://i.imgur.com/\(imgurID).png")
+                                
+                                self.getDataFromUrl(reviewImgUrl!) { data in
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        
+                                        self.addEmbeddedURL(data!, type: "Imgur", imgURL: imgurURL, imgID: imgurID)
+                                        
+                                        j += 1
+                                        
+                                        if j == imgurURLs.count  {
+                                            
+                                            if i == youTubeURLs.count {
+                                                
+                                                self.loadComments(self.reviewContent, userID: userID, reviewID: reviewID, review: review, songOrSetlistLabel: songOrSetlistLabel)
+                                                
+                                            }  else {
+                                                
+                                                
+                                                
+                                                for youTubeURL in youTubeURLs {
 
-                                                    self.reviewSongs[youTubeID] = songTitle
-
+                                                    let index = youTubeURL.endIndex
+                                                    let youTubeID = youTubeURL.substringWithRange(Range<String.Index>(start: index.advancedBy(-11), end: index))
+                                                    
+                                                    let reviewImgUrl = NSURL(string: "https://img.youtube.com/vi/\(youTubeID)/hqdefault.jpg")
+                                                    
+                                                    let titleSearch = "https://www.googleapis.com/youtube/v3/videos?id=\(youTubeID)&key=AIzaSyCa2qY9zSZWCKyX6HftBDvSSszkjJQSd8Y&part=snippet"
+                                                    
+                                                    request(.GET, titleSearch).responseJSON { response in
+                                                        let results = JSON(response.result.value!)
+                                                        
+                                                        if let items = results["items"].array {
+                                                            for item in items {
+                                                                if let item = item.dictionary {
+                                                                    if let snippet = item["snippet"]!.dictionary {
+                                                                        if let songTitle = snippet["title"]!.string {
+                                                                            
+                                                                            self.reviewSongs[youTubeID] = songTitle
+                                                                            
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    self.getDataFromUrl(reviewImgUrl!) { data in
+                                                        dispatch_async(dispatch_get_main_queue()) {
+                                                            
+                                                            self.addEmbeddedURL(data!, type: "YouTube", imgURL: youTubeURL, imgID: youTubeID)
+                                                            
+                                                            i += 1
+                                                            
+                                                            
+                                                            if i == youTubeURLs.count {
+                                                                
+                                                                    self.loadComments(self.reviewContent, userID: userID, reviewID: reviewID, review: review, songOrSetlistLabel: songOrSetlistLabel)
+                                                            
+                                                            }
+                                                            
+                                                            
+                                                            
+                                                        }
+                                                    }
+                                                    
+                                                    
+                                                }
+                                                
+                                            }
+                                            
+                                            
+                                            
+                                        }
+                                        
+                                    }
+                                }
+                                
+                                
+                            }
+                        } else {
+                            
+                            for youTubeURL in youTubeURLs {
+                                
+                                let index = youTubeURL.endIndex
+                                let youTubeID = youTubeURL.substringWithRange(Range<String.Index>(start: index.advancedBy(-11), end: index))
+                                
+                                let reviewImgUrl = NSURL(string: "https://img.youtube.com/vi/\(youTubeID)/hqdefault.jpg")
+                                
+                                let titleSearch = "https://www.googleapis.com/youtube/v3/videos?id=\(youTubeID)&key=AIzaSyCa2qY9zSZWCKyX6HftBDvSSszkjJQSd8Y&part=snippet"
+                                
+                                request(.GET, titleSearch).responseJSON { response in
+                                    let results = JSON(response.result.value!)
+                                    
+                                    if let items = results["items"].array {
+                                        for item in items {
+                                            if let item = item.dictionary {
+                                                if let snippet = item["snippet"]!.dictionary {
+                                                    if let songTitle = snippet["title"]!.string {
+                                                        
+                                                        self.reviewSongs[youTubeID] = songTitle
+                                                        
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                            }
-                            
-                            self.getDataFromUrl(reviewImgUrl!) { data in
-                                dispatch_async(dispatch_get_main_queue()) {
-
-                                    let attributedString = NSMutableAttributedString(attributedString: self.reviewContent.attributedText!)
-                                    let textAttachment = NSTextAttachment()
-                                    let youTubeImage = UIImage(data: data!)
-                                    
-                                    textAttachment.image = youTubeImage
-                                    
-                                    let oldWidth = textAttachment.image!.size.width
-                                    
-                                    let scaleFactor = oldWidth / (self.reviewContent.frame.size.width)
-                                    textAttachment.image = UIImage(CGImage: textAttachment.image!.CGImage!, scale: scaleFactor, orientation: .Up)
-                                    let attrStringWithImage = NSAttributedString(attachment: textAttachment)
-                                    
-                                    
-                                    
-                                    let range = (attributedString.string as NSString).rangeOfString(youTubeURL)
-                                    self.videoLocation[range.location] = youTubeID
-                                    self.locations.append(range.location)
-                                    attributedString.replaceCharactersInRange(range, withAttributedString: attrStringWithImage)
-                                    
-                                    self.reviewContent.attributedText = attributedString
-                                    
-                                    self.reviewContent.frame.size.height += textAttachment.image!.size.height
-                                    
-                                    self.reviewContentHeight = self.reviewContent.frame.height
-                                    
-                                    let tap = UITapGestureRecognizer()
-                                    tap.addTarget(self, action: "handleTapOnLabel:")
-                                    self.reviewContent.addGestureRecognizer(tap)
-                                    self.reviewContent.userInteractionEnabled = true
-                                    
-                                    
-                                    
-                                    // Create instances of NSLayoutManager, NSTextContainer and NSTextStorage
-                                    let layoutManager = NSLayoutManager()
-                                    let textContainer = NSTextContainer(size: CGSizeZero)
-                                    let textStorage = NSTextStorage(attributedString: attributedString)
-                                    
-                                    // Configure layoutManager and textStorage
-                                    layoutManager.addTextContainer(textContainer)
-                                    textStorage.addLayoutManager(layoutManager)
-                                    
-                                    // Configure textContainer
-                                    textContainer.lineFragmentPadding = 0.0;
-                                    textContainer.lineBreakMode = self.reviewContent.lineBreakMode
-                                    textContainer.maximumNumberOfLines = self.reviewContent.numberOfLines
-                                    
-                                    self.textContainer = textContainer
-                                    self.layoutManager = layoutManager
-                                    self.textStorage = textStorage
-                                    
-                                    i += 1
-                                    
-                                    if i == youTubeURLs.count {
+                                
+                                self.getDataFromUrl(reviewImgUrl!) { data in
+                                    dispatch_async(dispatch_get_main_queue()) {
                                         
-                                        self.loadComments(self.reviewContent, userID: userID, reviewID: reviewID, review: review, songOrSetlistLabel: songOrSetlistLabel)
+                                        self.addEmbeddedURL(data!, type: "YouTube", imgURL: youTubeURL, imgID: youTubeID)
+                                        
+                                        i += 1
+                                        
+                                        
+                                        if i == youTubeURLs.count {
+                                            
+                                            self.loadComments(self.reviewContent, userID: userID, reviewID: reviewID, review: review, songOrSetlistLabel: songOrSetlistLabel)
+                                            
+                                        }
+                                        
+                                        
                                         
                                     }
-                                    
-                                    
-                                    
                                 }
+                                
+                                
                             }
                             
-                            
                         }
+                        
                         
                     } else {
                         
@@ -817,6 +878,11 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                     reviewView.addSubview(self.reviewContent)
                     
                     
+                    let tap = UITapGestureRecognizer(target: self, action: "handleTapOnLabel:")
+                    tap.delegate = self
+                    self.reviewContent.addGestureRecognizer(tap)
+                    self.reviewContent.userInteractionEnabled = true
+                    
                     
                 }
 
@@ -824,9 +890,80 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         
     }
     
+    func addEmbeddedURL(data: NSData, type: String, imgURL: String, imgID: String) {
+        let attributedString = NSMutableAttributedString(attributedString: self.reviewContent.attributedText!)
+
+        let textAttachment = NSTextAttachment()
+        let embeddedImage = UIImage(data: data)
+        
+        if type == "YouTube" {
+            
+            let playButton = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+            playButton.image = UIImage(named: "play")
+            
+            UIGraphicsBeginImageContextWithOptions(CGSize(width: self.reviewContent.frame.width, height: self.reviewContent.frame.width/1.33), false, 0.0)
+            
+            embeddedImage!.drawInRect(CGRect(origin: CGPointZero, size: CGSize(width: self.reviewContent.frame.width, height: self.reviewContent.frame.width/1.33)))
+            playButton.image!.drawInRect(CGRect(origin: CGPoint(x: self.reviewContent.frame.width/2 - 37.5, y: self.reviewContent.frame.width/1.33/2 - 37.5), size: CGSize(width: 75, height: 75)))
+            
+            let newImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            textAttachment.image = newImage
+            
+        } else if type == "Imgur" {
+            
+            textAttachment.image = embeddedImage
+            let oldWidth = textAttachment.image!.size.width
+            
+            let scaleFactor = oldWidth / (self.reviewContent.frame.size.width)
+            textAttachment.image = UIImage(CGImage: textAttachment.image!.CGImage!, scale: scaleFactor, orientation: .Up)
+
+            
+        }
+        
+        let attrStringWithImage = NSAttributedString(attachment: textAttachment)
+        
+        
+        let range = (attributedString.string as NSString).rangeOfString(imgURL)
+
+        attributedString.replaceCharactersInRange(range, withAttributedString: attrStringWithImage)
+        
+        
+        if type == "YouTube" {
+            
+            let myCustomAttribute = [ "YouTube": imgID]
+            let nuRange = NSMakeRange(range.location, 1)
+            print(nuRange)
+            attributedString.addAttributes(myCustomAttribute, range: nuRange)
+        }
+        
+        self.reviewContent.attributedText = attributedString
+        
+        self.reviewContent.frame.size.height += textAttachment.image!.size.height
+        
+        self.reviewContentHeight = self.reviewContent.frame.height
+        
+        
+        
+        let layoutManager = NSLayoutManager()
+        let textContainer = NSTextContainer(size: CGSizeZero)
+        let textStorage = NSTextStorage(attributedString: attributedString)
+        
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+        
+        textContainer.lineFragmentPadding = 0.0;
+        
+        self.textContainer = textContainer
+        self.layoutManager = layoutManager
+        self.textStorage = textStorage
+    }
+    
     override func viewWillDisappear(animated: Bool) {
         self.commentTextView.removeFromSuperview()
         self.postComment.removeFromSuperview()
+        self.reviewView.subviews.map({ $0.removeFromSuperview() })
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -889,6 +1026,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         postComment.tag = self.ID
         
         postComment.userInteractionEnabled = true
+        
         
         let reviewID = String(ID)
         
@@ -1052,16 +1190,13 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         
         if postComment.textColor == UIColor.whiteColor() {
             
-            
             let dictionary = Locksmith.loadDataForUserAccount("resnateAccount")
             
             let resnateToken = dictionary!["token"] as! String
             
-            if ((commentTextView.text!).characters.count <= 3000){
+            if (commentTextView.text!).characters.count <= 3000 {
                 
                 let parameters =  ["body":"\(commentTextView.text)", "token": "\(resnateToken)"]
-                
-                
                 
                 let URL = NSURL(string: "https://www.resnate.com/api/activity/\(self.activityID)/comments/create")!
                 let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(""))
@@ -1069,8 +1204,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                 mutableURLRequest.setValue("Token \(resnateToken)", forHTTPHeaderField: "Authorization")
                 
                 request(ParameterEncoding.JSON.encode(mutableURLRequest, parameters: parameters).0).responseJSON { response in
-
-                        
+                    
                         self.loadReviewNComments()
                         
                         let delay = 1.5 * Double(NSEC_PER_SEC)
@@ -1082,7 +1216,6 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                 }
             }
             
-            
             commentTextView.text = "Write a comment..."
             commentTextView.textColor = UIColor.lightGrayColor()
             commentTextView.selectedTextRange = commentTextView.textRangeFromPosition(commentTextView.beginningOfDocument, toPosition: commentTextView.beginningOfDocument)
@@ -1092,7 +1225,6 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
             self.window!.endEditing(true)
             
         } else {
-            print("asd")
             self.window!.endEditing(true)
             
         }
@@ -1128,7 +1260,7 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
                 options: [], range: NSMakeRange(0, nsString.length))
             return results.map { nsString.substringWithRange($0.range)}
         } catch {
-            print("invalid regex")
+
             return []
         }
     }
@@ -1141,9 +1273,39 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         
     }
     
-    func handleTapOnLabel(tapGesture: UITapGestureRecognizer) {
+    func handleTapOnLabel(sender: UITapGestureRecognizer) {
         
-        let locationOfTouchInLabel = tapGesture.locationInView(tapGesture.view)
+        
+        let myTextView = sender.view as! UITextView
+        let layoutManager = myTextView.layoutManager
+        var location = sender.locationInView(myTextView)
+        location.x -= myTextView.textContainerInset.left;
+        location.y -= myTextView.textContainerInset.top;
+
+        let characterIndex = layoutManager.characterIndexForPoint(location, inTextContainer: myTextView.textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
+
+        if characterIndex < myTextView.textStorage.length {
+            
+            let attributeName = "YouTube"
+            let attributeValue = myTextView.attributedText.attribute(attributeName, atIndex: characterIndex, effectiveRange: nil) as? String
+            if let value = attributeValue {
+                print("You tapped on \(attributeName) and the value is: \(value)")
+                let youTubeID = value
+                
+                self.window!.endEditing(true)
+                
+                self.tabBarController?.view.addSubview(ytPlayer.videoPlayer)
+                
+                ytPlayer.playVid(youTubeID)
+                
+                ytPlayer.ytID = youTubeID
+                
+                ytPlayer.ytTitle = self.reviewSongs[youTubeID]!
+            }
+            
+        }
+        
+        /*let locationOfTouchInLabel = tapGesture.locationInView(tapGesture.view)
         let labelSize = tapGesture.view!.bounds.size
         let textBoundingBox = self.layoutManager.usedRectForTextContainer(self.textContainer)
         let textContainerOffset = CGPointMake((labelSize.width - textBoundingBox.size.width) * 0.5 - textBoundingBox.origin.x,
@@ -1152,6 +1314,8 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
         let locationOfTouchInTextContainer = CGPointMake(locationOfTouchInLabel.x - textContainerOffset.x,
             locationOfTouchInLabel.y - textContainerOffset.y)
         let indexOfCharacter = self.layoutManager.characterIndexForPoint(locationOfTouchInTextContainer, inTextContainer: self.textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
+        print(indexOfCharacter)
+        print(self.locations)
         
         if self.locations.contains(indexOfCharacter) {
             
@@ -1167,6 +1331,6 @@ class ReviewViewController: UIViewController, UIAlertViewDelegate, UITextFieldDe
             
             ytPlayer.ytTitle = self.reviewSongs[youTubeID]!
             
-        }
+        }*/
     }
 }

@@ -175,12 +175,19 @@ class SetlistViewController: UIViewController {
                                     }
                                     
                                 } else {
-                                    
+                                    if let result = json["setlists"]["setlist"]["sets"].string {
+                                        let setlistSong = UILabel(frame: CGRect(x: width/2 - 150, y: 150, width: 300, height: 30))
+                                        setlistSong.text = "No Setlist Found"
+                                        setlistSong.textAlignment = .Center
+                                        setlistSong.textColor = UIColor.whiteColor()
+                                        self.setlistScroll.addSubview(setlistSong)
+                                    }
                                     
                                     
                                     if let result = json["setlists"]["setlist"]["sets"]["set"].array {
                                         
-                                        if result.count == 1 {
+                                        if result.count <= 1 {
+                                            
                                             
                                             
                                         } else {
